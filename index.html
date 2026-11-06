@@ -53,7 +53,12 @@
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
-        body {
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
             background-color: #090D16;
             color: #F8FAFC;
             -webkit-tap-highlight-color: transparent;
@@ -117,40 +122,46 @@
         .animate-pulse-subtle {
             animation: pulse-subtle 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+<body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950 w-full overflow-x-hidden">
 
-    <!-- TOP HEADER BAR (Sticky Mobile-First & Desktop Responsive) -->
-    <header class="sticky top-0 z-30 bg-obsidian/90 backdrop-blur-xl border-b border-slate-800/80 px-4 py-3">
-        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <i class="ph-bold ph-person-simple-run text-slate-950 text-2xl"></i>
+    <!-- TOP HEADER BAR (Compact Mobile-First & Zero Horizontal Overflow on iPhone) -->
+    <header class="sticky top-0 z-30 bg-obsidian/95 backdrop-blur-xl border-b border-slate-800/80 px-3 py-2 w-full">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-1.5 w-full min-w-0">
+            <!-- Left Brand -->
+            <div class="flex items-center gap-2 min-w-0 shrink">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
+                    <i class="ph-bold ph-person-simple-run text-slate-950 text-lg"></i>
                 </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white">RunLab <span class="text-emerald-400">Pro</span></h1>
-                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">PWA Local</span>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="font-extrabold text-sm sm:text-base tracking-tight text-white truncate">RunLab <span class="text-emerald-400">Pro</span></h1>
                     </div>
-                    <p class="text-[11px] text-slate-400 hidden sm:block">Motor Científico .FIT (WorkOutDoors) • Karvonen Z2 • TRIMP • VAM</p>
+                    <p class="text-[10px] text-slate-400 truncate hidden sm:block">Analítica .FIT • Karvonen Z2 • Regresión Lineal</p>
                 </div>
             </div>
 
-            <!-- Live Physiological Pill Summary -->
-            <div class="flex items-center gap-2">
-                <button onclick="switchTab('settings')" class="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs transition active:scale-95" title="Configuración Fisiológica">
-                    <span class="flex items-center gap-1 text-rose-400 font-mono font-semibold">
-                        <i class="ph-fill ph-heart-beat"></i>
-                        <span id="header-z2-pill">Z2: 134-147</span>
+            <!-- Right Controls: Compact Z2/VAM Pill + Primary Upload .FIT Button -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="switchTab('settings')" class="flex items-center gap-1 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-lg px-2 py-1 text-[10px] sm:text-xs transition active:scale-95" title="Configuración Fisiológica">
+                    <span class="flex items-center gap-0.5 text-rose-400 font-mono font-semibold">
+                        <i class="ph-fill ph-heart-beat text-xs"></i>
+                        <span id="header-z2-pill">134-147</span>
                     </span>
-                    <span class="text-slate-500">|</span>
-                    <span class="text-cyan-400 font-mono font-semibold" id="header-vam-pill">VAM: --</span>
+                    <span class="text-slate-600">|</span>
+                    <span class="text-cyan-400 font-mono font-semibold" id="header-vam-pill">VAM:--</span>
                 </button>
 
                 <!-- Quick Upload .FIT Trigger -->
-                <label for="fit-file-input" class="cursor-pointer flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 transition">
-                    <i class="ph-bold ph-upload-simple text-base"></i>
+                <label for="fit-file-input" class="cursor-pointer flex items-center gap-1 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs px-2.5 py-1.5 rounded-lg shadow-md shadow-emerald-500/20 transition shrink-0">
+                    <i class="ph-bold ph-upload-simple text-sm"></i>
                     <span>Subir .FIT</span>
                 </label>
                 <input id="fit-file-input" type="file" accept=".fit,.FIT" multiple class="hidden" onchange="handleFitUpload(event)">
@@ -158,194 +169,227 @@
         </div>
     </header>
 
-    <!-- 42-DAY ROLLING INTENSITY ALERT BANNER (Shown dynamically if VAM is expired or missing) -->
-    <div id="vam-expired-banner" class="hidden bg-rose-950/80 border-b border-rose-500/40 px-4 py-3">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <div class="flex items-center gap-2.5">
-                <i class="ph-fill ph-warning-octagon text-rose-400 text-2xl shrink-0 animate-pulse-subtle"></i>
-                <div>
-                    <p class="text-xs sm:text-sm font-bold text-rose-200">
-                        Datos de intensidad caducados. Se recomienda test VAM de 5 min
-                    </p>
-                    <p class="text-[11px] text-rose-300/80" id="vam-expired-subtext">
-                        No se ha detectado ningún pico sostenido de 5-6 min en los últimos 42 días. Ritmos Z4 y Z5 anulados por seguridad fisiológica.
-                    </p>
-                </div>
+    <!-- 42-DAY ROLLING INTENSITY ALERT BANNER (Compact & Responsive) -->
+    <div id="vam-expired-banner" class="hidden bg-rose-950/85 border-b border-rose-500/40 px-3 py-2 w-full">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2 w-full min-w-0">
+            <div class="flex items-center gap-2 min-w-0">
+                <i class="ph-fill ph-warning-octagon text-rose-400 text-lg shrink-0 animate-pulse-subtle"></i>
+                <p class="text-[11px] sm:text-xs font-semibold text-rose-200 leading-tight">
+                    Datos de intensidad caducados (&gt;42d). Se recomienda test VAM de 5 min. <span class="text-rose-300/80 font-normal">Z4/Z5 anuladas.</span>
+                </p>
             </div>
-            <button onclick="simulateWorkout('vam_test')" class="shrink-0 text-xs font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/40 rounded-lg px-3 py-1.5 transition active:scale-95">
-                <i class="ph-bold ph-lightning mr-1"></i>Simular Test VAM 5m
-            </button>
         </div>
     </div>
 
     <!-- MAIN CONTENT CONTAINER -->
-    <main class="flex-1 max-w-6xl w-full mx-auto px-4 pt-4 pb-safe">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-3 pt-3 pb-safe overflow-x-hidden">
 
         <!-- ==========================================
              TAB 1: DASHBOARD & SESIONES (.FIT + MAPA)
              ========================================== -->
-        <section id="tab-dashboard" class="space-y-5">
+        <section id="tab-dashboard" class="space-y-3.5 w-full">
 
-            <!-- Quick Demo / WorkOutDoors Simulator Bar -->
-            <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                        <i class="ph-bold ph-Watch text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Importador Local WorkOutDoors (.FIT)</h2>
-                        <p class="text-[11px] text-slate-400">Sube tus archivos <code class="text-emerald-400">.fit</code> reales o genera sesiones de prueba con telemetría segundo a segundo.</p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <button onclick="simulateWorkout('z2_long')" class="flex-1 sm:flex-initial text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-xl px-3 py-2 transition active:scale-95">
-                        + Tirada Larga Z2 (Fatiga Cadencia)
-                    </button>
-                    <button onclick="simulateWorkout('vam_test')" class="flex-1 sm:flex-initial text-xs font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 rounded-xl px-3 py-2 transition active:scale-95">
-                        + Pico VAM 5 min (Hoy)
-                    </button>
-                    <button onclick="simulateExpiredVamScenario()" class="flex-1 sm:flex-initial text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-xl px-3 py-2 transition active:scale-95" title="Fuerza que el último test VAM tenga más de 42 días">
-                        Simular VAM &gt;42 días
-                    </button>
-                    <button onclick="downloadSampleBinaryFit()" class="flex-1 sm:flex-initial text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl px-3 py-2 transition active:scale-95" title="Descarga un archivo .fit binario real para probar el botón Subir .FIT">
-                        <i class="ph-bold ph-download-simple mr-1"></i>Descargar .FIT Binario
+            <!-- Primary Action Bar + Demo Cleanup Notice + Collapsible Simulator -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 space-y-2 w-full">
+                <div class="flex items-center justify-between gap-2">
+                    <label for="fit-file-input" class="cursor-pointer flex-1 flex items-center justify-center gap-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-bold text-xs py-2 px-3 rounded-lg transition active:scale-95">
+                        <i class="ph-bold ph-file-arrow-up text-base text-emerald-400"></i>
+                        <span>Importar entrenamiento .FIT (WorkOutDoors)</span>
+                    </label>
+
+                    <!-- Shown automatically if demo workouts are present so user can wipe them in 1 tap -->
+                    <button id="btn-clear-demos" onclick="clearDemoWorkouts()" class="hidden shrink-0 items-center gap-1 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-semibold text-[11px] py-2 px-2.5 rounded-lg transition active:scale-95">
+                        <i class="ph-bold ph-broom text-sm"></i>
+                        <span>Borrar Demos</span>
                     </button>
                 </div>
+
+                <!-- Collapsible Test Simulator (Closed by default so it doesn't clutter iPhone screen) -->
+                <details class="group pt-1 border-t border-slate-800/70">
+                    <summary class="cursor-pointer flex items-center justify-between text-[11px] text-slate-400 hover:text-slate-300 select-none py-0.5">
+                        <span class="flex items-center gap-1.5 font-medium">
+                            <i class="ph-bold ph-flask text-cyan-400"></i>
+                            Modo Pruebas / Simulador (Opcional - No duplica sesiones)
+                        </span>
+                        <i class="ph-bold ph-caret-down text-xs transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2">
+                        <button onclick="simulateWorkout('z2_long')" class="text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-lg px-2 py-1.5 transition active:scale-95 truncate">
+                            Demo Tirada Z2
+                        </button>
+                        <button onclick="simulateWorkout('vam_test')" class="text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg px-2 py-1.5 transition active:scale-95 truncate">
+                            Demo Test VAM 5m
+                        </button>
+                        <button onclick="simulateExpiredVamScenario()" class="text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg px-2 py-1.5 transition active:scale-95 truncate">
+                            Forzar VAM &gt;42d
+                        </button>
+                        <button onclick="downloadSampleBinaryFit()" class="text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg px-2 py-1.5 transition active:scale-95 truncate">
+                            Bajar .FIT Prueba
+                        </button>
+                    </div>
+                </details>
             </div>
 
-            <!-- KPI CARDS: WEEKLY SUMMARY & PHYSIOLOGICAL METRICS -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <!-- KPI CARDS: COMPACT 2x2 GRID FOR IPHONE -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 w-full">
                 <!-- KPI 1: Volumen Semanal -->
-                <div class="bg-panel border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
-                        <span>VOLUMEN SEMANAL</span>
-                        <i class="ph-duotone ph-road-horizon text-emerald-400 text-lg"></i>
+                <div class="bg-panel border border-slate-800/90 rounded-xl p-3 min-w-0">
+                    <div class="flex items-center justify-between text-slate-400 text-[10px] font-semibold uppercase tracking-wide mb-1">
+                        <span class="truncate">Volumen Semana</span>
+                        <i class="ph-duotone ph-road-horizon text-emerald-400 text-sm shrink-0"></i>
                     </div>
-                    <div class="flex items-baseline gap-1.5">
-                        <span id="kpi-week-km" class="mono-metric text-2xl sm:text-3xl font-bold text-white">0.0</span>
-                        <span class="text-xs text-slate-400 font-mono">km</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="kpi-week-km" class="mono-metric text-xl sm:text-2xl font-bold text-white">0.00</span>
+                        <span class="text-[11px] text-slate-400 font-mono">km</span>
                     </div>
-                    <div class="mt-2 flex items-center justify-between text-[11px] text-slate-400">
-                        <span id="kpi-week-time" class="mono-metric text-slate-300">0h 00m</span>
-                        <span id="kpi-week-sessions" class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">0 sesiones</span>
+                    <div class="mt-1.5 flex items-center justify-between text-[10px] text-slate-400 gap-1">
+                        <span id="kpi-week-time" class="mono-metric text-slate-300 truncate">0h 00m</span>
+                        <span id="kpi-week-sessions" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 shrink-0">0 ses.</span>
                     </div>
                 </div>
 
                 <!-- KPI 2: Eficiencia Aeróbica Z2 (Karvonen) -->
-                <div class="bg-panel border border-emerald-500/30 rounded-2xl p-4 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-emerald-300 text-xs font-semibold mb-1">
-                        <span>EFICIENCIA Z2 (KARVONEN)</span>
-                        <i class="ph-duotone ph-heartbeat text-emerald-400 text-lg"></i>
+                <div class="bg-panel border border-emerald-500/30 rounded-xl p-3 min-w-0">
+                    <div class="flex items-center justify-between text-emerald-300 text-[10px] font-semibold uppercase tracking-wide mb-1">
+                        <span class="truncate">Ritmo Z2 Puro</span>
+                        <i class="ph-duotone ph-heartbeat text-emerald-400 text-sm shrink-0"></i>
                     </div>
-                    <div class="flex items-baseline gap-1.5">
-                        <span id="kpi-z2-pace" class="mono-metric text-2xl sm:text-3xl font-bold text-emerald-400">--:--</span>
-                        <span class="text-xs text-slate-400 font-mono">/km</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="kpi-z2-pace" class="mono-metric text-xl sm:text-2xl font-bold text-emerald-400">--:--</span>
+                        <span class="text-[11px] text-slate-400 font-mono">/km</span>
                     </div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span id="kpi-z2-range-label" class="font-mono text-emerald-300/90">134-147 ppm</span>
-                        <span class="text-slate-400" title="Descarta los primeros y últimos 10 min">Sin 10' cal/enf</span>
+                    <div class="mt-1.5 flex items-center justify-between text-[10px] gap-1">
+                        <span id="kpi-z2-range-label" class="font-mono text-emerald-300/90 truncate">134-147 ppm</span>
+                        <span class="text-slate-400 shrink-0">Sin ±10'</span>
                     </div>
                 </div>
 
                 <!-- KPI 3: Carga TRIMP Semanal -->
-                <div class="bg-panel border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
-                        <span>CARGA TRIMP (SEMANA)</span>
-                        <i class="ph-duotone ph-fire text-amber-400 text-lg"></i>
+                <div class="bg-panel border border-slate-800/90 rounded-xl p-3 min-w-0">
+                    <div class="flex items-center justify-between text-slate-400 text-[10px] font-semibold uppercase tracking-wide mb-1">
+                        <span class="truncate">Carga TRIMP</span>
+                        <i class="ph-duotone ph-fire text-amber-400 text-sm shrink-0"></i>
                     </div>
-                    <div class="flex items-baseline gap-1.5">
-                        <span id="kpi-week-trimp" class="mono-metric text-2xl sm:text-3xl font-bold text-amber-400">0</span>
-                        <span class="text-xs text-slate-400 font-mono">pts</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="kpi-week-trimp" class="mono-metric text-xl sm:text-2xl font-bold text-amber-400">0</span>
+                        <span class="text-[11px] text-slate-400 font-mono">pts</span>
                     </div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span id="kpi-trimp-status" class="text-amber-300 font-medium">Carga óptima</span>
-                        <span class="text-slate-400 font-mono">Banister</span>
+                    <div class="mt-1.5 flex items-center justify-between text-[10px] gap-1">
+                        <span id="kpi-trimp-status" class="text-amber-300 font-medium truncate">Carga óptima</span>
+                        <span class="text-slate-500 font-mono shrink-0">Semanal</span>
                     </div>
                 </div>
 
                 <!-- KPI 4: Pico VAM & Ventana 42 Días -->
-                <div id="kpi-vam-card" class="bg-panel border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
-                        <span>VAM (5-6 MIN) & Z4/Z5</span>
-                        <i class="ph-duotone ph-gauge text-cyan-400 text-lg"></i>
+                <div id="kpi-vam-card" class="bg-panel border border-slate-800/90 rounded-xl p-3 min-w-0">
+                    <div class="flex items-center justify-between text-slate-400 text-[10px] font-semibold uppercase tracking-wide mb-1">
+                        <span class="truncate">VAM (5-6m)</span>
+                        <i class="ph-duotone ph-gauge text-cyan-400 text-sm shrink-0"></i>
                     </div>
-                    <div class="flex items-baseline gap-1.5">
-                        <span id="kpi-vam-pace" class="mono-metric text-2xl sm:text-3xl font-bold text-cyan-400">--:--</span>
-                        <span class="text-xs text-slate-400 font-mono">/km</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="kpi-vam-pace" class="mono-metric text-xl sm:text-2xl font-bold text-cyan-400">--:--</span>
+                        <span class="text-[11px] text-slate-400 font-mono">/km</span>
                     </div>
-                    <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <span id="kpi-vam-zones" class="font-mono text-slate-300">Z4: --:--</span>
-                        <span id="kpi-vam-age" class="px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono">-- días</span>
+                    <div class="mt-1.5 flex items-center justify-between text-[10px] gap-1">
+                        <span id="kpi-vam-zones" class="font-mono text-slate-300 truncate">Z4: --:--</span>
+                        <span id="kpi-vam-age" class="px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono shrink-0">--d</span>
                     </div>
                 </div>
             </div>
 
-            <!-- VAM & INTENSITY ZONES PANEL (Dynamic 42-Day Window Status) -->
-            <div class="bg-panel border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
-                    <div>
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i class="ph-fill ph-speedometer text-cyan-400 text-lg"></i>
-                            Zonas de Intensidad Dinámicas (Karvonen + Pico VAM)
-                        </h3>
-                        <p class="text-xs text-slate-400">Calculadas en tiempo real desde tu FC Basal (<span id="zone-header-basal" class="font-mono text-slate-200">57</span> ppm), FC Máx (<span id="zone-header-max" class="font-mono text-slate-200">185</span> ppm) y mejor pico VAM de los últimos 42 días.</p>
+            <!-- NEW: WEEKLY Z2 EFFICIENCY PROGRESSION CHART & LINEAR REGRESSION TRENDLINE -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                                <i class="ph-bold ph-chart-line-up text-emerald-400 text-base"></i>
+                                Evolución Semanal Ritmo Z2 y Regresión Lineal
+                            </h3>
+                            <span id="z2-trend-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                                Calculando tendencia...
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-0.5">
+                            Media semanal de tu ritmo en Z2 Karvonen y <strong>Línea de Tendencia (Regresión Lineal)</strong>. Más arriba = ritmo más rápido al mismo pulso.
+                        </p>
                     </div>
-                    <div id="vam-validity-badge" class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    <button id="btn-toggle-trend-preview" onclick="toggleTrendPreviewData()" class="self-start sm:self-auto shrink-0 text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg px-2.5 py-1 transition active:scale-95">
+                        <i class="ph-bold ph-magic-wand mr-1"></i>Ver ejemplo 6 sem
+                    </button>
+                </div>
+
+                <!-- Responsive SVG Chart Container -->
+                <div id="z2-trend-chart-container" class="w-full pt-3">
+                    <!-- Populated dynamically by renderWeeklyZ2TrendChart() -->
+                </div>
+            </div>
+
+            <!-- VAM & INTENSITY ZONES PANEL (Compact) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-800">
+                    <div class="min-w-0">
+                        <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 truncate">
+                            <i class="ph-fill ph-speedometer text-cyan-400 text-base"></i>
+                            Zonas Dinámicas (FC Basal <span id="zone-header-basal" class="font-mono text-emerald-400">57</span> / Máx <span id="zone-header-max" class="font-mono text-rose-400">185</span>)
+                        </h3>
+                    </div>
+                    <div id="vam-validity-badge" class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                         VAM Vigente
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 mt-3">
                     <!-- Z2 Karvonen Box -->
-                    <div class="bg-slate-900/90 border border-emerald-500/30 rounded-xl p-3.5">
+                    <div class="bg-slate-900/90 border border-emerald-500/30 rounded-xl p-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Zona 2 • Base Aeróbica</span>
-                            <span class="text-[11px] font-mono bg-emerald-500/15 text-emerald-300 px-2 py-0.5 rounded">60-70% FC Res</span>
+                            <span class="text-[11px] font-bold uppercase text-emerald-400">Zona 2 • Base Aeróbica</span>
+                            <span class="text-[10px] font-mono bg-emerald-500/15 text-emerald-300 px-1.5 py-0.5 rounded">60-70% Karvonen</span>
                         </div>
-                        <div class="mt-2 flex items-baseline justify-between">
+                        <div class="mt-1.5 flex items-baseline justify-between">
                             <div>
-                                <p class="text-[11px] text-slate-400">Rango Cardíaco Objetivo</p>
-                                <p id="card-z2-hr" class="mono-metric text-xl font-bold text-white">134 - 147 <span class="text-xs font-normal text-slate-400">ppm</span></p>
+                                <p class="text-[10px] text-slate-400">Pulso Z2</p>
+                                <p id="card-z2-hr" class="mono-metric text-base font-bold text-white">134 - 147 <span class="text-[10px] font-normal text-slate-400">ppm</span></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[11px] text-slate-400">Ritmo Eficiencia Semanal</p>
-                                <p id="card-z2-pace" class="mono-metric text-xl font-bold text-emerald-400">--:-- <span class="text-xs font-normal text-slate-400">/km</span></p>
+                                <p class="text-[10px] text-slate-400">Media Semanal</p>
+                                <p id="card-z2-pace" class="mono-metric text-base font-bold text-emerald-400">--:-- <span class="text-[10px] font-normal text-slate-400">/km</span></p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Z4 Threshold Box -->
-                    <div id="box-z4" class="bg-slate-900/90 border border-amber-500/30 rounded-xl p-3.5">
+                    <div id="box-z4" class="bg-slate-900/90 border border-amber-500/30 rounded-xl p-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Zona 4 • Umbral (80-85% VAM)</span>
-                            <span class="text-[11px] font-mono bg-amber-500/15 text-amber-300 px-2 py-0.5 rounded">Umbral Anaeróbico</span>
+                            <span class="text-[11px] font-bold uppercase text-amber-400">Zona 4 • Umbral (80-85% VAM)</span>
+                            <span class="text-[10px] font-mono bg-amber-500/15 text-amber-300 px-1.5 py-0.5 rounded">Umbral</span>
                         </div>
-                        <div class="mt-2 flex items-baseline justify-between">
+                        <div class="mt-1.5 flex items-baseline justify-between">
                             <div>
-                                <p class="text-[11px] text-slate-400">Ritmo Objetivo Z4</p>
-                                <p id="card-z4-pace" class="mono-metric text-xl font-bold text-amber-300">--:-- - --:-- <span class="text-xs font-normal text-slate-400">/km</span></p>
+                                <p class="text-[10px] text-slate-400">Ritmo Z4</p>
+                                <p id="card-z4-pace" class="mono-metric text-base font-bold text-amber-300">--:-- - --:-- <span class="text-[10px] font-normal text-slate-400">/km</span></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[11px] text-slate-400">FC Estimada (80-88%)</p>
-                                <p id="card-z4-hr" class="mono-metric text-sm font-semibold text-slate-300">159 - 170 ppm</p>
+                                <p class="text-[10px] text-slate-400">FC Estimada</p>
+                                <p id="card-z4-hr" class="mono-metric text-xs font-semibold text-slate-300">159 - 170 ppm</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Z5 VO2Max Box -->
-                    <div id="box-z5" class="bg-slate-900/90 border border-rose-500/30 rounded-xl p-3.5">
+                    <div id="box-z5" class="bg-slate-900/90 border border-rose-500/30 rounded-xl p-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-wider text-rose-400">Zona 5 • VO2máx (90-100% VAM)</span>
-                            <span class="text-[11px] font-mono bg-rose-500/15 text-rose-300 px-2 py-0.5 rounded">Potencia Aeróbica</span>
+                            <span class="text-[11px] font-bold uppercase text-rose-400">Zona 5 • VO2máx (90-100% VAM)</span>
+                            <span class="text-[10px] font-mono bg-rose-500/15 text-rose-300 px-1.5 py-0.5 rounded">VO2máx</span>
                         </div>
-                        <div class="mt-2 flex items-baseline justify-between">
+                        <div class="mt-1.5 flex items-baseline justify-between">
                             <div>
-                                <p class="text-[11px] text-slate-400">Ritmo Objetivo Z5</p>
-                                <p id="card-z5-pace" class="mono-metric text-xl font-bold text-rose-300">--:-- - --:-- <span class="text-xs font-normal text-slate-400">/km</span></p>
+                                <p class="text-[10px] text-slate-400">Ritmo Z5</p>
+                                <p id="card-z5-pace" class="mono-metric text-base font-bold text-rose-300">--:-- - --:-- <span class="text-[10px] font-normal text-slate-400">/km</span></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[11px] text-slate-400">Pico VAM Detectado</p>
-                                <p id="card-vam-speed" class="mono-metric text-sm font-semibold text-cyan-300">-- km/h</p>
+                                <p class="text-[10px] text-slate-400">Pico VAM</p>
+                                <p id="card-vam-speed" class="mono-metric text-xs font-semibold text-cyan-300">-- km/h</p>
                             </div>
                         </div>
                     </div>
@@ -353,63 +397,59 @@
             </div>
 
             <!-- MAP & SELECTED WORKOUT DEEP TELEMETRY -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 w-full">
                 <!-- Left Column: Leaflet GPS Map & Telemetry Breakdown (7 cols) -->
-                <div class="lg:col-span-7 bg-panel border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
-                    <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
-                        <div>
+                <div class="lg:col-span-7 bg-panel border border-slate-800 rounded-xl overflow-hidden flex flex-col min-w-0">
+                    <div class="p-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                        <div class="min-w-0">
                             <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Ruta GPS OpenStreetMap</span>
-                            <h3 id="selected-workout-title" class="text-base font-bold text-white mt-0.5">Selecciona o sube un entrenamiento .FIT</h3>
-                            <p id="selected-workout-subtitle" class="text-xs text-slate-400">El trazado destaca en verde los tramos centrales y en gris los 10 min de calentamiento/enfriamiento.</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-[11px]">
-                            <span class="flex items-center gap-1 text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block"></span>Cal/Enf (10m)</span>
-                            <span class="flex items-center gap-1 text-emerald-300"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>Núcleo Z2</span>
+                            <h3 id="selected-workout-title" class="text-sm font-bold text-white mt-0.5 truncate">Selecciona o sube un entrenamiento .FIT</h3>
+                            <p id="selected-workout-subtitle" class="text-[11px] text-slate-400 truncate">Verde: tramo central evaluado Z2 • Gris: 10m cal/enf descartados.</p>
                         </div>
                     </div>
 
                     <!-- Map Container -->
-                    <div id="map-container" class="w-full h-72 sm:h-80 relative z-10 bg-slate-950"></div>
+                    <div id="map-container" class="w-full h-60 sm:h-72 relative z-10 bg-slate-950"></div>
 
                     <!-- Selected Session Analytical Breakdown -->
-                    <div class="p-4 bg-slate-900/70 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
-                            <p class="text-[10px] text-slate-400 uppercase">Ritmo Z2 Puro (Sin ±10m)</p>
-                            <p id="detail-z2-pace" class="mono-metric text-lg font-bold text-emerald-400 mt-0.5">--:-- /km</p>
-                            <p id="detail-z2-seconds" class="text-[10px] text-slate-400 font-mono">0s en rango Karvonen</p>
+                    <div class="p-3 bg-slate-900/70 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 min-w-0">
+                            <p class="text-[9px] text-slate-400 uppercase truncate">Ritmo Z2 (Sin ±10m)</p>
+                            <p id="detail-z2-pace" class="mono-metric text-sm sm:text-base font-bold text-emerald-400 mt-0.5">--:-- /km</p>
+                            <p id="detail-z2-seconds" class="text-[10px] text-slate-400 font-mono truncate">0s en Z2</p>
                         </div>
-                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
-                            <p class="text-[10px] text-slate-400 uppercase">FC Media / Máx</p>
-                            <p id="detail-hr" class="mono-metric text-lg font-bold text-rose-400 mt-0.5">-- / -- ppm</p>
-                            <p id="detail-trimp" class="text-[10px] text-amber-300 font-mono">TRIMP: -- pts</p>
+                        <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 min-w-0">
+                            <p class="text-[9px] text-slate-400 uppercase truncate">FC Media / Máx</p>
+                            <p id="detail-hr" class="mono-metric text-sm sm:text-base font-bold text-rose-400 mt-0.5">-- / -- ppm</p>
+                            <p id="detail-trimp" class="text-[10px] text-amber-300 font-mono truncate">TRIMP: -- pts</p>
                         </div>
-                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
-                            <p class="text-[10px] text-slate-400 uppercase">Mejor Pico 5 Min (VAM)</p>
-                            <p id="detail-peak5m" class="mono-metric text-lg font-bold text-cyan-400 mt-0.5">--:-- /km</p>
-                            <p id="detail-peak5m-hr" class="text-[10px] text-slate-400 font-mono">FC pico: -- ppm</p>
+                        <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 min-w-0">
+                            <p class="text-[9px] text-slate-400 uppercase truncate">Pico 5 Min (VAM)</p>
+                            <p id="detail-peak5m" class="mono-metric text-sm sm:text-base font-bold text-cyan-400 mt-0.5">--:-- /km</p>
+                            <p id="detail-peak5m-hr" class="text-[10px] text-slate-400 font-mono truncate">FC pico: -- ppm</p>
                         </div>
-                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
-                            <p class="text-[10px] text-slate-400 uppercase">Deriva Cadencia (Final)</p>
-                            <p id="detail-cadence-drift" class="mono-metric text-lg font-bold text-white mt-0.5">-- spm</p>
-                            <p id="detail-cadence-status" class="text-[10px] text-slate-400 font-mono">Sin fatiga cruzada</p>
+                        <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 min-w-0">
+                            <p class="text-[9px] text-slate-400 uppercase truncate">Cadencia (Final)</p>
+                            <p id="detail-cadence-drift" class="mono-metric text-sm sm:text-base font-bold text-white mt-0.5">-- spm</p>
+                            <p id="detail-cadence-status" class="text-[10px] text-slate-400 font-mono truncate">Sin fatiga</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Column: Stored .FIT Workouts List in IndexedDB (5 cols) -->
-                <div class="lg:col-span-5 bg-panel border border-slate-800 rounded-2xl p-4 flex flex-col max-h-[540px]">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                <div class="lg:col-span-5 bg-panel border border-slate-800 rounded-xl p-3 flex flex-col max-h-[500px] min-w-0">
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 gap-2">
+                        <div class="min-w-0">
+                            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
                                 <i class="ph-bold ph-database text-emerald-400"></i>
-                                Historial Local (.FIT en IndexedDB)
+                                Sesiones Guardadas (.FIT)
                             </h3>
-                            <p class="text-[11px] text-slate-400">Toca cualquier sesión para inspeccionar su ruta GPS y telemetría Z2.</p>
+                            <p class="text-[10px] text-slate-400">Toca el lápiz ✏️ para ajustar km o 🗑️ para borrar.</p>
                         </div>
-                        <span id="workouts-count-badge" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300">0 archivos</span>
+                        <span id="workouts-count-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 shrink-0">0 archivos</span>
                     </div>
 
-                    <div id="workouts-list" class="flex-1 overflow-y-auto space-y-2.5 mt-3 pr-1">
+                    <div id="workouts-list" class="flex-1 overflow-y-auto space-y-2 mt-2.5 pr-0.5">
                         <!-- Dynamically populated workout cards -->
                     </div>
                 </div>
@@ -717,27 +757,27 @@
                         </button>
                     </div>
                 </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- CUSTOM CONFIRMATION MODAL (No native confirm/alert used) -->
+    <!-- CUSTOM CONFIRMATION / EDIT DISTANCE MODAL (No native confirm/alert/prompt used) -->
     <div id="custom-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-panel border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
+        <div class="bg-panel border border-slate-700 rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3.5">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
-                    <i class="ph-bold ph-warning text-xl"></i>
+                <div id="modal-icon-box" class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+                    <i id="modal-icon" class="ph-bold ph-warning text-lg"></i>
                 </div>
-                <div>
-                    <h3 id="modal-title" class="text-base font-bold text-white">Confirmar acción</h3>
+                <div class="min-w-0">
+                    <h3 id="modal-title" class="text-sm font-bold text-white">Confirmar acción</h3>
                     <p id="modal-desc" class="text-xs text-slate-400 mt-0.5">¿Estás seguro de continuar?</p>
                 </div>
             </div>
-            <div class="flex items-center justify-end gap-2.5 pt-2">
-                <button onclick="closeCustomModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300">
+            <div id="modal-input-wrapper" class="hidden">
+                <label class="block text-[11px] font-mono text-slate-300 mb-1">Distancia Real del Entrenamiento (km):</label>
+                <input id="modal-distance-input" type="number" step="0.01" min="0.1" max="250" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-3 py-2 text-base font-mono font-bold text-white">
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-1">
+                <button onclick="closeCustomModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300">
                     Cancelar
                 </button>
-                <button id="modal-confirm-btn" class="px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-xs font-bold text-slate-950">
+                <button id="modal-confirm-btn" class="px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-400 text-xs font-bold text-slate-950">
                     Confirmar
                 </button>
             </div>
@@ -745,26 +785,26 @@
     </div>
 
     <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toast-container" class="fixed top-16 right-4 left-4 sm:left-auto sm:w-96 z-50 pointer-events-none flex flex-col gap-2"></div>
+    <div id="toast-container" class="fixed top-14 right-3 left-3 sm:left-auto sm:w-80 z-50 pointer-events-none flex flex-col gap-1.5"></div>
 
     <!-- BOTTOM TOUCH NAVIGATION BAR (iPhone Mobile-First Priority) -->
-    <nav class="fixed bottom-0 inset-x-0 z-40 bg-obsidian/95 backdrop-blur-xl border-t border-slate-800/90 bottom-nav-safe">
-        <div class="max-w-xl mx-auto grid grid-cols-4 gap-1 px-2 pt-1.5">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-emerald-400 bg-emerald-500/10 font-semibold transition active:scale-95">
-                <i class="ph-fill ph-chart-polar text-xl"></i>
-                <span class="text-[11px] mt-0.5">Analítica .FIT</span>
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-obsidian/95 backdrop-blur-xl border-t border-slate-800/90 bottom-nav-safe w-full">
+        <div class="max-w-xl mx-auto grid grid-cols-4 gap-1 px-2 pt-1">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-emerald-400 bg-emerald-500/10 font-semibold transition active:scale-95">
+                <i class="ph-fill ph-chart-polar text-lg"></i>
+                <span class="text-[10px] mt-0.5">Analítica .FIT</span>
             </button>
-            <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
-                <i class="ph-bold ph-clipboard-text text-xl"></i>
-                <span class="text-[11px] mt-0.5">Fatiga Semanal</span>
+            <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
+                <i class="ph-bold ph-clipboard-text text-lg"></i>
+                <span class="text-[10px] mt-0.5">Fatiga Semanal</span>
             </button>
-            <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
-                <i class="ph-bold ph-robot text-xl"></i>
-                <span class="text-[11px] mt-0.5">Reporte IA</span>
+            <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
+                <i class="ph-bold ph-robot text-lg"></i>
+                <span class="text-[10px] mt-0.5">Reporte IA</span>
             </button>
-            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
-                <i class="ph-bold ph-sliders-horizontal text-xl"></i>
-                <span class="text-[11px] mt-0.5">Ajustes / Datos</span>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
+                <i class="ph-bold ph-sliders-horizontal text-lg"></i>
+                <span class="text-[10px] mt-0.5">Ajustes / Datos</span>
             </button>
         </div>
     </nav>
@@ -868,7 +908,8 @@ self.addEventListener('fetch', (event) => {
             selectedWorkoutId: null,
             weeklyLogs: {}, // Keyed by ISO week e.g. "2026-W45"
             leafletMap: null,
-            mapLayers: []
+            mapLayers: [],
+            showMultiWeekTrendDemo: false
         };
 
         function loadSettingsFromLocalStorage() {
@@ -926,7 +967,13 @@ self.addEventListener('fetch', (event) => {
 
             // Re-analyze all stored workouts dynamically using the new physiological variables
             for (const workout of appState.workouts) {
-                workout.metrics = analyzeWorkoutStream(workout.records, workout.startTime, appState.settings);
+                workout.metrics = analyzeWorkoutStream(
+                    workout.records,
+                    workout.startTime,
+                    appState.settings,
+                    workout.authoritativeDistanceMeters,
+                    workout.authoritativeDurationSec
+                );
                 await saveWorkoutToIDB(workout);
             }
 
@@ -1031,10 +1078,27 @@ self.addEventListener('fetch', (event) => {
         }
 
         /**
-         * Core Physiological & Biomechanical Analyzer on second-by-second records
-         * Each record in `records`: { t (elapsed sec), hr (bpm), speed (m/s), cad (spm), lat, lon }
+         * Haversine distance in meters between two GPS coordinates
          */
-        function analyzeWorkoutStream(records, startTimeISO, settings = appState.settings) {
+        function haversineMeters(lat1, lon1, lat2, lon2) {
+            if (lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined) return 0;
+            const R = 6371000;
+            const toRad = (deg) => (deg * Math.PI) / 180;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        /**
+         * Core Physiological & Biomechanical Analyzer on records
+         * Accurately computes Total Distance from authoritative FIT session/record/GPS data
+         * so progressive or variable-interval WorkOutDoors .FIT files never undercount km!
+         */
+        function analyzeWorkoutStream(records, startTimeISO, settings = appState.settings, authoritativeDistanceMeters = null, authoritativeDurationSec = null) {
             if (!records || records.length === 0) {
                 return null;
             }
@@ -1042,34 +1106,90 @@ self.addEventListener('fetch', (event) => {
             const { fcMax, fcBasal } = settings;
             const { z2Min, z2Max } = getKarvonenZones(fcMax, fcBasal);
 
-            const totalDurationSec = records[records.length - 1].t - records[0].t || records.length;
-            let totalDistanceMeters = 0;
-            let hrSum = 0;
-            let hrCount = 0;
+            const streamSpanSec = Math.max(1, (records[records.length - 1].t - records[0].t) || records.length);
+            const totalDurationSec = authoritativeDurationSec && authoritativeDurationSec > 10
+                ? authoritativeDurationSec
+                : streamSpanSec;
+
+            let integratedSpeedDistMeters = 0;
+            let gpsCumulativeMeters = 0;
+            let maxRecordDistFieldMeters = 0;
+            let hrWeightedSum = 0;
+            let hrWeightTotal = 0;
             let maxHrObserved = 0;
 
-            // 1. Overall Distance & HR statistics
+            // 1. Enrich records with accurate speed & distance deltas (handles smart recording >1s and missing speed fields)
             for (let i = 0; i < records.length; i++) {
                 const r = records[i];
-                const dt = i === 0 ? 1 : Math.max(0.5, Math.min(10, r.t - records[i - 1].t));
-                if (r.speed && r.speed > 0) {
-                    totalDistanceMeters += r.speed * dt;
+                const prev = i > 0 ? records[i - 1] : null;
+                const rawDt = prev ? (r.t - prev.t) : 1;
+                const dt = Math.max(0.5, Math.min(30, rawDt > 0 ? rawDt : 1));
+
+                if (r.dist !== undefined && r.dist > maxRecordDistFieldMeters) {
+                    maxRecordDistFieldMeters = r.dist;
                 }
+
+                let stepGpsMeters = 0;
+                if (prev && r.lat !== undefined && r.lon !== undefined && prev.lat !== undefined && prev.lon !== undefined) {
+                    stepGpsMeters = haversineMeters(prev.lat, prev.lon, r.lat, r.lon);
+                    if (stepGpsMeters < 150) { // Filter out GPS glitches
+                        gpsCumulativeMeters += stepGpsMeters;
+                    }
+                }
+
+                // Derive reliable instantaneous speed (m/s) if missing or under-scaled
+                let effectiveSpeed = r.speed || 0;
+                if ((!effectiveSpeed || effectiveSpeed <= 0.2) && prev) {
+                    if (r.dist !== undefined && prev.dist !== undefined && r.dist > prev.dist) {
+                        effectiveSpeed = (r.dist - prev.dist) / dt;
+                    } else if (stepGpsMeters > 0.2 && stepGpsMeters < 100) {
+                        effectiveSpeed = stepGpsMeters / dt;
+                    }
+                }
+                r._effSpeed = effectiveSpeed;
+                r._dt = dt;
+
+                if (effectiveSpeed > 0) {
+                    integratedSpeedDistMeters += effectiveSpeed * dt;
+                }
+
                 if (r.hr && r.hr > 35) {
-                    hrSum += r.hr;
-                    hrCount++;
+                    hrWeightedSum += r.hr * dt;
+                    hrWeightTotal += dt;
                     if (r.hr > maxHrObserved) maxHrObserved = r.hr;
                 }
             }
 
-            const avgHr = hrCount > 0 ? Math.round(hrSum / hrCount) : 0;
-            const avgSpeedMs = totalDurationSec > 0 ? totalDistanceMeters / totalDurationSec : 0;
+            // Determine authoritative total distance in meters:
+            // Priority: 1) Manual override or FIT Session/Lap total_distance, 2) Max cumulative record.distance, 3) Max of GPS Haversine vs Integrated Speed
+            let bestDistanceMeters = 0;
+            if (authoritativeDistanceMeters && authoritativeDistanceMeters > 50) {
+                bestDistanceMeters = authoritativeDistanceMeters;
+            } else if (maxRecordDistFieldMeters > 50) {
+                bestDistanceMeters = maxRecordDistFieldMeters;
+            } else {
+                bestDistanceMeters = Math.max(integratedSpeedDistMeters, gpsCumulativeMeters);
+            }
+
+            // If instantaneous speeds were under-scaled compared to authoritative distance, scale them proportionally so Z2 pace & VAM are 100% exact
+            const speedCorrectionFactor = (integratedSpeedDistMeters > 100 && bestDistanceMeters > integratedSpeedDistMeters * 1.08)
+                ? (bestDistanceMeters / integratedSpeedDistMeters)
+                : 1.0;
+
+            if (speedCorrectionFactor !== 1.0) {
+                for (let i = 0; i < records.length; i++) {
+                    records[i]._effSpeed = (records[i]._effSpeed || 0) * speedCorrectionFactor;
+                }
+            }
+
+            const avgHr = hrWeightTotal > 0 ? Math.round(hrWeightedSum / hrWeightTotal) : 0;
+            const avgSpeedMs = totalDurationSec > 0 ? bestDistanceMeters / totalDurationSec : 0;
 
             // 2. AEROBIC EFFICIENCY (Z2 KARVONEN)
             // Rule: Discard first 10 minutes (600s) and last 10 minutes (600s) of the .fit
             const warmupCutoff = records[0].t + 600;
             const cooldownCutoff = records[records.length - 1].t - 600;
-            const hasEnoughDurationForTrim = totalDurationSec > 1260; // > 21 mins
+            const hasEnoughDurationForTrim = streamSpanSec > 1260; // > 21 mins
 
             let z2SpeedSum = 0;
             let z2TimeSec = 0;
@@ -1078,25 +1198,27 @@ self.addEventListener('fetch', (event) => {
 
             for (let i = 0; i < records.length; i++) {
                 const r = records[i];
-                const dt = i === 0 ? 1 : Math.max(0.5, Math.min(10, r.t - records[i - 1].t));
+                const dt = r._dt || 1;
+                const spd = r._effSpeed || 0;
 
+                // If workout is >=21 min, exclude first & last 10m; if shorter, evaluate middle 60% of the run so short Z2 runs still get a reading
                 const isInsideCoreWindow = hasEnoughDurationForTrim
                     ? (r.t >= warmupCutoff && r.t <= cooldownCutoff)
-                    : false;
+                    : (r.t >= records[0].t + streamSpanSec * 0.20 && r.t <= records[records.length - 1].t - streamSpanSec * 0.20);
 
                 if (isInsideCoreWindow) {
                     coreTimeSec += dt;
-                    if (r.hr >= z2Min && r.hr <= z2Max && r.speed > 1.2) {
-                        z2SpeedSum += r.speed * dt;
+                    if (r.hr >= z2Min && r.hr <= z2Max && spd > 1.1) {
+                        z2SpeedSum += spd * dt;
                         z2TimeSec += dt;
                         z2HrSum += r.hr * dt;
                     }
                 }
             }
 
-            const z2AvgSpeedMs = z2TimeSec >= 30 ? (z2SpeedSum / z2TimeSec) : 0;
+            const z2AvgSpeedMs = z2TimeSec >= 20 ? (z2SpeedSum / z2TimeSec) : 0;
             const z2AvgPaceSec = z2AvgSpeedMs > 0 ? (1000 / z2AvgSpeedMs) : null;
-            const z2AvgHr = z2TimeSec >= 30 ? Math.round(z2HrSum / z2TimeSec) : null;
+            const z2AvgHr = z2TimeSec >= 20 ? Math.round(z2HrSum / z2TimeSec) : null;
             const z2RatioPercent = coreTimeSec > 0 ? Math.round((z2TimeSec / coreTimeSec) * 100) : 0;
 
             // 3. TRAINING LOAD (TRIMP - Banister Exponential Formula using Dynamic FC Basal & FC Max)
@@ -1105,29 +1227,31 @@ self.addEventListener('fetch', (event) => {
             const trimp = Math.round(durationMinutes * hrReserveRatio * 0.64 * Math.exp(1.92 * hrReserveRatio));
 
             // 4. VAM (MAXIMAL AEROBIC SPEED) PEAK DETECTOR (Sustained 5 to 6 minutes = 300s-360s)
-            // Uses sliding window of 300 seconds to find highest sustained speed with elevated cardiac effort (>= 82% FCmax)
             let best5mSpeedMs = 0;
             let best5mAvgHr = 0;
             let startIdx = 0;
             let windowDist = 0;
             let windowHrWeighted = 0;
+            let windowTimeSum = 0;
 
             for (let endIdx = 0; endIdx < records.length; endIdx++) {
-                const dtEnd = endIdx === 0 ? 1 : Math.max(0.5, Math.min(10, records[endIdx].t - records[endIdx - 1].t));
-                windowDist += (records[endIdx].speed || 0) * dtEnd;
+                const dtEnd = records[endIdx]._dt || 1;
+                windowDist += (records[endIdx]._effSpeed || 0) * dtEnd;
                 windowHrWeighted += (records[endIdx].hr || 0) * dtEnd;
+                windowTimeSum += dtEnd;
 
-                while (records[endIdx].t - records[startIdx].t > 300 && startIdx < endIdx) {
-                    const dtStart = startIdx === 0 ? 1 : Math.max(0.5, Math.min(10, records[startIdx].t - records[startIdx - 1].t));
-                    windowDist -= (records[startIdx].speed || 0) * dtStart;
+                while (records[endIdx].t - records[startIdx].t > 310 && startIdx < endIdx) {
+                    const dtStart = records[startIdx]._dt || 1;
+                    windowDist -= (records[startIdx]._effSpeed || 0) * dtStart;
                     windowHrWeighted -= (records[startIdx].hr || 0) * dtStart;
+                    windowTimeSum -= dtStart;
                     startIdx++;
                 }
 
                 const spanSec = records[endIdx].t - records[startIdx].t;
-                if (spanSec >= 295 && spanSec <= 365) {
-                    const candidateSpeed = windowDist / spanSec;
-                    const candidateHr = windowHrWeighted / spanSec;
+                if (spanSec >= 290 && spanSec <= 370 && windowTimeSum > 0) {
+                    const candidateSpeed = windowDist / windowTimeSum;
+                    const candidateHr = windowHrWeighted / windowTimeSum;
                     if (candidateSpeed > best5mSpeedMs) {
                         best5mSpeedMs = candidateSpeed;
                         best5mAvgHr = Math.round(candidateHr);
@@ -1135,27 +1259,24 @@ self.addEventListener('fetch', (event) => {
                 }
             }
 
-            // A 5-6 min peak qualifies as a true VAM Peak/Test if HR reached >= 84% of FCMax (or speed >= 3.6 m/s at high effort)
             const isVamPeakQualified = best5mSpeedMs >= 3.3 && best5mAvgHr >= Math.round(fcMax * 0.84);
 
             // 5. CROSS-MUSCULAR FATIGUE DETECTION (Cadence Drop at the end of runs)
-            // Compares initial active running cadence (after 5m warmup) vs final 20% of the run
-            const activeCadenceRecords = records.filter(r => r.speed > 1.8 && r.cad && r.cad > 120);
+            const activeCadenceRecords = records.filter(r => (r._effSpeed || 0) > 1.7 && r.cad && r.cad > 120);
             let initialCadence = 0;
             let finalCadence = 0;
             let cadenceDropSpm = 0;
             let hasCrossFatigue = false;
 
-            if (activeCadenceRecords.length >= 60) {
-                const sliceCount = Math.max(15, Math.floor(activeCadenceRecords.length * 0.25));
+            if (activeCadenceRecords.length >= 20) {
+                const sliceCount = Math.max(8, Math.floor(activeCadenceRecords.length * 0.25));
                 const firstSlice = activeCadenceRecords.slice(0, sliceCount);
                 const lastSlice = activeCadenceRecords.slice(-sliceCount);
 
                 initialCadence = Math.round(firstSlice.reduce((acc, r) => acc + r.cad, 0) / firstSlice.length);
                 finalCadence = Math.round(lastSlice.reduce((acc, r) => acc + r.cad, 0) / lastSlice.length);
-                cadenceDropSpm = finalCadence - initialCadence; // Negative means cadence dropped
+                cadenceDropSpm = finalCadence - initialCadence;
 
-                // Flag cross-muscular fatigue if cadence drops by 5 spm or more on runs >= 35 min
                 if (cadenceDropSpm <= -5 && totalDurationSec >= 2100) {
                     hasCrossFatigue = true;
                 }
@@ -1163,7 +1284,7 @@ self.addEventListener('fetch', (event) => {
 
             return {
                 totalDurationSec: Math.round(totalDurationSec),
-                totalDistanceKm: Number((totalDistanceMeters / 1000).toFixed(2)),
+                totalDistanceKm: Number((bestDistanceMeters / 1000).toFixed(2)),
                 avgSpeedMs,
                 avgPaceStr: speedToPaceString(avgSpeedMs),
                 avgHr,
@@ -1274,7 +1395,7 @@ self.addEventListener('fetch', (event) => {
 
         /**
          * Native Binary .FIT Protocol Decoder (Garmin / WorkOutDoors FIT SDK standard)
-         * Parses binary ArrayBuffer directly without external servers
+         * Extracts Global Msg 18 (Session), Msg 19 (Lap), and Msg 20 (Record) including cumulative distance
          */
         function parseFitBinaryNative(arrayBuffer) {
             const view = new DataView(arrayBuffer);
@@ -1292,7 +1413,10 @@ self.addEventListener('fetch', (event) => {
             const endOffset = Math.min(byteLen, headerSize + dataSize);
             const localDefs = {};
             const rawRecords = [];
-            const FIT_EPOCH_OFFSET_SEC = 631065600; // Seconds between 1970-01-01 and 1989-12-31
+            let sessionDistanceMeters = 0;
+            let sessionDurationSec = 0;
+            let lapDistanceSumMeters = 0;
+            const FIT_EPOCH_OFFSET_SEC = 631065600;
             let lastTimestamp = null;
 
             while (offset < endOffset) {
@@ -1303,8 +1427,9 @@ self.addEventListener('fetch', (event) => {
                     const localMsgType = (recordHeader >> 5) & 0x03;
                     const timeOffset = recordHeader & 0x1F;
                     if (lastTimestamp !== null) {
+                        const prevLow5 = lastTimestamp & 0x1F;
                         lastTimestamp = (lastTimestamp & 0xFFFFFFE0) + timeOffset;
-                        if (timeOffset < (lastTimestamp & 0x1F)) lastTimestamp += 32;
+                        if (timeOffset < prevLow5) lastTimestamp += 32;
                     }
                     const def = localDefs[localMsgType];
                     if (!def) break;
@@ -1320,7 +1445,7 @@ self.addEventListener('fetch', (event) => {
 
                 if (isDefinition) {
                     offset++; // reserved
-                    const arch = view.getUint8(offset++); // 0 = little-endian, 1 = big-endian
+                    const arch = view.getUint8(offset++);
                     const littleEndian = arch === 0;
                     const globalMsgNum = view.getUint16(offset, littleEndian);
                     offset += 2;
@@ -1349,8 +1474,18 @@ self.addEventListener('fetch', (event) => {
                     const rec = readFitDataMessage(view, offset, def, lastTimestamp);
                     offset = rec.nextOffset;
                     if (rec.data && rec.data.timestamp) lastTimestamp = rec.data.timestamp;
+
                     if (def.globalMsgNum === 20 && rec.data) {
                         rawRecords.push(rec.data);
+                    } else if (def.globalMsgNum === 18 && rec.data) {
+                        if (rec.data.totalDistanceMeters > sessionDistanceMeters) {
+                            sessionDistanceMeters = rec.data.totalDistanceMeters;
+                        }
+                        if (rec.data.totalTimerSec > sessionDurationSec) {
+                            sessionDurationSec = rec.data.totalTimerSec;
+                        }
+                    } else if (def.globalMsgNum === 19 && rec.data && rec.data.totalDistanceMeters) {
+                        lapDistanceSumMeters += rec.data.totalDistanceMeters;
                     }
                 }
             }
@@ -1368,17 +1503,28 @@ self.addEventListener('fetch', (event) => {
                     t: elapsedSec,
                     hr: r.hr || 0,
                     speed: r.speed || 0,
+                    dist: r.dist,
                     cad: r.cadence || 0,
                     lat: r.lat,
                     lon: r.lon
                 };
             });
 
-            return { startTimeISO, records: normalizedRecords };
+            const authoritativeDistanceMeters = sessionDistanceMeters > 50
+                ? sessionDistanceMeters
+                : (lapDistanceSumMeters > 50 ? lapDistanceSumMeters : null);
+
+            return {
+                startTimeISO,
+                records: normalizedRecords,
+                authoritativeDistanceMeters,
+                authoritativeDurationSec: sessionDurationSec > 10 ? sessionDurationSec : null
+            };
         }
 
         function readFitDataMessage(view, offset, def, fallbackTimestamp) {
             const le = def.littleEndian;
+            const gMsg = def.globalMsgNum;
             let data = { timestamp: fallbackTimestamp };
 
             for (const f of def.fields) {
@@ -1386,30 +1532,46 @@ self.addEventListener('fetch', (event) => {
                     return { nextOffset: view.byteLength, data: null };
                 }
                 const fNum = f.fieldNum;
+
                 if (fNum === 253 && f.size === 4) {
                     const ts = view.getUint32(offset, le);
                     if (ts !== 0xFFFFFFFF) data.timestamp = ts;
-                } else if (fNum === 0 && f.size === 4) {
-                    const latSemi = view.getInt32(offset, le);
-                    if (latSemi !== 0x7FFFFFFF) data.lat = Number((latSemi * (180 / Math.pow(2, 31))).toFixed(6));
-                } else if (fNum === 1 && f.size === 4) {
-                    const lonSemi = view.getInt32(offset, le);
-                    if (lonSemi !== 0x7FFFFFFF) data.lon = Number((lonSemi * (180 / Math.pow(2, 31))).toFixed(6));
-                } else if (fNum === 3 && f.size === 1) {
-                    const hr = view.getUint8(offset);
-                    if (hr !== 0xFF) data.hr = hr;
-                } else if (fNum === 4 && f.size === 1) {
-                    const cad = view.getUint8(offset);
-                    if (cad !== 0xFF) {
-                        // WorkOutDoors / Garmin stores running cadence as strides/min (e.g. 86 = 172 spm)
-                        data.cadence = cad < 115 ? cad * 2 : cad;
+                } else if (gMsg === 20) {
+                    // Record Message (20)
+                    if (fNum === 0 && f.size === 4) {
+                        const latSemi = view.getInt32(offset, le);
+                        if (latSemi !== 0x7FFFFFFF) data.lat = Number((latSemi * (180 / Math.pow(2, 31))).toFixed(6));
+                    } else if (fNum === 1 && f.size === 4) {
+                        const lonSemi = view.getInt32(offset, le);
+                        if (lonSemi !== 0x7FFFFFFF) data.lon = Number((lonSemi * (180 / Math.pow(2, 31))).toFixed(6));
+                    } else if (fNum === 3 && f.size === 1) {
+                        const hr = view.getUint8(offset);
+                        if (hr !== 0xFF) data.hr = hr;
+                    } else if (fNum === 4 && f.size === 1) {
+                        const cad = view.getUint8(offset);
+                        if (cad !== 0xFF) data.cadence = cad < 115 ? cad * 2 : cad;
+                    } else if (fNum === 5 && f.size === 4) {
+                        // Cumulative distance in meters (scale 100)
+                        const rawDist = view.getUint32(offset, le);
+                        if (rawDist !== 0xFFFFFFFF) data.dist = Number((rawDist / 100).toFixed(2));
+                    } else if (fNum === 6 && f.size === 2) {
+                        const rawSpd = view.getUint16(offset, le);
+                        if (rawSpd !== 0xFFFF && !data.speed) data.speed = Number((rawSpd / 1000).toFixed(3));
+                    } else if (fNum === 73 && f.size === 4) {
+                        const enhSpd = view.getUint32(offset, le);
+                        if (enhSpd !== 0xFFFFFFFF) data.speed = Number((enhSpd / 1000).toFixed(3));
                     }
-                } else if (fNum === 6 && f.size === 2) {
-                    const rawSpd = view.getUint16(offset, le);
-                    if (rawSpd !== 0xFFFF && !data.speed) data.speed = Number((rawSpd / 1000).toFixed(3));
-                } else if (fNum === 73 && f.size === 4) {
-                    const enhSpd = view.getUint32(offset, le);
-                    if (enhSpd !== 0xFFFFFFFF) data.speed = Number((enhSpd / 1000).toFixed(3));
+                } else if (gMsg === 18 || gMsg === 19) {
+                    // Session (18) or Lap (19) Message -> Authoritative total_distance (field 9) & total_timer_time (field 8)
+                    if (fNum === 9 && f.size === 4) {
+                        const rawTotalDist = view.getUint32(offset, le);
+                        if (rawTotalDist !== 0xFFFFFFFF) data.totalDistanceMeters = Number((rawTotalDist / 100).toFixed(2));
+                    } else if ((fNum === 8 || fNum === 7) && f.size === 4) {
+                        const rawTime = view.getUint32(offset, le);
+                        if (rawTime !== 0xFFFFFFFF && !data.totalTimerSec) {
+                            data.totalTimerSec = Math.round(rawTime / 1000);
+                        }
+                    }
                 }
                 offset += f.size;
             }
@@ -1422,9 +1584,17 @@ self.addEventListener('fetch', (event) => {
         }
 
         /**
-         * Parses an uploaded .FIT file using fit-file-parser first, falling back to native binary parser
+         * Parses an uploaded .FIT file using native binary decoder + fit-file-parser cross-check
+         * Guarantees exact distance extraction from Session, Lap, Record.distance, or GPS Haversine
          */
         async function parseFitFileBuffer(arrayBuffer, fileName) {
+            let nativeResult = null;
+            try {
+                nativeResult = parseFitBinaryNative(arrayBuffer);
+            } catch (e) {
+                console.warn('Aviso en decodificador nativo:', e);
+            }
+
             if (externalFitParserClass) {
                 try {
                     const parser = new externalFitParserClass({
@@ -1441,9 +1611,24 @@ self.addEventListener('fetch', (event) => {
                         });
                     });
 
-                    if (parsedData && parsedData.records && parsedData.records.length > 10) {
+                    if (parsedData && parsedData.records && parsedData.records.length > 5) {
                         const firstRec = parsedData.records[0];
                         const startTs = firstRec.timestamp ? new Date(firstRec.timestamp).getTime() : Date.now();
+
+                        // Extract authoritative session distance & duration if present in fit-file-parser output
+                        let sessionDistMeters = null;
+                        let sessionDurSec = null;
+                        if (parsedData.sessions && parsedData.sessions.length > 0) {
+                            const s = parsedData.sessions[0];
+                            if (s.total_distance && s.total_distance > 0) {
+                                // Handle if parser returned km instead of m
+                                sessionDistMeters = s.total_distance < 100 ? s.total_distance * 1000 : s.total_distance;
+                            }
+                            if (s.total_timer_time || s.total_elapsed_time) {
+                                sessionDurSec = Math.round(s.total_timer_time || s.total_elapsed_time);
+                            }
+                        }
+
                         const records = parsedData.records.map((r, i) => {
                             const recTs = r.timestamp ? new Date(r.timestamp).getTime() : startTs + i * 1000;
                             const elapsedSec = r.elapsed_time !== undefined
@@ -1453,29 +1638,44 @@ self.addEventListener('fetch', (event) => {
                             const spm = rawCad > 0 && rawCad < 115 ? rawCad * 2 : rawCad;
                             let lat = r.position_lat;
                             let lon = r.position_long;
-                            // Convert semicircles if fit-file-parser returned raw integers
                             if (lat && Math.abs(lat) > 180) lat = lat * (180 / Math.pow(2, 31));
                             if (lon && Math.abs(lon) > 180) lon = lon * (180 / Math.pow(2, 31));
+
+                            let distMeters = r.distance;
+                            if (distMeters !== undefined && distMeters > 0 && distMeters < 100 && elapsedSec > 300) {
+                                distMeters = distMeters * 1000;
+                            }
 
                             return {
                                 t: elapsedSec,
                                 hr: Math.round(r.heart_rate || 0),
                                 speed: Number((r.enhanced_speed ?? r.speed ?? 0).toFixed(3)),
+                                dist: distMeters !== undefined ? Number(distMeters.toFixed(2)) : undefined,
                                 cad: Math.round(spm),
                                 lat: lat ? Number(lat.toFixed(6)) : undefined,
                                 lon: lon ? Number(lon.toFixed(6)) : undefined
                             };
                         });
+
+                        const bestAuthDist = Math.max(
+                            sessionDistMeters || 0,
+                            nativeResult?.authoritativeDistanceMeters || 0
+                        );
+
                         return {
                             startTimeISO: new Date(startTs).toISOString(),
-                            records
+                            records,
+                            authoritativeDistanceMeters: bestAuthDist > 50 ? bestAuthDist : null,
+                            authoritativeDurationSec: sessionDurSec || nativeResult?.authoritativeDurationSec || null
                         };
                     }
                 } catch (err) {
-                    console.warn('Fallback al decodificador binario nativo .FIT:', err);
+                    console.warn('Usando resultado del decodificador binario nativo .FIT:', err);
                 }
             }
-            return parseFitBinaryNative(arrayBuffer);
+
+            if (nativeResult) return nativeResult;
+            throw new Error('No se pudo decodificar el archivo .FIT.');
         }
 
         async function handleFitUpload(event) {
@@ -1486,14 +1686,22 @@ self.addEventListener('fetch', (event) => {
                 try {
                     const buffer = await file.arrayBuffer();
                     const parsed = await parseFitFileBuffer(buffer, file.name);
-                    const metrics = analyzeWorkoutStream(parsed.records, parsed.startTimeISO, appState.settings);
+                    const metrics = analyzeWorkoutStream(
+                        parsed.records,
+                        parsed.startTimeISO,
+                        appState.settings,
+                        parsed.authoritativeDistanceMeters,
+                        parsed.authoritativeDurationSec
+                    );
 
                     const cleanName = file.name.replace(/\.fit$/i, '');
                     const workoutObj = {
                         id: 'fit_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-                        title: `WorkOutDoors: ${cleanName}`,
+                        title: cleanName,
                         fileName: file.name,
                         startTime: parsed.startTimeISO,
+                        authoritativeDistanceMeters: parsed.authoritativeDistanceMeters,
+                        authoritativeDurationSec: parsed.authoritativeDurationSec,
                         records: parsed.records,
                         metrics
                     };
@@ -1501,7 +1709,7 @@ self.addEventListener('fetch', (event) => {
                     await saveWorkoutToIDB(workoutObj);
                     appState.workouts.unshift(workoutObj);
                     appState.selectedWorkoutId = workoutObj.id;
-                    showToast(`Archivo ${file.name} analizado (${metrics.totalDistanceKm} km • Z2: ${metrics.z2AvgPaceStr}/km).`, 'success');
+                    showToast(`${file.name}: ${metrics.totalDistanceKm} km • Z2: ${metrics.z2AvgPaceStr}/km`, 'success');
                 } catch (err) {
                     console.error('Error procesando .FIT:', err);
                     showToast(`Error al leer ${file.name}: ${err.message}`, 'error');
@@ -1615,18 +1823,18 @@ self.addEventListener('fetch', (event) => {
         }
 
         /*************************************************************************
-         * 5. WORKOUTDOORS TELEMETRY SIMULATOR & DEMO SEEDING
+         * 5. WORKOUTDOORS TELEMETRY SIMULATOR (IDEMPOTENT - NO DUPLICATES)
          *************************************************************************/
-        function buildSyntheticWorkout({ title, daysAgo, durationSec, type, settings }) {
+        function buildSyntheticWorkout({ id, title, daysAgo, durationSec, type, settings }) {
             const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
             const { z2Min, z2Max } = getKarvonenZones(settings.fcMax, settings.fcBasal);
             const targetZ2Hr = Math.round((z2Min + z2Max) / 2);
 
-            // GPS Loop coordinates (Madrid Casa de Campo / Madrid Río scenic loops)
             const baseLat = type === 'vam_test' ? 40.4075 : 40.4180;
             const baseLon = type === 'vam_test' ? -3.7210 : -3.7420;
-            const stepSec = 5; // 5-second sampling for compact IndexedDB storage
+            const stepSec = 5;
             const records = [];
+            let cumDist = 0;
 
             for (let t = 0; t <= durationSec; t += stepSec) {
                 const progress = t / durationSec;
@@ -1635,11 +1843,10 @@ self.addEventListener('fetch', (event) => {
                 const lon = Number((baseLon + Math.cos(theta) * 0.019 + Math.sin(theta * 2) * 0.002).toFixed(6));
 
                 let hr = targetZ2Hr;
-                let speed = 3.38; // ~4:55 /km
+                let speed = 3.38;
                 let cad = 174;
 
                 if (type === 'z2_long') {
-                    // First 10m warmup, core Z2, last 10m cooldown + cross-muscular cadence drop in final 25%
                     if (t < 600) {
                         hr = settings.fcBasal + 48 + Math.round((t / 600) * 28);
                         speed = 3.05 + (t / 600) * 0.30;
@@ -1650,10 +1857,98 @@ self.addEventListener('fetch', (event) => {
                         cad = 165;
                     } else {
                         hr = targetZ2Hr + Math.round(Math.sin(t / 90) * 3);
-                        speed = 3.41 + Math.sin(t / 120) * 0.06; // ~4:53 /km in Z2
-                        // Simulate neuromuscular cadence drop after 70% of long run
+                        speed = 3.41 + Math.sin(t / 120) * 0.06;
                         cad = progress > 0.72 ? 165 : 175;
                     }
+                } else if (type === 'vam_test') {
+                    if (t >= 660 && t <= 1000) {
+                        hr = Math.round(settings.fcMax * 0.94);
+                        speed = 4.54;
+                        cad = 186;
+                    } else if (t < 600 || t > durationSec - 600) {
+                        hr = targetZ2Hr - 12;
+                        speed = 3.05;
+                        cad = 170;
+                    } else {
+                        hr = targetZ2Hr + 1;
+                        speed = 3.36;
+                        cad = 174;
+                    }
+                }
+
+                if (t > 0) cumDist += speed * stepSec;
+                records.push({
+                    t,
+                    hr,
+                    speed: Number(speed.toFixed(3)),
+                    dist: Number(cumDist.toFixed(2)),
+                    cad,
+                    lat,
+                    lon
+                });
+            }
+
+            const startTimeISO = startDate.toISOString();
+            const metrics = analyzeWorkoutStream(records, startTimeISO, settings, cumDist, durationSec);
+
+            return {
+                id: id || ('demo_' + type),
+                isDemo: true,
+                title,
+                fileName: `${title.toLowerCase().replace(/\s+/g, '_')}.fit`,
+                startTime: startTimeISO,
+                authoritativeDistanceMeters: Number(cumDist.toFixed(2)),
+                authoritativeDurationSec: durationSec,
+                isExplicitVamTest: type === 'vam_test',
+                records,
+                metrics
+            };
+        }
+
+        async function simulateWorkout(kind) {
+            let workout = null;
+            if (kind === 'z2_long') {
+                workout = buildSyntheticWorkout({
+                    id: 'demo_z2_long', // Fixed ID so pressing multiple times NEVER duplicates!
+                    title: '[DEMO] Tirada Larga Z2 (75m)',
+                    daysAgo: 1,
+                    durationSec: 4500,
+                    type: 'z2_long',
+                    settings: appState.settings
+                });
+            } else if (kind === 'vam_test') {
+                workout = buildSyntheticWorkout({
+                    id: 'demo_vam_test', // Fixed ID so pressing multiple times NEVER duplicates!
+                    title: '[DEMO] Test VAM 5 min',
+                    daysAgo: 0,
+                    durationSec: 2700,
+                    type: 'vam_test',
+                    settings: appState.settings
+                });
+            }
+
+            if (workout) {
+                await saveWorkoutToIDB(workout);
+                // Replace if already exists instead of stacking duplicates
+                appState.workouts = appState.workouts.filter(w => w.id !== workout.id);
+                appState.workouts.unshift(workout);
+                appState.workouts.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+                appState.selectedWorkoutId = workout.id;
+                refreshAllViews();
+                showToast(`Sesión demo actualizada (sin duplicar kilómetros).`, 'info');
+            }
+        }
+
+        async function clearDemoWorkouts() {
+            const toDelete = appState.workouts.filter(w => w.isDemo || String(w.id).startsWith('sim_') || String(w.id).startsWith('demo_'));
+            for (const w of toDelete) {
+                await deleteWorkoutFromIDB(w.id);
+            }
+            appState.workouts = appState.workouts.filter(w => !w.isDemo && !String(w.id).startsWith('sim_') && !String(w.id).startsWith('demo_'));
+            appState.selectedWorkoutId = appState.workouts[0]?.id || null;
+            refreshAllViews();
+            showToast(`${toDelete.length} sesiones de prueba eliminadas. Solo quedan tus .FIT reales.`, 'success');
+        }
                 } else if (type === 'z2_easy') {
                     if (t < 600) {
                         hr = settings.fcBasal + 50 + Math.round((t / 600) * 24);
@@ -1761,19 +2056,223 @@ self.addEventListener('fetch', (event) => {
         }
 
         /*************************************************************************
-         * 6. LEAFLET.JS + OPENSTREETMAP GPS ROUTE RENDERER
+         * 7.5 WEEKLY Z2 EFFICIENCY PROGRESSION CHART & LINEAR REGRESSION ENGINE
          *************************************************************************/
-        function initLeafletMap() {
-            if (appState.leafletMap) return;
-            appState.leafletMap = L.map('map-container', {
-                zoomControl: true,
-                attributionControl: true
-            }).setView([40.4168, -3.7038], 13);
+        function toggleTrendPreviewData() {
+            appState.showMultiWeekTrendDemo = !appState.showMultiWeekTrendDemo;
+            const btn = document.getElementById('btn-toggle-trend-preview');
+            if (appState.showMultiWeekTrendDemo) {
+                btn.innerHTML = `<i class="ph-bold ph-user-check mr-1"></i>Ver solo mis datos reales`;
+                btn.className = 'self-start sm:self-auto shrink-0 text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-lg px-2.5 py-1 transition active:scale-95';
+            } else {
+                btn.innerHTML = `<i class="ph-bold ph-magic-wand mr-1"></i>Ver ejemplo 6 sem`;
+                btn.className = 'self-start sm:self-auto shrink-0 text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg px-2.5 py-1 transition active:scale-95';
+            }
+            renderWeeklyZ2TrendChart();
+        }
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(appState.leafletMap);
+        /**
+         * Computes weekly Z2 averages and Ordinary Least Squares (OLS) Linear Regression
+         * Returns weekly points + regression slope (seconds per km per week)
+         */
+        function computeWeeklyZ2RegressionData() {
+            if (appState.showMultiWeekTrendDemo) {
+                // 6-week sample progression showing how aerobic efficiency improves from 6:28/km to 5:58/km
+                const sampleWeeks = [
+                    { weekKey: 'Sem -5', label: 'S-5', paceSec: 388, totalKm: 16.5 },
+                    { weekKey: 'Sem -4', label: 'S-4', paceSec: 381, totalKm: 18.0 },
+                    { weekKey: 'Sem -3', label: 'S-3', paceSec: 384, totalKm: 15.2 },
+                    { weekKey: 'Sem -2', label: 'S-2', paceSec: 372, totalKm: 20.4 },
+                    { weekKey: 'Sem -1', label: 'S-1', paceSec: 366, totalKm: 22.0 },
+                    { weekKey: 'Actual', label: 'Hoy', paceSec: 358, totalKm: 18.01 }
+                ];
+                return calculateLinearRegressionOnWeeks(sampleWeeks, true);
+            }
+
+            // Group real stored workouts by ISO Week
+            const weekMap = {};
+            for (const w of appState.workouts) {
+                if (!w.metrics || !w.metrics.z2AvgPaceSec || w.metrics.z2TimeSec < 20) continue;
+                const d = new Date(w.startTime);
+                const isoWeek = getCurrentISOWeekString(d);
+                if (!weekMap[isoWeek]) {
+                    weekMap[isoWeek] = {
+                        weekKey: isoWeek,
+                        label: isoWeek.replace(/^\d{4}-/, ''),
+                        weightedSpeedSum: 0,
+                        z2SecSum: 0,
+                        totalKm: 0
+                    };
+                }
+                weekMap[isoWeek].weightedSpeedSum += w.metrics.z2AvgSpeedMs * w.metrics.z2TimeSec;
+                weekMap[isoWeek].z2SecSum += w.metrics.z2TimeSec;
+                weekMap[isoWeek].totalKm += w.metrics.totalDistanceKm;
+            }
+
+            const sortedWeeks = Object.values(weekMap)
+                .sort((a, b) => a.weekKey.localeCompare(b.weekKey))
+                .map(item => {
+                    const avgSpeed = item.weightedSpeedSum / item.z2SecSum;
+                    return {
+                        weekKey: item.weekKey,
+                        label: item.label,
+                        paceSec: Math.round(1000 / avgSpeed),
+                        totalKm: Number(item.totalKm.toFixed(1))
+                    };
+                });
+
+            return calculateLinearRegressionOnWeeks(sortedWeeks, false);
+        }
+
+        function calculateLinearRegressionOnWeeks(weeksArray, isDemo) {
+            const n = weeksArray.length;
+            if (n === 0) {
+                return { weeks: [], slopeSecPerWeek: 0, hasRegression: false, isDemo };
+            }
+            if (n === 1) {
+                weeksArray[0].regPaceSec = weeksArray[0].paceSec;
+                return { weeks: weeksArray, slopeSecPerWeek: 0, hasRegression: false, isDemo };
+            }
+
+            // Ordinary Least Squares (OLS) Linear Regression: y = m*x + b
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            for (let i = 0; i < n; i++) {
+                const x = i;
+                const y = weeksArray[i].paceSec;
+                sumX += x;
+                sumY += y;
+                sumXY += x * y;
+                sumXX += x * x;
+            }
+
+            const denominator = (n * sumXX - sumX * sumX);
+            const slope = denominator !== 0 ? (n * sumXY - sumX * sumY) / denominator : 0;
+            const intercept = (sumY - slope * sumX) / n;
+
+            const enriched = weeksArray.map((w, idx) => ({
+                ...w,
+                regPaceSec: intercept + slope * idx
+            }));
+
+            return {
+                weeks: enriched,
+                slopeSecPerWeek: Number(slope.toFixed(1)), // Negative means faster pace (fewer sec/km) = IMPROVING!
+                hasRegression: true,
+                isDemo
+            };
+        }
+
+        function renderWeeklyZ2TrendChart() {
+            const container = document.getElementById('z2-trend-chart-container');
+            const badge = document.getElementById('z2-trend-badge');
+            if (!container || !badge) return;
+
+            const regData = computeWeeklyZ2RegressionData();
+            const weeks = regData.weeks;
+
+            if (weeks.length === 0) {
+                badge.textContent = 'Sin datos Z2 aún';
+                badge.className = 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400';
+                container.innerHTML = `
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 text-center">
+                        <p class="text-xs text-slate-300 font-medium">Sube tus archivos .FIT para ver la curva semanal y su Regresión Lineal.</p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">O pulsa "Ver ejemplo 6 sem" arriba a la derecha para previsualizar la gráfica.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Update Regression Slope Badge
+            if (!regData.hasRegression) {
+                badge.textContent = `1 semana (${paceSecondsToString(weeks[0].paceSec)}/km) • Añade otra semana para Regresión Lineal`;
+                badge.className = 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
+            } else {
+                const s = regData.slopeSecPerWeek;
+                if (s < -1.0) {
+                    badge.textContent = `📈 Regresión: MEJORANDO (${s}s/km por semana)`;
+                    badge.className = 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                } else if (s > 1.0) {
+                    badge.textContent = `📉 Regresión: FATIGA / +LENTO (+${s}s/km por sem)`;
+                    badge.className = 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                } else {
+                    badge.textContent = `➡️ Regresión Lineal: ESTABLE (${s}s/km por sem)`;
+                    badge.className = 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
+                }
+            }
+
+            // Render SVG Chart (Inverted Y-axis: faster pace / lower secPerKm is HIGHER on the chart)
+            const width = 560;
+            const height = 175;
+            const padLeft = 48;
+            const padRight = 22;
+            const padTop = 24;
+            const padBottom = 30;
+            const plotW = width - padLeft - padRight;
+            const plotH = height - padTop - padBottom;
+
+            const allPaces = weeks.flatMap(w => [w.paceSec, w.regPaceSec]);
+            const minPaceSec = Math.min(...allPaces) - 10; // Fastest pace (top of chart)
+            const maxPaceSec = Math.max(...allPaces) + 10; // Slowest pace (bottom of chart)
+            const paceRange = Math.max(20, maxPaceSec - minPaceSec);
+
+            const getX = (i) => weeks.length === 1 ? padLeft + plotW / 2 : padLeft + (i / (weeks.length - 1)) * plotW;
+            // Faster pace (smaller sec) -> smaller Y (higher on SVG)
+            const getY = (sec) => padTop + ((sec - minPaceSec) / paceRange) * plotH;
+
+            // Horizontal reference grid lines (3 lines)
+            const gridPaces = [
+                Math.round(minPaceSec + paceRange * 0.15),
+                Math.round(minPaceSec + paceRange * 0.50),
+                Math.round(minPaceSec + paceRange * 0.85)
+            ];
+
+            const gridLinesSvg = gridPaces.map(gp => {
+                const y = getY(gp).toFixed(1);
+                return `
+                    <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="#1E293B" stroke-dasharray="3,3" stroke-width="1" />
+                    <text x="${padLeft - 6}" y="${Number(y) + 3}" text-anchor="end" fill="#64748B" font-size="10" font-family="JetBrains Mono">${paceSecondsToString(gp)}</text>
+                `;
+            }).join('');
+
+            // Actual Z2 Weekly Pace Polyline
+            const polyPoints = weeks.map((w, i) => `${getX(i).toFixed(1)},${getY(w.paceSec).toFixed(1)}`).join(' ');
+
+            // Linear Regression Trendline (Dashed Cyan/Amber)
+            const regStartX = getX(0).toFixed(1);
+            const regStartY = getY(weeks[0].regPaceSec).toFixed(1);
+            const regEndX = getX(weeks.length - 1).toFixed(1);
+            const regEndY = getY(weeks[weeks.length - 1].regPaceSec).toFixed(1);
+            const regStrokeColor = regData.slopeSecPerWeek <= 0 ? '#06B6D4' : '#F59E0B';
+
+            const nodesSvg = weeks.map((w, i) => {
+                const cx = getX(i).toFixed(1);
+                const cy = getY(w.paceSec).toFixed(1);
+                return `
+                    <g>
+                        <circle cx="${cx}" cy="${cy}" r="4.5" fill="#10B981" stroke="#090D16" stroke-width="2" />
+                        <text x="${cx}" y="${Number(cy) - 8}" text-anchor="middle" fill="#E2E8F0" font-size="10" font-weight="bold" font-family="JetBrains Mono">${paceSecondsToString(w.paceSec)}</text>
+                        <text x="${cx}" y="${height - 8}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono">${w.label}</text>
+                    </g>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2.5">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 px-1 mb-1">
+                        <span class="text-emerald-400 font-mono">↑ Arriba = Ritmo más rápido (Mayor eficiencia Z2)</span>
+                        <span class="flex items-center gap-3">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>Media Semanal</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-cyan-400 inline-block"></span>Regresión Lineal</span>
+                        </span>
+                    </div>
+                    <svg viewBox="0 0 ${width} ${height}" class="w-full h-36 sm:h-44 overflow-visible">
+                        ${gridLinesSvg}
+                        ${weeks.length > 1 ? `<polyline fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${polyPoints}" />` : ''}
+                        ${regData.hasRegression ? `<line x1="${regStartX}" y1="${regStartY}" x2="${regEndX}" y2="${regEndY}" stroke="${regStrokeColor}" stroke-width="2" stroke-dasharray="5,5" />` : ''}
+                        ${nodesSvg}
+                    </svg>
+                </div>
+            `;
         }
 
         function renderWorkoutOnMap(workout) {
@@ -2023,21 +2522,21 @@ self.addEventListener('fetch', (event) => {
                     fatigueAlerts.push(
                         `ALERTA FATIGA MUSCULAR CRUZADA en "${w.title}": Caída brusca de cadencia de ${m.initialCadence} spm a ${m.finalCadence} spm (${m.cadenceDropSpm} spm) en el tramo final.`
                     );
-                }
-            }
-
-            const meanZ2SpeedMs = totalZ2Seconds > 0 ? (weightedZ2SpeedSum / totalZ2Seconds) : 0;
-            const meanZ2PaceStr = meanZ2SpeedMs > 0 ? speedToPaceString(meanZ2SpeedMs) : '--:--';
-
-            // Z2 Efficiency Trend between first and last Z2 session of the week
+            // Z2 Efficiency Trend between first and last Z2 session of the week + Multi-week Linear Regression
             const z2Sessions = chronological.filter(w => w.metrics && w.metrics.z2AvgPaceSec);
+            const regSummary = computeWeeklyZ2RegressionData();
             let z2TrendText = 'Estable (1 sola sesión Z2 evaluada)';
-            if (z2Sessions.length >= 2) {
+            if (regSummary.hasRegression && !regSummary.isDemo) {
+                const s = regSummary.slopeSecPerWeek;
+                z2TrendText = s < 0
+                    ? `REGRESIÓN LINEAL INTER-SEMANAL EN MEJORA (${s} seg/km por semana al mismo pulso Z2)`
+                    : `REGRESIÓN LINEAL CON DERIVA (+${s} seg/km por semana en Z2)`;
+            } else if (z2Sessions.length >= 2) {
                 const firstPace = z2Sessions[0].metrics.z2AvgPaceSec;
                 const lastPace = z2Sessions[z2Sessions.length - 1].metrics.z2AvgPaceSec;
                 const diffSec = Math.round(lastPace - firstPace);
                 if (diffSec < -2) {
-                    z2TrendText = `MEJORA AERÓBICA (${Math.abs(diffSec)}s/km más rápido al mismo rango cardíaco ${z2Min}-${z2Max} ppm)`;
+                    z2TrendText = `MEJORA AERÓBICA INTRA-SEMANAL (${Math.abs(diffSec)}s/km más rápido al mismo rango cardíaco ${z2Min}-${z2Max} ppm)`;
                 } else if (diffSec > 2) {
                     z2TrendText = `DERIVA / FATIGA (+${diffSec}s/km más lento para sostener ${z2Min}-${z2Max} ppm)`;
                 } else {
@@ -2243,7 +2742,13 @@ self.addEventListener('fetch', (event) => {
                 // Restore workouts into IndexedDB and recalculate metrics with current settings
                 await clearAllWorkoutsFromIDB();
                 for (const w of data.workouts) {
-                    w.metrics = analyzeWorkoutStream(w.records, w.startTime, appState.settings);
+                    w.metrics = analyzeWorkoutStream(
+                        w.records,
+                        w.startTime,
+                        appState.settings,
+                        w.authoritativeDistanceMeters,
+                        w.authoritativeDurationSec
+                    );
                     await saveWorkoutToIDB(w);
                 }
 
@@ -2316,6 +2821,48 @@ self.addEventListener('fetch', (event) => {
             refreshDashboardUI();
         }
 
+        function openEditWorkoutDistanceModal(id, event) {
+            event.stopPropagation();
+            const workout = appState.workouts.find(w => w.id === id);
+            if (!workout || !workout.metrics) return;
+
+            const modal = document.getElementById('custom-modal');
+            const inputWrapper = document.getElementById('modal-input-wrapper');
+            const distInput = document.getElementById('modal-distance-input');
+            const iconBox = document.getElementById('modal-icon-box');
+            const icon = document.getElementById('modal-icon');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+
+            iconBox.className = 'w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0';
+            icon.className = 'ph-bold ph-pencil-simple text-lg';
+            document.getElementById('modal-title').textContent = 'Ajustar Distancia Oficial (.FIT)';
+            document.getElementById('modal-desc').textContent = `Corrige los kilómetros exactos de "${workout.title}". Se recalcularán el volumen semanal y el ritmo medio.`;
+            inputWrapper.classList.remove('hidden');
+            distInput.value = workout.metrics.totalDistanceKm;
+
+            confirmBtn.textContent = 'Guardar km';
+            confirmBtn.className = 'px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-bold text-slate-950';
+            confirmBtn.onclick = async () => {
+                const newKm = Number(distInput.value);
+                if (newKm > 0.1 && newKm < 300) {
+                    workout.authoritativeDistanceMeters = Math.round(newKm * 1000);
+                    workout.metrics = analyzeWorkoutStream(
+                        workout.records,
+                        workout.startTime,
+                        appState.settings,
+                        workout.authoritativeDistanceMeters,
+                        workout.authoritativeDurationSec
+                    );
+                    await saveWorkoutToIDB(workout);
+                    closeCustomModal();
+                    refreshAllViews();
+                    showToast(`Distancia actualizada a ${newKm.toFixed(2)} km.`, 'success');
+                }
+            };
+
+            modal.classList.remove('hidden');
+        }
+
         async function deleteSingleWorkout(id, event) {
             event.stopPropagation();
             await deleteWorkoutFromIDB(id);
@@ -2331,11 +2878,24 @@ self.addEventListener('fetch', (event) => {
             const { fcMax, fcBasal } = appState.settings;
             const { z2Min, z2Max, z4MinHr, z4MaxHr } = getKarvonenZones(fcMax, fcBasal);
 
+            // Show "Borrar Demos" button if any demo/simulated sessions exist in IndexedDB
+            const hasDemos = appState.workouts.some(w => w.isDemo || String(w.id).startsWith('sim_') || String(w.id).startsWith('demo_'));
+            const clearDemosBtn = document.getElementById('btn-clear-demos');
+            if (clearDemosBtn) {
+                if (hasDemos) {
+                    clearDemosBtn.classList.remove('hidden');
+                    clearDemosBtn.classList.add('flex');
+                } else {
+                    clearDemosBtn.classList.add('hidden');
+                    clearDemosBtn.classList.remove('flex');
+                }
+            }
+
             // Header pills
-            document.getElementById('header-z2-pill').textContent = `Z2: ${z2Min}-${z2Max}`;
+            document.getElementById('header-z2-pill').textContent = `${z2Min}-${z2Max}`;
             document.getElementById('zone-header-basal').textContent = fcBasal;
             document.getElementById('zone-header-max').textContent = fcMax;
-            document.getElementById('card-z2-hr').innerHTML = `${z2Min} - ${z2Max} <span class="text-xs font-normal text-slate-400">ppm</span>`;
+            document.getElementById('card-z2-hr').innerHTML = `${z2Min} - ${z2Max} <span class="text-[10px] font-normal text-slate-400">ppm</span>`;
             document.getElementById('kpi-z2-range-label').textContent = `${z2Min}-${z2Max} ppm`;
             document.getElementById('card-z4-hr').textContent = `${z4MinHr} - ${z4MaxHr} ppm`;
 
@@ -2352,7 +2912,7 @@ self.addEventListener('fetch', (event) => {
                 weekKm += w.metrics.totalDistanceKm;
                 weekSec += w.metrics.totalDurationSec;
                 weekTrimp += w.metrics.trimp;
-                if (w.metrics.z2TimeSec >= 30 && w.metrics.z2AvgSpeedMs > 0) {
+                if (w.metrics.z2TimeSec >= 20 && w.metrics.z2AvgSpeedMs > 0) {
                     z2SpeedWeighted += w.metrics.z2AvgSpeedMs * w.metrics.z2TimeSec;
                     z2SecTotal += w.metrics.z2TimeSec;
                 }
@@ -2360,23 +2920,23 @@ self.addEventListener('fetch', (event) => {
 
             const weekZ2PaceStr = z2SecTotal > 0 ? speedToPaceString(z2SpeedWeighted / z2SecTotal) : '--:--';
 
-            document.getElementById('kpi-week-km').textContent = weekKm.toFixed(1);
+            document.getElementById('kpi-week-km').textContent = weekKm.toFixed(2);
             document.getElementById('kpi-week-time').textContent = formatDurationHMS(weekSec);
-            document.getElementById('kpi-week-sessions').textContent = `${weekWorkouts.length} sesiones`;
+            document.getElementById('kpi-week-sessions').textContent = `${weekWorkouts.length} ses.`;
             document.getElementById('kpi-z2-pace').textContent = weekZ2PaceStr;
-            document.getElementById('card-z2-pace').innerHTML = `${weekZ2PaceStr} <span class="text-xs font-normal text-slate-400">/km</span>`;
+            document.getElementById('card-z2-pace').innerHTML = `${weekZ2PaceStr} <span class="text-[10px] font-normal text-slate-400">/km</span>`;
             document.getElementById('kpi-week-trimp').textContent = weekTrimp;
 
             const trimpStatusEl = document.getElementById('kpi-trimp-status');
             if (weekTrimp > 450) {
                 trimpStatusEl.textContent = 'Carga muy alta';
-                trimpStatusEl.className = 'text-rose-400 font-semibold';
+                trimpStatusEl.className = 'text-rose-400 font-semibold truncate';
             } else if (weekTrimp >= 180) {
                 trimpStatusEl.textContent = 'Carga óptima';
-                trimpStatusEl.className = 'text-emerald-400 font-semibold';
+                trimpStatusEl.className = 'text-emerald-400 font-semibold truncate';
             } else {
-                trimpStatusEl.textContent = 'Carga de descarga';
-                trimpStatusEl.className = 'text-cyan-300 font-medium';
+                trimpStatusEl.textContent = 'Asimilación';
+                trimpStatusEl.className = 'text-cyan-300 font-medium truncate';
             }
 
             // VAM & 42-Day Rolling Window Evaluation
@@ -2386,46 +2946,49 @@ self.addEventListener('fetch', (event) => {
 
             if (vamStatus.isValid) {
                 expiredBanner.classList.add('hidden');
-                document.getElementById('header-vam-pill').textContent = `VAM: ${vamStatus.vamPaceStr}`;
+                document.getElementById('header-vam-pill').textContent = `VAM:${vamStatus.vamPaceStr}`;
                 document.getElementById('kpi-vam-pace').textContent = vamStatus.vamPaceStr;
-                document.getElementById('kpi-vam-pace').className = 'mono-metric text-2xl sm:text-3xl font-bold text-cyan-400';
+                document.getElementById('kpi-vam-pace').className = 'mono-metric text-xl sm:text-2xl font-bold text-cyan-400';
                 document.getElementById('kpi-vam-zones').textContent = `Z4: ${vamStatus.z4PaceRangeStr}`;
-                document.getElementById('kpi-vam-age').textContent = `Hace ${vamStatus.daysAgo}d`;
-                document.getElementById('kpi-vam-age').className = 'px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono';
+                document.getElementById('kpi-vam-age').textContent = `${vamStatus.daysAgo}d`;
+                document.getElementById('kpi-vam-age').className = 'px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono shrink-0';
 
-                document.getElementById('card-z4-pace').innerHTML = `${vamStatus.z4PaceRangeStr} <span class="text-xs font-normal text-slate-400">/km</span>`;
-                document.getElementById('card-z5-pace').innerHTML = `${vamStatus.z5PaceRangeStr} <span class="text-xs font-normal text-slate-400">/km</span>`;
-                document.getElementById('card-vam-speed').textContent = `${vamStatus.vamSpeedKmh} km/h (${vamStatus.vamPaceStr}/km)`;
+                document.getElementById('card-z4-pace').innerHTML = `${vamStatus.z4PaceRangeStr} <span class="text-[10px] font-normal text-slate-400">/km</span>`;
+                document.getElementById('card-z5-pace').innerHTML = `${vamStatus.z5PaceRangeStr} <span class="text-[10px] font-normal text-slate-400">/km</span>`;
+                document.getElementById('card-vam-speed').textContent = `${vamStatus.vamSpeedKmh} km/h (${vamStatus.vamPaceStr})`;
 
-                validityBadge.textContent = `VAM Vigente (${42 - vamStatus.daysAgo} días restantes)`;
-                validityBadge.className = 'self-start sm:self-auto px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+                validityBadge.textContent = `VAM Vigente (${42 - vamStatus.daysAgo}d)`;
+                validityBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
             } else {
                 expiredBanner.classList.remove('hidden');
-                document.getElementById('header-vam-pill').textContent = `VAM: CADUCADO`;
-                document.getElementById('kpi-vam-pace').textContent = 'ANULADO';
-                document.getElementById('kpi-vam-pace').className = 'mono-metric text-xl sm:text-2xl font-bold text-rose-400';
+                document.getElementById('header-vam-pill').textContent = `VAM:CAD`;
+                document.getElementById('kpi-vam-pace').textContent = 'CADUC.';
+                document.getElementById('kpi-vam-pace').className = 'mono-metric text-lg sm:text-xl font-bold text-rose-400';
                 document.getElementById('kpi-vam-zones').textContent = 'Z4/Z5 anuladas';
-                document.getElementById('kpi-vam-age').textContent = vamStatus.daysAgo !== null ? `Hace ${vamStatus.daysAgo}d (>42d)` : 'Sin test';
-                document.getElementById('kpi-vam-age').className = 'px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono';
+                document.getElementById('kpi-vam-age').textContent = vamStatus.daysAgo !== null ? `${vamStatus.daysAgo}d` : '--';
+                document.getElementById('kpi-vam-age').className = 'px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono shrink-0';
 
-                document.getElementById('card-z4-pace').innerHTML = `ANULADO <span class="text-xs font-normal text-rose-300/80">(Test &gt;42d)</span>`;
-                document.getElementById('card-z5-pace').innerHTML = `ANULADO <span class="text-xs font-normal text-rose-300/80">(Test &gt;42d)</span>`;
-                document.getElementById('card-vam-speed').textContent = 'Requiere test VAM 5 min';
+                document.getElementById('card-z4-pace').innerHTML = `ANULADO <span class="text-[10px] font-normal text-rose-300/80">(&gt;42d)</span>`;
+                document.getElementById('card-z5-pace').innerHTML = `ANULADO <span class="text-[10px] font-normal text-rose-300/80">(&gt;42d)</span>`;
+                document.getElementById('card-vam-speed').textContent = 'Hacer test 5 min';
 
-                validityBadge.textContent = 'Datos de intensidad caducados (>42 días)';
-                validityBadge.className = 'self-start sm:self-auto px-3 py-1 rounded-full text-xs font-mono font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+                validityBadge.textContent = 'Caducado (>42d)';
+                validityBadge.className = 'shrink-0 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40';
             }
+
+            // Update Weekly Z2 Linear Regression Chart
+            renderWeeklyZ2TrendChart();
 
             // Render Workouts List
             const listEl = document.getElementById('workouts-list');
-            document.getElementById('workouts-count-badge').textContent = `${appState.workouts.length} sesiones`;
+            document.getElementById('workouts-count-badge').textContent = `${appState.workouts.length} ses.`;
 
             if (appState.workouts.length === 0) {
                 listEl.innerHTML = `
-                    <div class="text-center py-10 px-4 border border-dashed border-slate-800 rounded-xl">
-                        <i class="ph-duotone ph-file-ArrowUp text-3xl text-slate-500"></i>
-                        <p class="text-xs text-slate-300 font-semibold mt-2">No hay entrenamientos .FIT almacenados</p>
-                        <p class="text-[11px] text-slate-500 mt-1">Usa el botón "Subir .FIT" o genera una sesión demo arriba.</p>
+                    <div class="text-center py-8 px-3 border border-dashed border-slate-800 rounded-xl">
+                        <i class="ph-duotone ph-file-arrow-up text-2xl text-emerald-400"></i>
+                        <p class="text-xs text-slate-200 font-semibold mt-1.5">Sube tus archivos .FIT de WorkOutDoors</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Pulsa "Subir .FIT" arriba para analizar tus entrenamientos reales.</p>
                     </div>
                 `;
                 return;
@@ -2438,40 +3001,47 @@ self.addEventListener('fetch', (event) => {
             listEl.innerHTML = appState.workouts.map(w => {
                 const m = w.metrics;
                 const isSelected = w.id === appState.selectedWorkoutId;
+                const isDemoSession = w.isDemo || String(w.id).startsWith('sim_') || String(w.id).startsWith('demo_');
                 const dateFormatted = new Date(w.startTime).toLocaleDateString('es-ES', {
-                    day: '2-digit', month: 'short', year: 'numeric'
+                    day: '2-digit', month: 'short'
                 });
 
                 return `
-                    <div onclick="selectWorkout('${w.id}')" class="cursor-pointer rounded-xl p-3.5 border transition ${
+                    <div onclick="selectWorkout('${w.id}')" class="cursor-pointer rounded-xl p-2.5 border transition ${
                         isSelected
-                            ? 'bg-slate-800/95 border-emerald-500/60 shadow-md shadow-emerald-500/10'
+                            ? 'bg-slate-800/95 border-emerald-500/60 shadow-sm'
                             : 'bg-slate-900/70 hover:bg-slate-800/50 border-slate-800'
                     }">
-                        <div class="flex items-start justify-between gap-2">
-                            <div>
-                                <div class="flex items-center gap-1.5 flex-wrap">
-                                    <span class="text-xs font-bold text-white">${w.title}</span>
-                                    ${m.isVamPeakQualified || w.isExplicitVamTest ? '<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Pico VAM</span>' : ''}
-                                    ${m.hasCrossFatigue ? '<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Fatiga Cadencia</span>' : ''}
+                        <div class="flex items-start justify-between gap-1.5">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1 flex-wrap">
+                                    <span class="text-xs font-bold text-white truncate">${w.title}</span>
+                                    ${isDemoSession ? '<span class="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">DEMO</span>' : ''}
+                                    ${m.isVamPeakQualified || w.isExplicitVamTest ? '<span class="text-[9px] font-mono px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300">VAM</span>' : ''}
+                                    ${m.hasCrossFatigue ? '<span class="text-[9px] font-mono px-1 py-0.2 rounded bg-rose-500/20 text-rose-300">Fatiga</span>' : ''}
                                 </div>
-                                <p class="text-[11px] text-slate-400 font-mono mt-0.5">${dateFormatted} • ${m.totalDistanceKm} km • ${formatDurationHMS(m.totalDurationSec)}</p>
+                                <p class="text-[10px] text-slate-400 font-mono mt-0.5">${dateFormatted} • <strong class="text-white">${m.totalDistanceKm} km</strong> • ${formatDurationHMS(m.totalDurationSec)}</p>
                             </div>
-                            <button onclick="deleteSingleWorkout('${w.id}', event)" class="text-slate-500 hover:text-rose-400 p-1 rounded-lg transition" title="Eliminar entrenamiento">
-                                <i class="ph-bold ph-trash text-sm"></i>
-                            </button>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button onclick="openEditWorkoutDistanceModal('${w.id}', event)" class="text-slate-400 hover:text-emerald-400 p-1 rounded-lg bg-slate-950/60 border border-slate-800 transition" title="Editar distancia (km)">
+                                    <i class="ph-bold ph-pencil-simple text-xs"></i>
+                                </button>
+                                <button onclick="deleteSingleWorkout('${w.id}', event)" class="text-slate-400 hover:text-rose-400 p-1 rounded-lg bg-slate-950/60 border border-slate-800 transition" title="Eliminar entrenamiento">
+                                    <i class="ph-bold ph-trash text-xs"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-slate-800/80 text-[11px] font-mono">
+                        <div class="grid grid-cols-3 gap-1.5 mt-2 pt-1.5 border-t border-slate-800/80 text-[10px] font-mono">
                             <div>
-                                <span class="text-slate-400 block text-[10px]">Ritmo Z2 Puro</span>
+                                <span class="text-slate-500 block text-[9px]">Ritmo Z2</span>
                                 <span class="text-emerald-400 font-bold">${m.z2AvgPaceStr}/km</span>
                             </div>
                             <div>
-                                <span class="text-slate-400 block text-[10px]">FC Media</span>
+                                <span class="text-slate-500 block text-[9px]">FC Media</span>
                                 <span class="text-rose-300 font-semibold">${m.avgHr} ppm</span>
                             </div>
                             <div>
-                                <span class="text-slate-400 block text-[10px]">Carga TRIMP</span>
+                                <span class="text-slate-500 block text-[9px]">TRIMP</span>
                                 <span class="text-amber-300 font-semibold">${m.trimp} pts</span>
                             </div>
                         </div>
@@ -2553,9 +3123,18 @@ self.addEventListener('fetch', (event) => {
 
         function openResetDatabaseModal() {
             const modal = document.getElementById('custom-modal');
+            const inputWrapper = document.getElementById('modal-input-wrapper');
+            const iconBox = document.getElementById('modal-icon-box');
+            const icon = document.getElementById('modal-icon');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+
+            inputWrapper.classList.add('hidden');
+            iconBox.className = 'w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0';
+            icon.className = 'ph-bold ph-warning text-lg';
             document.getElementById('modal-title').textContent = '¿Vaciar historial de entrenamientos?';
             document.getElementById('modal-desc').textContent = 'Se eliminarán las sesiones .FIT guardadas en IndexedDB. Tus ajustes fisiológicos de FC Máx y Basal se mantendrán.';
-            const confirmBtn = document.getElementById('modal-confirm-btn');
+            confirmBtn.textContent = 'Confirmar';
+            confirmBtn.className = 'px-3.5 py-2 rounded-xl bg-rose-500 hover:bg-rose-400 text-xs font-bold text-slate-950';
             confirmBtn.onclick = async () => {
                 await clearAllWorkoutsFromIDB();
                 appState.workouts = [];
@@ -2582,39 +3161,26 @@ self.addEventListener('fetch', (event) => {
 
             try {
                 appState.workouts = await getAllWorkoutsFromIDB();
-                // Seed initial realistic WorkOutDoors sessions on first visit so all features can be inspected right away
-                if (appState.workouts.length === 0) {
-                    const demo1 = buildSyntheticWorkout({
-                        title: 'Tirada Larga Z2 Casa de Campo',
-                        daysAgo: 1,
-                        durationSec: 4200, // 70 min
-                        type: 'z2_long',
-                        settings: appState.settings
-                    });
-                    const demo2 = buildSyntheticWorkout({
-                        title: 'Rodaje Aeróbico Madrid Río',
-                        daysAgo: 3,
-                        durationSec: 3000, // 50 min
-                        type: 'z2_easy',
-                        settings: appState.settings
-                    });
-                    const demo3 = buildSyntheticWorkout({
-                        title: 'Sesión Pico VAM 5 min + Z2',
-                        daysAgo: 5,
-                        durationSec: 2700, // 45 min
-                        type: 'vam_test',
-                        settings: appState.settings
-                    });
 
-                    await saveWorkoutToIDB(demo1);
-                    await saveWorkoutToIDB(demo2);
-                    await saveWorkoutToIDB(demo3);
-                    appState.workouts = [demo1, demo2, demo3];
-                } else {
-                    // Recalculate dynamically with stored settings
-                    for (const w of appState.workouts) {
-                        w.metrics = analyzeWorkoutStream(w.records, w.startTime, appState.settings);
+                // If user has real .FIT workouts uploaded ('fit_*'), automatically remove any leftover duplicate 'sim_*' sessions
+                const hasRealFits = appState.workouts.some(w => String(w.id).startsWith('fit_'));
+                if (hasRealFits) {
+                    const leftoverSims = appState.workouts.filter(w => String(w.id).startsWith('sim_'));
+                    for (const s of leftoverSims) {
+                        await deleteWorkoutFromIDB(s.id);
                     }
+                    appState.workouts = appState.workouts.filter(w => !String(w.id).startsWith('sim_'));
+                }
+
+                // Recalculate all stored workouts with the improved distance/time analyzer
+                for (const w of appState.workouts) {
+                    w.metrics = analyzeWorkoutStream(
+                        w.records,
+                        w.startTime,
+                        appState.settings,
+                        w.authoritativeDistanceMeters,
+                        w.authoritativeDurationSec
+                    );
                 }
             } catch (err) {
                 console.error('Error iniciando IndexedDB:', err);
