@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="RunLab Pro">
     <meta name="theme-color" content="#0b0f17">
-    <title>RunLab Pro v2.2 — WorkOutDoors .FIT Analytics & AI Coach</title>
+    <title>RunLab Pro v2.3 — WorkOutDoors .FIT Analytics & AI Coach</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -117,17 +117,17 @@
             z-index: 50;
             background-color: #0b0f17;
             border-bottom: 1px solid #1e293b;
-            padding-top: max(calc(env(safe-area-inset-top, 0px) + 12px), 14px);
+            padding-top: max(54px, calc(env(safe-area-inset-top, 44px) + 12px));
         }
         @supports (-webkit-touch-callout: none) {
             /* Specific targeting for iOS Safari & iPhone PWA to clear the Notch / Dynamic Island and iOS top blur completely */
             .app-header {
-                padding-top: max(calc(env(safe-area-inset-top, 47px) + 10px), 54px);
+                padding-top: max(54px, calc(env(safe-area-inset-top, 44px) + 12px));
             }
         }
         @media (display-mode: standalone) {
             .app-header {
-                padding-top: max(calc(env(safe-area-inset-top, 47px) + 10px), 54px);
+                padding-top: max(54px, calc(env(safe-area-inset-top, 44px) + 12px));
             }
         }
         @keyframes pulse-subtle {
@@ -141,10 +141,10 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950 w-full overflow-x-hidden">
 
-    <!-- TOP HEADER BAR (iPhone Notch & iOS Top Blur Safe Area Protected - v2.2) -->
+    <!-- TOP HEADER BAR (iPhone Notch & iOS Top Blur Safe Area Protected - v2.3) -->
     <header class="app-header px-3 pb-2.5 w-full">
         <div class="max-w-5xl mx-auto flex items-center justify-between gap-2 w-full">
-            <!-- Left: Brand + Visible Version Badge v2.2 + Z2 Indicator -->
+            <!-- Left: Brand + Visible Version Badge v2.3 + Z2 Indicator -->
             <div class="flex items-center gap-2 min-w-0">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
                     <i class="ph-bold ph-person-simple-run text-slate-950 text-base"></i>
@@ -152,7 +152,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
                         <h1 class="font-extrabold text-sm tracking-tight text-white truncate">RunLab <span class="text-emerald-400">Pro</span></h1>
-                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.2</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.3</span>
                     </div>
                     <button onclick="switchTab('settings')" class="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-200 font-mono truncate">
                         <i class="ph-fill ph-heart text-rose-400 text-[10px]"></i>
@@ -388,44 +388,128 @@
         </section>
 
         <!-- ==========================================
-             TAB 2: ENTRADA DE DATOS MANUALES (SEMANAL)
+             TAB 2: HISTORIAL Y TENDENCIA AUTONÓMICA (VFC + FC REPOSO - SIN RPE SUBJETIVO)
              ========================================== -->
-        <section id="tab-weekly" class="hidden space-y-4 w-full">
-            <div class="bg-panel border border-slate-800 rounded-xl p-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+        <section id="tab-weekly" class="hidden space-y-3.5 w-full">
+
+            <!-- SEMAPHORE & AUTONOMIC ASSIMILATION DIAGNOSTIC CARD (PLEWS / BUCHHEIT METHOD) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800">
                     <div>
-                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">Control de Fatiga Semanal</span>
-                        <h2 class="text-base font-bold text-white mt-1">Biomarcadores y Fuerza de la Semana</h2>
+                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Método Plews / Buchheit • Cero Subjetividad</span>
+                        <h2 class="text-sm sm:text-base font-bold text-white mt-1">Estado Autonómico y Asimilación de Carga</h2>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs text-slate-400 font-mono">Semana:</label>
-                        <input type="week" id="weekly-iso-picker" onchange="loadWeeklyLogForSelectedWeek()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs font-mono text-white">
+                    <div id="autonomic-semaphore-badge" class="self-start sm:self-auto px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 shrink-0">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span>Asimilación Óptima</span>
                     </div>
                 </div>
 
-                <form id="weekly-form" onsubmit="saveWeeklyManualData(event)" class="space-y-3.5 mt-3.5">
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label for="input-rpe" class="text-xs font-bold uppercase text-slate-200">RPE Medio Semanal (1-10)</label>
-                            <span id="rpe-value-badge" class="mono-metric text-xs font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">6.5 / 10</span>
+                <!-- Autonomic Explanation Box -->
+                <div id="autonomic-diagnosis-box" class="bg-slate-900/90 border border-emerald-500/30 rounded-xl p-3 text-xs text-slate-200 leading-relaxed">
+                    Analizando la desviación de tu VFC frente a la línea base móvil de 4 semanas y la respuesta de tu FC en reposo frente a tu FC Basal...
+                </div>
+
+                <!-- 3 Objective Physiological KPIs -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <!-- KPI A: VFC vs 4-Week Rolling Baseline -->
+                    <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2.5">
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 uppercase font-semibold">
+                            <span>VFC vs Base (4 sem)</span>
+                            <i class="ph-duotone ph-wave-sine text-cyan-400 text-sm"></i>
                         </div>
-                        <input id="input-rpe" type="range" min="1" max="10" step="0.5" value="6.5" oninput="updateRpeBadge(this.value)" class="w-full cursor-pointer">
+                        <div class="flex items-baseline justify-between mt-1">
+                            <p id="auto-kpi-hrv-val" class="mono-metric text-lg font-bold text-white">-- ms</p>
+                            <span id="auto-kpi-hrv-delta" class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300">0.0%</span>
+                        </div>
+                        <p id="auto-kpi-hrv-base" class="text-[10px] text-slate-400 font-mono mt-0.5">Base móvil: -- ms</p>
                     </div>
 
+                    <!-- KPI B: Autonomic Cost Ratio (TRIMP / VFC) -->
+                    <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2.5">
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 uppercase font-semibold">
+                            <span>Ratio TRIMP / VFC</span>
+                            <i class="ph-duotone ph-scales text-amber-400 text-sm"></i>
+                        </div>
+                        <div class="flex items-baseline justify-between mt-1">
+                            <p id="auto-kpi-trimp-hrv" class="mono-metric text-lg font-bold text-amber-400">--</p>
+                            <span class="text-[10px] font-mono text-slate-400">pts / ms</span>
+                        </div>
+                        <p id="auto-kpi-trimp-hrv-desc" class="text-[10px] text-slate-400 font-mono mt-0.5">Coste interno por ms VFC</p>
+                    </div>
+
+                    <!-- KPI C: Automatic Physiological Effort (.FIT) -->
+                    <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2.5">
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 uppercase font-semibold">
+                            <span>Esfuerzo Fisio (.FIT)</span>
+                            <i class="ph-duotone ph-lightning text-emerald-400 text-sm"></i>
+                        </div>
+                        <div class="flex items-baseline justify-between mt-1">
+                            <p id="auto-kpi-physio-effort" class="mono-metric text-lg font-bold text-emerald-400">-- / 10</p>
+                            <span id="auto-kpi-trimp-density" class="text-[10px] font-mono text-slate-400">-- TRIMP/min</span>
+                        </div>
+                        <p id="auto-kpi-physio-label" class="text-[10px] text-slate-400 font-mono mt-0.5">Calculado de tus .FIT</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WEEKLY HRV (VFC) PROGRESSION & BASELINE BAND SVG CHART -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <i class="ph-bold ph-activity text-cyan-400 text-sm"></i>
+                                Tendencia Semanal VFC (ms) y Banda de Normalidad (±5%)
+                            </h3>
+                            <span id="hrv-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300">
+                                -- ms/sem
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-0.5">
+                            Evolución semanal de tu VFC, franja sombreada de tu <strong>Línea Base Móvil</strong> y recta de Regresión Lineal.
+                        </p>
+                    </div>
+                    <button id="btn-toggle-hrv-demo" onclick="toggleHrvTrendPreview()" class="self-start sm:self-auto shrink-0 text-[10px] font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg px-2 py-1 transition active:scale-95">
+                        <i class="ph-bold ph-magic-wand mr-1"></i>Ver ejemplo 5 sem
+                    </button>
+                </div>
+
+                <div id="hrv-trend-chart-container" class="w-full pt-2.5"></div>
+            </div>
+
+            <!-- WEEKLY BIOMARKERS & STRENGTH FORM (MULTI-WEEK MEMORY) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Registro Semanal (Memoria Multitemporal)</span>
+                        <h2 class="text-sm sm:text-base font-bold text-white mt-1">Biomarcadores y Fuerza de la Semana</h2>
+                        <p class="text-[10px] text-slate-400">Puedes guardar la semana actual o elegir semanas anteriores para construir tu línea base.</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <label class="text-xs text-slate-400 font-mono">Semana:</label>
+                        <input type="week" id="weekly-iso-picker" onchange="loadWeeklyLogForSelectedWeek()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white">
+                    </div>
+                </div>
+
+                <form id="weekly-form" onsubmit="saveWeeklyManualData(event)" class="space-y-3 mt-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-                            <label for="input-weekly-rhr" class="block text-xs font-bold uppercase text-slate-200">FC Reposo Media Semanal (ppm)</label>
-                            <p class="text-[10px] text-slate-400 mb-2">Chivato de estrés (NO cambia tu FC Basal de <span id="weekly-basal-ref" class="font-mono text-emerald-400">57</span> ppm).</p>
+                            <label for="input-weekly-hrv" class="block text-xs font-bold uppercase text-cyan-300">VFC / HRV Media Semanal (ms)</label>
+                            <p class="text-[10px] text-slate-400 mb-2">Se compara automáticamente con tus semanas previas.</p>
                             <div class="flex items-center gap-2">
-                                <input id="input-weekly-rhr" type="number" min="30" max="120" step="1" required oninput="updateRhrStressIndicator()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white">
-                                <span id="rhr-delta-badge" class="shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-slate-800 text-slate-300">+2 ppm</span>
+                                <input id="input-weekly-hrv" type="number" min="10" max="250" step="1" required oninput="updateWeeklyFormLiveIndicators()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono font-bold text-white">
+                                <span id="hrv-delta-badge" class="shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-slate-800 text-cyan-300">Base</span>
                             </div>
                         </div>
 
                         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-                            <label for="input-weekly-hrv" class="block text-xs font-bold uppercase text-slate-200">VFC / HRV Media Semanal (ms)</label>
-                            <p class="text-[10px] text-slate-400 mb-2">Variabilidad de la frecuencia cardíaca en milisegundos.</p>
-                            <input id="input-weekly-hrv" type="number" min="10" max="250" step="1" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white">
+                            <label for="input-weekly-rhr" class="block text-xs font-bold uppercase text-rose-300">FC Reposo Media Semanal (ppm)</label>
+                            <p class="text-[10px] text-slate-400 mb-2">Chivato de estrés (NO cambia tu FC Basal de <span id="weekly-basal-ref" class="font-mono text-emerald-400">57</span> ppm).</p>
+                            <div class="flex items-center gap-2">
+                                <input id="input-weekly-rhr" type="number" min="30" max="120" step="1" required oninput="updateWeeklyFormLiveIndicators()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono font-bold text-white">
+                                <span id="rhr-delta-badge" class="shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-slate-800 text-slate-300">+2 ppm</span>
+                            </div>
                         </div>
                     </div>
 
@@ -442,14 +526,29 @@
 
                     <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
                         <label for="input-strength-notes" class="block text-xs font-bold uppercase text-slate-200 mb-1.5">Notas de Entrenamiento de Fuerza</label>
-                        <textarea id="input-strength-notes" rows="2" placeholder="Ej: Subida de pesos en polea y sentadilla búlgara." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white"></textarea>
+                        <textarea id="input-strength-notes" rows="2" placeholder="Ej: Subida de pesos en polea y sentadilla búlgara sin molestias." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white"></textarea>
                     </div>
 
                     <button type="submit" class="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs py-3 px-4 rounded-xl shadow-md transition">
                         <i class="ph-bold ph-floppy-disk text-base"></i>
-                        <span>Guardar Datos de la Semana</span>
+                        <span>Guardar Semana en el Historial Autonómico</span>
                     </button>
                 </form>
+            </div>
+
+            <!-- STORED WEEKLY HISTORY LIST -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5">
+                <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                    <div>
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-clock-counter-clockwise text-emerald-400 text-sm"></i>
+                            Historial de Semanas Registradas
+                        </h3>
+                        <p class="text-[10px] text-slate-400">Toca una semana para editarla o consultar su diagnóstico.</p>
+                    </div>
+                    <span id="weekly-history-count" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">0 sem.</span>
+                </div>
+                <div id="weekly-history-list" class="space-y-2 mt-2.5 max-h-72 overflow-y-auto pr-0.5"></div>
             </div>
         </section>
 
@@ -475,7 +574,7 @@
                         <p id="report-preview-z2" class="mono-metric text-xs font-bold text-emerald-400 mt-0.5">--</p>
                     </div>
                     <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5">
-                        <p class="text-[10px] text-slate-400">Fatiga Muscular Cruzada</p>
+                        <p class="text-[10px] text-slate-400">Diagnóstico Autonómico (VFC)</p>
                         <p id="report-preview-fatigue" class="mono-metric text-xs font-bold text-white mt-0.5">--</p>
                     </div>
                     <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5">
@@ -484,7 +583,7 @@
                     </div>
                 </div>
 
-                <textarea id="ai-report-textarea" readonly rows="16" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-[11px] text-slate-200 leading-relaxed focus:outline-none"></textarea>
+                <textarea id="ai-report-textarea" readonly rows="18" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-[11px] text-slate-200 leading-relaxed focus:outline-none"></textarea>
             </div>
         </section>
 
@@ -498,7 +597,7 @@
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Variables Fisiológicas (LocalStorage)</span>
                         <h2 class="text-base font-bold text-white mt-1">Configuración del Atleta</h2>
                     </div>
-                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Versión v2.2</span>
+                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Versión v2.3</span>
                 </div>
 
                 <form onsubmit="saveAthleteSettings(event)" class="mt-3.5 space-y-3.5">
@@ -567,7 +666,7 @@
             </div>
 
             <div class="text-center py-2 text-[11px] font-mono text-slate-500">
-                RunLab Pro <strong class="text-emerald-400">v2.2</strong> • Motor .FIT Local + Regresión Lineal Z2
+                RunLab Pro <strong class="text-emerald-400">v2.3</strong> • Motor .FIT Local + Diagnóstico Autonómico VFC
             </div>
         </section>
     </main>
@@ -610,8 +709,8 @@
                 <span class="text-[10px] mt-0.5">Analítica .FIT</span>
             </button>
             <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
-                <i class="ph-bold ph-clipboard-text text-base"></i>
-                <span class="text-[10px] mt-0.5">Fatiga Semanal</span>
+                <i class="ph-bold ph-heartbeat text-base"></i>
+                <span class="text-[10px] mt-0.5">VFC / Fatiga</span>
             </button>
             <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
                 <i class="ph-bold ph-robot text-base"></i>
@@ -619,21 +718,21 @@
             </button>
             <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
                 <i class="ph-bold ph-sliders-horizontal text-base"></i>
-                <span class="text-[10px] mt-0.5">Ajustes v2.2</span>
+                <span class="text-[10px] mt-0.5">Ajustes v2.3</span>
             </button>
         </div>
     </nav>
 
     <!-- =========================================================================
-         CORE APPLICATION LOGIC v2.2: CLEAN, VERIFIED & ZERO DEMO CLUTTER
+         CORE APPLICATION LOGIC v2.3: AUTONOMIC HRV ENGINE & ZERO DEMO CLUTTER
          ========================================================================= -->
     <script>
-        const APP_VERSION = '2.2';
+        const APP_VERSION = '2.3';
 
         const PWA_MANIFEST_JSON = {
-            name: "RunLab Pro v2.2 — Analítica .FIT",
-            short_name: "RunLab v2.2",
-            description: "Analizador científico local de archivos .fit (WorkOutDoors) con Eficiencia Z2 Karvonen, Regresión Lineal, TRIMP y VAM.",
+            name: "RunLab Pro v2.3 — Analítica .FIT",
+            short_name: "RunLab v2.3",
+            description: "Analizador científico local de archivos .fit (WorkOutDoors) con Eficiencia Z2 Karvonen, Diagnóstico Autonómico VFC, TRIMP y VAM.",
             start_url: "./index.html",
             display: "standalone",
             background_color: "#090D16",
@@ -660,7 +759,8 @@
 
         const STORAGE_KEYS = {
             SETTINGS: 'runlab_athlete_settings_v1',
-            WEEKLY_LOGS: 'runlab_weekly_logs_v1'
+            WEEKLY_LOGS_LEGACY: 'runlab_weekly_logs_v1',
+            WEEKLY_HISTORY_V23: 'runlab_weekly_history_v23'
         };
 
         const IDB_CONFIG = {
@@ -679,7 +779,8 @@
             weeklyLogs: {},
             leafletMap: null,
             mapLayers: [],
-            showMultiWeekTrendDemo: false
+            showMultiWeekTrendDemo: false,
+            showHrvTrendDemo: false
         };
 
         function loadSettingsFromLocalStorage() {
@@ -1730,7 +1831,7 @@
         }
 
         /*************************************************************************
-         * WEEKLY MANUAL DATA ENTRY
+         * AUTONOMIC HRV ENGINE, PLEWS/BUCHHEIT BASELINE & WEEKLY HISTORY (v2.3)
          *************************************************************************/
         function getCurrentISOWeekString(dateObj = new Date()) {
             const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
@@ -1743,72 +1844,255 @@
 
         function loadWeeklyLogsFromStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_LOGS);
-                if (raw) {
-                    appState.weeklyLogs = JSON.parse(raw);
+                const rawV23 = localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V23);
+                const rawLegacy = localStorage.getItem(STORAGE_KEYS.WEEKLY_LOGS_LEGACY);
+
+                if (rawV23) {
+                    appState.weeklyLogs = JSON.parse(rawV23) || {};
+                } else if (rawLegacy) {
+                    const legacyParsed = JSON.parse(rawLegacy) || {};
+                    appState.weeklyLogs = {};
+                    for (const [k, v] of Object.entries(legacyParsed)) {
+                        appState.weeklyLogs[k] = {
+                            weeklyRhr: Number(v.weeklyRhr) || (appState.settings.fcBasal + 2),
+                            hrv: Number(v.hrv) || 68,
+                            weight: Number(v.weight) || 71.4,
+                            waist: Number(v.waist) || 78.5,
+                            strengthNotes: v.strengthNotes || '',
+                            updatedAt: v.updatedAt || new Date().toISOString()
+                        };
+                    }
+                    localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V23, JSON.stringify(appState.weeklyLogs));
                 } else {
                     const currentWeek = getCurrentISOWeekString();
                     appState.weeklyLogs = {
                         [currentWeek]: {
-                            rpe: 6.5,
-                            weeklyRhr: 59,
+                            weeklyRhr: appState.settings.fcBasal + 2,
                             hrv: 68,
                             weight: 71.4,
                             waist: 78.5,
-                            strengthNotes: ''
+                            strengthNotes: '',
+                            updatedAt: new Date().toISOString()
                         }
                     };
-                    localStorage.setItem(STORAGE_KEYS.WEEKLY_LOGS, JSON.stringify(appState.weeklyLogs));
+                    localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V23, JSON.stringify(appState.weeklyLogs));
                 }
-            } catch (e) {}
+            } catch (e) {
+                appState.weeklyLogs = {};
+            }
 
             const picker = document.getElementById('weekly-iso-picker');
             if (picker && !picker.value) picker.value = getCurrentISOWeekString();
             loadWeeklyLogForSelectedWeek();
         }
 
+        function getSortedWeeklyHistoryArray() {
+            return Object.entries(appState.weeklyLogs || {})
+                .map(([weekKey, data]) => ({
+                    weekKey,
+                    label: weekKey.replace(/^\d{4}-/, ''),
+                    weeklyRhr: Number(data.weeklyRhr) || appState.settings.fcBasal,
+                    hrv: Number(data.hrv) || 65,
+                    weight: Number(data.weight) || 71.5,
+                    waist: Number(data.waist) || 78.5,
+                    strengthNotes: data.strengthNotes || '',
+                    updatedAt: data.updatedAt || ''
+                }))
+                .sort((a, b) => a.weekKey.localeCompare(b.weekKey));
+        }
+
+        // Automatic Physiological Effort (1-10) extracted from .FIT workouts (replaces subjective RPE)
+        function computeAutomaticPhysiologicalEffort(workoutsSubset) {
+            if (!workoutsSubset || workoutsSubset.length === 0) {
+                return {
+                    score10: 0,
+                    trimpPerMin: 0,
+                    highIntensityPct: 0,
+                    label: 'Sin sesiones .FIT'
+                };
+            }
+
+            let totalTrimp = 0;
+            let totalDurationSec = 0;
+            let totalNonZ2ActiveSec = 0;
+
+            for (const w of workoutsSubset) {
+                if (!w.metrics) continue;
+                totalTrimp += w.metrics.trimp || 0;
+                totalDurationSec += w.metrics.totalDurationSec || 0;
+                const nonZ2 = Math.max(0, (w.metrics.totalDurationSec || 0) - (w.metrics.z2TimeSec || 0));
+                totalNonZ2ActiveSec += nonZ2;
+            }
+
+            const totalMinutes = Math.max(1, totalDurationSec / 60);
+            const trimpPerMin = totalTrimp / totalMinutes;
+            const highIntensityPct = Math.round((totalNonZ2ActiveSec / Math.max(1, totalDurationSec)) * 100);
+
+            // Physiological mapping: 0.8 TRIMP/min ~ 3.5/10 (easy Z1/Z2), 1.6 TRIMP/min ~ 6.5/10, 2.4+ TRIMP/min ~ 9.2/10
+            const volumeBonus = Math.min(1.5, totalTrimp / 280);
+            const rawScore = 1.5 + (trimpPerMin * 3.1) + volumeBonus;
+            const score10 = Number(Math.max(1.0, Math.min(10.0, rawScore)).toFixed(1));
+
+            let label = 'Aeróbico Regenerativo';
+            if (score10 >= 8.0) label = 'Estrés Fisiológico Muy Alto';
+            else if (score10 >= 6.5) label = 'Carga Fisiológica Moderada-Alta';
+            else if (score10 >= 4.5) label = 'Estímulo Aeróbico Óptimo';
+
+            return {
+                score10,
+                trimpPerMin: Number(trimpPerMin.toFixed(2)),
+                highIntensityPct,
+                label
+            };
+        }
+
+        // Plews / Buchheit Autonomic Evaluation for a target ISO Week
+        function computeAutonomicDiagnostics(targetWeekKey) {
+            const selectedKey = targetWeekKey || document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
+            const allWeeks = getSortedWeeklyHistoryArray();
+            const { fcBasal } = appState.settings;
+
+            const currentEntry = appState.weeklyLogs[selectedKey] || {
+                weeklyRhr: Number(document.getElementById('input-weekly-rhr')?.value) || (fcBasal + 2),
+                hrv: Number(document.getElementById('input-weekly-hrv')?.value) || 68,
+                weight: Number(document.getElementById('input-weekly-weight')?.value) || 71.4,
+                waist: Number(document.getElementById('input-weekly-waist')?.value) || 78.5,
+                strengthNotes: document.getElementById('input-strength-notes')?.value || ''
+            };
+
+            const priorWeeks = allWeeks.filter(w => w.weekKey < selectedKey).slice(-4);
+            const hasPriorBaseline = priorWeeks.length > 0;
+            const baselineHrv = hasPriorBaseline
+                ? Number((priorWeeks.reduce((acc, w) => acc + w.hrv, 0) / priorWeeks.length).toFixed(1))
+                : Number(currentEntry.hrv);
+
+            const deltaHrvMs = Number((currentEntry.hrv - baselineHrv).toFixed(1));
+            const deltaHrvPct = baselineHrv > 0
+                ? Number((((currentEntry.hrv - baselineHrv) / baselineHrv) * 100).toFixed(1))
+                : 0;
+
+            const rhrDelta = currentEntry.weeklyRhr - fcBasal;
+
+            // Linear regression slope across all logged weeks (up to 6 most recent up to selectedKey)
+            const weeksUpToTarget = allWeeks.filter(w => w.weekKey <= selectedKey).slice(-6);
+            let hrvSlopeMsPerWeek = 0;
+            if (weeksUpToTarget.length >= 2) {
+                const n = weeksUpToTarget.length;
+                let sX = 0, sY = 0, sXY = 0, sXX = 0;
+                for (let i = 0; i < n; i++) {
+                    sX += i;
+                    sY += weeksUpToTarget[i].hrv;
+                    sXY += i * weeksUpToTarget[i].hrv;
+                    sXX += i * i;
+                }
+                const denom = n * sXX - sX * sX;
+                hrvSlopeMsPerWeek = denom !== 0 ? Number(((n * sXY - sX * sY) / denom).toFixed(1)) : 0;
+            }
+
+            // Weekly workouts TRIMP & TRIMP/VFC Cost Ratio
+            const weekWorkouts = getWorkoutsForCurrentWeek();
+            const weekTrimp = weekWorkouts.reduce((acc, w) => acc + (w.metrics?.trimp || 0), 0);
+            const trimpToHrvRatio = currentEntry.hrv > 0 ? Number((weekTrimp / currentEntry.hrv).toFixed(2)) : 0;
+            const physioEffort = computeAutomaticPhysiologicalEffort(weekWorkouts);
+
+            // Crossed Autonomic Semaphore (Plews / Buchheit)
+            let statusLevel = 'green';
+            let statusTitle = 'Asimilación Óptima / Equilibrio Vagotónico';
+            let statusSummary = `VFC en rango (${deltaHrvPct >= 0 ? '+' : ''}${deltaHrvPct}% vs base ${baselineHrv} ms) y FC Reposo controlada (${rhrDelta >= 0 ? '+' : ''}${rhrDelta} ppm vs basal). Tu sistema nervioso autónomo asimila bien la carga.`;
+
+            if (deltaHrvPct <= -10 || (deltaHrvPct <= -5 && rhrDelta >= 4) || rhrDelta >= 5) {
+                statusLevel = 'red';
+                statusTitle = 'Sobrecarga Autonómica / Fatiga Acumulada';
+                statusSummary = `Caída marcada de VFC (${deltaHrvPct}% vs línea base de ${baselineHrv} ms) acompañada de FC Reposo en ${currentEntry.weeklyRhr} ppm (${rhrDelta >= 0 ? '+' : ''}${rhrDelta} ppm sobre tu basal). Se recomienda reducir intensidad o priorizar descanso.`;
+            } else if (deltaHrvPct <= -5 || (rhrDelta >= 3 && rhrDelta <= 4)) {
+                statusLevel = 'amber';
+                statusTitle = 'Fatiga Simpática Moderada / Alerta de Carga';
+                statusSummary = `Desviación moderada detectada: VFC en ${currentEntry.hrv} ms (${deltaHrvPct >= 0 ? '+' : ''}${deltaHrvPct}% vs base ${baselineHrv} ms) y FC Reposo a ${rhrDelta >= 0 ? '+' : ''}${rhrDelta} ppm de tu basal. Vigila la densidad de sesiones intensas.`;
+            }
+
+            return {
+                weekKey: selectedKey,
+                currentEntry,
+                priorWeeksCount: priorWeeks.length,
+                hasPriorBaseline,
+                baselineHrv,
+                deltaHrvMs,
+                deltaHrvPct,
+                rhrDelta,
+                hrvSlopeMsPerWeek,
+                weekTrimp,
+                trimpToHrvRatio,
+                physioEffort,
+                statusLevel,
+                statusTitle,
+                statusSummary
+            };
+        }
+
         function loadWeeklyLogForSelectedWeek() {
             const weekKey = document.getElementById('weekly-iso-picker').value || getCurrentISOWeekString();
+            const allWeeks = getSortedWeeklyHistoryArray();
+            const lastKnown = allWeeks.length > 0 ? allWeeks[allWeeks.length - 1] : null;
+
             const entry = appState.weeklyLogs[weekKey] || {
-                rpe: 6.0,
-                weeklyRhr: appState.settings.fcBasal + 2,
-                hrv: 65,
-                weight: 71.5,
-                waist: 79.0,
+                weeklyRhr: lastKnown ? lastKnown.weeklyRhr : (appState.settings.fcBasal + 2),
+                hrv: lastKnown ? lastKnown.hrv : 68,
+                weight: lastKnown ? lastKnown.weight : 71.4,
+                waist: lastKnown ? lastKnown.waist : 78.5,
                 strengthNotes: ''
             };
 
-            document.getElementById('input-rpe').value = entry.rpe;
-            updateRpeBadge(entry.rpe);
             document.getElementById('input-weekly-rhr').value = entry.weeklyRhr;
             document.getElementById('input-weekly-hrv').value = entry.hrv;
             document.getElementById('input-weekly-weight').value = entry.weight;
             document.getElementById('input-weekly-waist').value = entry.waist;
-            document.getElementById('input-strength-notes').value = entry.strengthNotes;
-            updateRhrStressIndicator();
+            document.getElementById('input-strength-notes').value = entry.strengthNotes || '';
+            updateWeeklyFormLiveIndicators();
+            refreshAutonomicTabUI();
         }
 
-        function updateRpeBadge(val) {
-            const num = Number(val);
-            const badge = document.getElementById('rpe-value-badge');
-            badge.textContent = `${num.toFixed(1)} / 10`;
-        }
-
-        function updateRhrStressIndicator() {
-            const weeklyRhr = Number(document.getElementById('input-weekly-rhr').value) || appState.settings.fcBasal;
+        function updateWeeklyFormLiveIndicators() {
+            const weekKey = document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
+            const weeklyRhr = Number(document.getElementById('input-weekly-rhr')?.value) || appState.settings.fcBasal;
+            const weeklyHrv = Number(document.getElementById('input-weekly-hrv')?.value) || 68;
             const basal = appState.settings.fcBasal;
-            const diff = weeklyRhr - basal;
-            const sign = diff > 0 ? `+${diff}` : `${diff}`;
-            const badge = document.getElementById('rhr-delta-badge');
+
+            const rhrDiff = weeklyRhr - basal;
+            const rhrSign = rhrDiff > 0 ? `+${rhrDiff}` : `${rhrDiff}`;
+            const rhrBadge = document.getElementById('rhr-delta-badge');
             document.getElementById('weekly-basal-ref').textContent = basal;
-            badge.textContent = `${sign} ppm vs Basal`;
+            if (rhrBadge) {
+                rhrBadge.textContent = `${rhrSign} ppm vs Basal`;
+                rhrBadge.className = rhrDiff >= 4
+                    ? 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                    : (rhrDiff >= 3
+                        ? 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        : 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30');
+            }
+
+            const allWeeks = getSortedWeeklyHistoryArray();
+            const priorWeeks = allWeeks.filter(w => w.weekKey < weekKey).slice(-4);
+            const hrvBadge = document.getElementById('hrv-delta-badge');
+            if (hrvBadge) {
+                if (priorWeeks.length > 0) {
+                    const base = priorWeeks.reduce((acc, w) => acc + w.hrv, 0) / priorWeeks.length;
+                    const pct = (((weeklyHrv - base) / base) * 100).toFixed(1);
+                    const pctSign = pct > 0 ? `+${pct}%` : `${pct}%`;
+                    hrvBadge.textContent = `${pctSign} vs Base`;
+                    hrvBadge.className = pct <= -5
+                        ? 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        : 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
+                } else {
+                    hrvBadge.textContent = '1ª sem base';
+                    hrvBadge.className = 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-slate-800 text-cyan-300';
+                }
+            }
         }
 
         function saveWeeklyManualData(event) {
             event.preventDefault();
             const weekKey = document.getElementById('weekly-iso-picker').value || getCurrentISOWeekString();
             appState.weeklyLogs[weekKey] = {
-                rpe: Number(document.getElementById('input-rpe').value),
                 weeklyRhr: Number(document.getElementById('input-weekly-rhr').value),
                 hrv: Number(document.getElementById('input-weekly-hrv').value),
                 weight: Number(document.getElementById('input-weekly-weight').value),
@@ -1817,13 +2101,262 @@
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem(STORAGE_KEYS.WEEKLY_LOGS, JSON.stringify(appState.weeklyLogs));
+            localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V23, JSON.stringify(appState.weeklyLogs));
             refreshAllViews();
-            showToast(`Datos semanales (${weekKey}) guardados.`, 'success');
+            showToast(`Semana ${weekKey} guardada en el historial autonómico.`, 'success');
+        }
+
+        function selectWeekFromHistory(weekKey) {
+            const picker = document.getElementById('weekly-iso-picker');
+            if (picker) {
+                picker.value = weekKey;
+                loadWeeklyLogForSelectedWeek();
+                showToast(`Cargada semana ${weekKey}`, 'info');
+            }
+        }
+
+        function deleteWeekFromHistory(weekKey, event) {
+            event.stopPropagation();
+            if (appState.weeklyLogs[weekKey]) {
+                delete appState.weeklyLogs[weekKey];
+                localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V23, JSON.stringify(appState.weeklyLogs));
+                refreshAllViews();
+                showToast(`Semana ${weekKey} eliminada del historial.`, 'info');
+            }
+        }
+
+        function toggleHrvTrendPreview() {
+            appState.showHrvTrendDemo = !appState.showHrvTrendDemo;
+            const btn = document.getElementById('btn-toggle-hrv-demo');
+            if (appState.showHrvTrendDemo) {
+                btn.innerHTML = `<i class="ph-bold ph-user-check mr-1"></i>Ver mi historial real`;
+                btn.className = 'self-start sm:self-auto shrink-0 text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-lg px-2 py-1 transition active:scale-95';
+            } else {
+                btn.innerHTML = `<i class="ph-bold ph-magic-wand mr-1"></i>Ver ejemplo 5 sem`;
+                btn.className = 'self-start sm:self-auto shrink-0 text-[10px] font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg px-2 py-1 transition active:scale-95';
+            }
+            renderWeeklyHrvTrendChart();
+        }
+
+        function renderWeeklyHrvTrendChart() {
+            const container = document.getElementById('hrv-trend-chart-container');
+            const slopeBadge = document.getElementById('hrv-trend-slope-badge');
+            if (!container || !slopeBadge) return;
+
+            let weeks = getSortedWeeklyHistoryArray();
+            if (appState.showHrvTrendDemo) {
+                weeks = [
+                    { weekKey: '2026-W41', label: 'W41', hrv: 66, weeklyRhr: 58 },
+                    { weekKey: '2026-W42', label: 'W42', hrv: 68, weeklyRhr: 57 },
+                    { weekKey: '2026-W43', label: 'W43', hrv: 64, weeklyRhr: 59 },
+                    { weekKey: '2026-W44', label: 'W44', hrv: 70, weeklyRhr: 57 },
+                    { weekKey: '2026-W45', label: 'Actual', hrv: 72, weeklyRhr: 57 }
+                ];
+            }
+
+            if (weeks.length === 0) {
+                slopeBadge.textContent = 'Sin datos';
+                container.innerHTML = `
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 text-center">
+                        <p class="text-xs text-slate-300 font-medium">Guarda tu primera semana abajo para iniciar la curva de VFC.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Compute linear regression on HRV values
+            const n = weeks.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            for (let i = 0; i < n; i++) {
+                sumX += i;
+                sumY += weeks[i].hrv;
+                sumXY += i * weeks[i].hrv;
+                sumXX += i * i;
+            }
+            const denom = n * sumXX - sumX * sumX;
+            const slope = (n > 1 && denom !== 0) ? (n * sumXY - sumX * sumY) / denom : 0;
+            const intercept = (sumY - slope * sumX) / n;
+            const meanHrv = sumY / n;
+
+            const slopeFormatted = slope >= 0 ? `+${slope.toFixed(1)}` : `${slope.toFixed(1)}`;
+            slopeBadge.textContent = n > 1 ? `Tendencia: ${slopeFormatted} ms/sem` : `Base inicial: ${weeks[0].hrv} ms`;
+            slopeBadge.className = slope >= 0
+                ? 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                : (slope <= -1.5
+                    ? 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                    : 'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30');
+
+            const width = 540;
+            const height = 155;
+            const padLeft = 40;
+            const padRight = 20;
+            const padTop = 22;
+            const padBottom = 26;
+            const plotW = width - padLeft - padRight;
+            const plotH = height - padTop - padBottom;
+
+            const bandLow = meanHrv * 0.95;
+            const bandHigh = meanHrv * 1.05;
+            const allValues = weeks.map(w => w.hrv).concat([bandLow, bandHigh]);
+            const minHrv = Math.max(10, Math.floor(Math.min(...allValues) - 6));
+            const maxHrv = Math.ceil(Math.max(...allValues) + 6);
+            const range = Math.max(10, maxHrv - minHrv);
+
+            const getX = (i) => n === 1 ? padLeft + plotW / 2 : padLeft + (i / (n - 1)) * plotW;
+            // Higher HRV is better -> higher on Y axis (smaller SVG Y)
+            const getY = (val) => padTop + ((maxHrv - val) / range) * plotH;
+
+            const bandTopY = getY(bandHigh).toFixed(1);
+            const bandBottomY = getY(bandLow).toFixed(1);
+            const bandHeight = Math.max(4, Number(bandBottomY) - Number(bandTopY)).toFixed(1);
+
+            const polyPoints = weeks.map((w, i) => `${getX(i).toFixed(1)},${getY(w.hrv).toFixed(1)}`).join(' ');
+            const regStartX = getX(0).toFixed(1);
+            const regStartY = getY(intercept).toFixed(1);
+            const regEndX = getX(n - 1).toFixed(1);
+            const regEndY = getY(intercept + slope * (n - 1)).toFixed(1);
+
+            const nodesSvg = weeks.map((w, i) => {
+                const cx = getX(i).toFixed(1);
+                const cy = getY(w.hrv).toFixed(1);
+                return `
+                    <g>
+                        <circle cx="${cx}" cy="${cy}" r="4.5" fill="#06B6D4" stroke="#090D16" stroke-width="2" />
+                        <text x="${cx}" y="${Number(cy) - 8}" text-anchor="middle" fill="#F8FAFC" font-size="10" font-weight="bold" font-family="JetBrains Mono">${w.hrv}ms</text>
+                        <text x="${cx}" y="${height - 6}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono">${w.label}</text>
+                    </g>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2">
+                    <div class="flex items-center justify-between text-[9px] text-slate-400 px-1 mb-1">
+                        <span class="text-cyan-400 font-mono">↑ Más arriba = Mayor VFC (Mejor recuperación vagal)</span>
+                        <span class="flex items-center gap-2">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-emerald-500/25 border border-emerald-500/40 inline-block"></span>Banda Base ±5%</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-emerald-400 inline-block"></span>Regresión</span>
+                        </span>
+                    </div>
+                    <svg viewBox="0 0 ${width} ${height}" class="w-full h-36 sm:h-40 overflow-visible">
+                        <rect x="${padLeft}" y="${bandTopY}" width="${plotW}" height="${bandHeight}" fill="#10B981" fill-opacity="0.11" rx="4" />
+                        <line x1="${padLeft}" y1="${getY(meanHrv).toFixed(1)}" x2="${width - padRight}" y2="${getY(meanHrv).toFixed(1)}" stroke="#10B981" stroke-opacity="0.35" stroke-dasharray="3,3" stroke-width="1" />
+                        <text x="${padLeft - 5}" y="${Number(getY(meanHrv).toFixed(1)) + 3}" text-anchor="end" fill="#10B981" font-size="9" font-family="JetBrains Mono">${Math.round(meanHrv)}ms</text>
+                        ${n > 1 ? `<polyline fill="none" stroke="#06B6D4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${polyPoints}" />` : ''}
+                        ${n > 1 ? `<line x1="${regStartX}" y1="${regStartY}" x2="${regEndX}" y2="${regEndY}" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5" />` : ''}
+                        ${nodesSvg}
+                    </svg>
+                </div>
+            `;
+        }
+
+        function refreshAutonomicTabUI() {
+            const weekKey = document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
+            const diag = computeAutonomicDiagnostics(weekKey);
+
+            // Semaphore Badge & Diagnosis Box
+            const semBadge = document.getElementById('autonomic-semaphore-badge');
+            const diagBox = document.getElementById('autonomic-diagnosis-box');
+            if (semBadge && diagBox) {
+                if (diag.statusLevel === 'red') {
+                    semBadge.className = 'self-start sm:self-auto px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1.5 shrink-0';
+                    semBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span><span>Sobrecarga Autonómica</span>`;
+                    diagBox.className = 'bg-rose-950/40 border border-rose-500/40 rounded-xl p-3 text-xs text-rose-100 leading-relaxed';
+                } else if (diag.statusLevel === 'amber') {
+                    semBadge.className = 'self-start sm:self-auto px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5 shrink-0';
+                    semBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Fatiga Simpática Moderada</span>`;
+                    diagBox.className = 'bg-amber-950/30 border border-amber-500/40 rounded-xl p-3 text-xs text-amber-100 leading-relaxed';
+                } else {
+                    semBadge.className = 'self-start sm:self-auto px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 shrink-0';
+                    semBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Asimilación Óptima</span>`;
+                    diagBox.className = 'bg-slate-900/90 border border-emerald-500/30 rounded-xl p-3 text-xs text-slate-200 leading-relaxed';
+                }
+                diagBox.innerHTML = `<strong class="block mb-0.5 text-white">${diag.statusTitle} (${weekKey}):</strong> ${diag.statusSummary}`;
+            }
+
+            // 3 Objective KPIs
+            const hrvValEl = document.getElementById('auto-kpi-hrv-val');
+            const hrvDeltaEl = document.getElementById('auto-kpi-hrv-delta');
+            const hrvBaseEl = document.getElementById('auto-kpi-hrv-base');
+            if (hrvValEl) hrvValEl.textContent = `${diag.currentEntry.hrv} ms`;
+            if (hrvDeltaEl) {
+                const sign = diag.deltaHrvPct > 0 ? `+${diag.deltaHrvPct}%` : `${diag.deltaHrvPct}%`;
+                hrvDeltaEl.textContent = diag.hasPriorBaseline ? sign : 'Base';
+                hrvDeltaEl.className = diag.deltaHrvPct <= -5
+                    ? 'text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300'
+                    : 'text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300';
+            }
+            if (hrvBaseEl) {
+                hrvBaseEl.textContent = diag.hasPriorBaseline
+                    ? `Base móvil (${diag.priorWeeksCount} sem): ${diag.baselineHrv} ms`
+                    : `Base inicial: ${diag.baselineHrv} ms (añade más semanas)`;
+            }
+
+            const trimpHrvEl = document.getElementById('auto-kpi-trimp-hrv');
+            const trimpHrvDescEl = document.getElementById('auto-kpi-trimp-hrv-desc');
+            if (trimpHrvEl) trimpHrvEl.textContent = `${diag.trimpToHrvRatio}`;
+            if (trimpHrvDescEl) {
+                trimpHrvDescEl.textContent = `${diag.weekTrimp} TRIMP / ${diag.currentEntry.hrv} ms VFC`;
+            }
+
+            const physioEffortEl = document.getElementById('auto-kpi-physio-effort');
+            const trimpDensityEl = document.getElementById('auto-kpi-trimp-density');
+            const physioLabelEl = document.getElementById('auto-kpi-physio-label');
+            if (physioEffortEl) {
+                physioEffortEl.textContent = diag.physioEffort.score10 > 0 ? `${diag.physioEffort.score10} / 10` : '-- / 10';
+            }
+            if (trimpDensityEl) trimpDensityEl.textContent = `${diag.physioEffort.trimpPerMin} TRIMP/min`;
+            if (physioLabelEl) physioLabelEl.textContent = diag.physioEffort.label;
+
+            renderWeeklyHrvTrendChart();
+            renderWeeklyHistoryList(weekKey);
+        }
+
+        function renderWeeklyHistoryList(activeWeekKey) {
+            const listEl = document.getElementById('weekly-history-list');
+            const countBadge = document.getElementById('weekly-history-count');
+            if (!listEl || !countBadge) return;
+
+            const sortedDesc = getSortedWeeklyHistoryArray().reverse();
+            countBadge.textContent = `${sortedDesc.length} sem.`;
+
+            if (sortedDesc.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Aún no hay semanas guardadas.</p>`;
+                return;
+            }
+
+            listEl.innerHTML = sortedDesc.map(item => {
+                const isSelected = item.weekKey === activeWeekKey;
+                const d = computeAutonomicDiagnostics(item.weekKey);
+                const signPct = d.deltaHrvPct > 0 ? `+${d.deltaHrvPct}%` : `${d.deltaHrvPct}%`;
+                const rhrSign = d.rhrDelta > 0 ? `+${d.rhrDelta}` : `${d.rhrDelta}`;
+                const dotColor = d.statusLevel === 'red' ? 'bg-rose-400' : (d.statusLevel === 'amber' ? 'bg-amber-400' : 'bg-emerald-400');
+
+                return `
+                    <div onclick="selectWeekFromHistory('${item.weekKey}')" class="cursor-pointer rounded-xl p-2.5 border transition ${
+                        isSelected ? 'bg-slate-800/95 border-cyan-500/60' : 'bg-slate-900/70 hover:bg-slate-800/50 border-slate-800'
+                    }">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-2 h-2 rounded-full ${dotColor} shrink-0"></span>
+                                <span class="font-mono text-xs font-bold text-white">${item.weekKey}</span>
+                                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300">VFC: ${item.hrv} ms (${d.hasPriorBaseline ? signPct : 'Base'})</span>
+                                <span class="text-[10px] font-mono text-slate-300 hidden sm:inline">RHR: ${item.weeklyRhr} ppm (${rhrSign})</span>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <span class="text-[10px] font-mono text-slate-400">${item.weight}kg • ${item.waist}cm</span>
+                                <button onclick="deleteWeekFromHistory('${item.weekKey}', event)" class="text-slate-400 hover:text-rose-400 p-1 rounded bg-slate-950/60 border border-slate-800" title="Borrar semana">
+                                    <i class="ph-bold ph-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${item.strengthNotes ? `<p class="text-[10px] text-slate-400 mt-1 truncate">🏋️ ${item.strengthNotes}</p>` : ''}
+                    </div>
+                `;
+            }).join('');
         }
 
         /*************************************************************************
-         * AI COACH REPORT GENERATOR
+         * AI COACH REPORT GENERATOR (v2.3 WITH PLEWS/BUCHHEIT AUTONOMIC BLOCK)
          *************************************************************************/
         function getWorkoutsForCurrentWeek() {
             const now = new Date();
@@ -1837,14 +2370,8 @@
             const { z2Min, z2Max, z4MinHr, z4MaxHr } = getKarvonenZones(fcMax, fcBasal);
             const weekWorkouts = getWorkoutsForCurrentWeek();
             const weekKey = document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
-            const manual = appState.weeklyLogs[weekKey] || {
-                rpe: 6.5,
-                weeklyRhr: fcBasal + 2,
-                hrv: 68,
-                weight: 71.4,
-                waist: 78.5,
-                strengthNotes: 'Sin notas.'
-            };
+            const autoDiag = computeAutonomicDiagnostics(weekKey);
+            const manual = autoDiag.currentEntry;
 
             let totalKm = 0;
             let totalDurationSec = 0;
@@ -1894,30 +2421,33 @@
             }
 
             const vamStatus = evaluateVamRollingWindow();
-            const rhrDelta = manual.weeklyRhr - fcBasal;
+            const rhrDelta = autoDiag.rhrDelta;
             const rhrSign = rhrDelta > 0 ? `+${rhrDelta}` : `${rhrDelta}`;
+            const hrvDeltaSign = autoDiag.deltaHrvPct > 0 ? `+${autoDiag.deltaHrvPct}%` : `${autoDiag.deltaHrvPct}%`;
+            const hrvSlopeSign = autoDiag.hrvSlopeMsPerWeek >= 0 ? `+${autoDiag.hrvSlopeMsPerWeek}` : `${autoDiag.hrvSlopeMsPerWeek}`;
 
             const elZ2Preview = document.getElementById('report-preview-z2');
             const elFatiguePreview = document.getElementById('report-preview-fatigue');
             const elRhrPreview = document.getElementById('report-preview-rhr');
             if (elZ2Preview) elZ2Preview.textContent = `${meanZ2PaceStr} /km (${z2Min}-${z2Max} ppm)`;
-            if (elFatiguePreview) elFatiguePreview.textContent = fatigueAlerts.length > 0 ? `${fatigueAlerts.length} alerta(s)` : 'Cadencia estable';
+            if (elFatiguePreview) elFatiguePreview.textContent = `${manual.hrv} ms (${autoDiag.hasPriorBaseline ? hrvDeltaSign : 'Base'})`;
             if (elRhrPreview) elRhrPreview.textContent = `${manual.weeklyRhr} ppm (${rhrSign} vs Basal)`;
 
             const reportLines = [
                 `===================================================================`,
-                `REPORTE CIENTÍFICO DE ENTRENAMIENTO RUNNING — RUNLAB PRO v2.2 (${weekKey})`,
+                `REPORTE CIENTÍFICO DE ENTRENAMIENTO RUNNING — RUNLAB PRO v2.3 (${weekKey})`,
                 `===================================================================`,
-                `Actúa como mi Fisiólogo del Ejercicio y Entrenador de Running. Analiza los siguientes datos extraídos de mis archivos .FIT (WorkOutDoors) y mis biomarcadores semanales:`,
+                `Actúa como mi Fisiólogo del Ejercicio y Entrenador de Running. Analiza los siguientes datos objetivos extraídos de mis archivos .FIT (WorkOutDoors) y mi tendencia autonómica (VFC/HRV + FC Reposo):`,
                 ``,
                 `1. VARIABLES FISIOLÓGICAS ACTIVAS (KARVONEN)`,
                 `- FC Máxima: ${fcMax} ppm | FC Basal: ${fcBasal} ppm`,
                 `- Rango Z2 Karvonen (60-70% FCR): ${z2Min} - ${z2Max} ppm`,
                 ``,
-                `2. VOLUMEN TOTAL Y CARGA (TRIMP)`,
+                `2. VOLUMEN TOTAL, CARGA (TRIMP) Y ESFUERZO FISIOLÓGICO AUTOMÁTICO`,
                 `- Sesiones: ${weekWorkouts.length} entrenamientos`,
                 `- Volumen Total: ${totalKm.toFixed(2)} km (${formatDurationHMS(totalDurationSec)})`,
                 `- Carga TRIMP Acumulada: ${totalTrimp} pts`,
+                `- Esfuerzo Fisiológico Automático (.FIT): ${autoDiag.physioEffort.score10}/10 (${autoDiag.physioEffort.label} | Densidad: ${autoDiag.physioEffort.trimpPerMin} TRIMP/min)`,
                 ``,
                 `3. EFICIENCIA AERÓBICA Z2 Y REGRESIÓN LINEAL (SIN 10' CAL/ENF)`,
                 `- Ritmo Medio Z2 (${z2Min}-${z2Max} ppm): ${meanZ2PaceStr} min/km`,
@@ -1925,12 +2455,14 @@
                 `- Sesiones de la semana:`,
                 ...(sessionLines.length > 0 ? sessionLines : ['  - Sin sesiones registradas.']),
                 ``,
-                `4. RECUPERACIÓN, BIOMARCADORES Y FUERZA`,
+                `4. ESTADO AUTONÓMICO Y ASIMILACIÓN (MÉTODO PLEWS / BUCHHEIT - SIN RPE SUBJETIVO)`,
+                `- Diagnóstico Autonómico Cruzado: ${autoDiag.statusTitle.toUpperCase()}`,
+                `- VFC / HRV Media Semanal: ${manual.hrv} ms vs Línea Base Móvil (${autoDiag.baselineHrv} ms) -> Desviación: ${hrvDeltaSign} | Pendiente Lineal: ${hrvSlopeSign} ms/sem`,
                 `- FC Reposo Semanal: ${manual.weeklyRhr} ppm (${rhrSign} ppm vs FC Basal ${fcBasal} ppm)`,
-                `- VFC / HRV Media: ${manual.hrv} ms | RPE Medio: ${manual.rpe}/10`,
-                `- Peso: ${manual.weight} kg | Cintura: ${manual.waist} cm`,
-                `- Notas de Fuerza: "${manual.strengthNotes || 'Sin notas'}"`,
-                `- Fatiga Muscular Cruzada (Cadencia): ${fatigueAlerts.length > 0 ? fatigueAlerts.join(' | ') : 'Sin caídas bruscas de cadencia.'}`,
+                `- Ratio de Coste Autonómico (TRIMP / VFC): ${autoDiag.trimpToHrvRatio} pts TRIMP por cada ms de VFC`,
+                `- Antropometría: Peso ${manual.weight} kg | Cintura ${manual.waist} cm`,
+                `- Notas de Entrenamiento de Fuerza: "${manual.strengthNotes || 'Sin notas'}"`,
+                `- Fatiga Muscular Cruzada (Cadencia en tiradas largas): ${fatigueAlerts.length > 0 ? fatigueAlerts.join(' | ') : 'Sin caídas bruscas de cadencia.'}`,
                 ``,
                 `5. VAM (5-6 MIN) Y ZONAS Z4/Z5 (VENTANA 42 DÍAS)`,
                 ...(vamStatus.isValid
@@ -1976,7 +2508,7 @@
          * REAL CACHE-BUSTING FOR iOS SAFARI / GITHUB PAGES & JSON BACKUP
          *************************************************************************/
         async function forceAppUpdateAntiCache() {
-            showToast('Limpiando caché de Safari/GitHub Pages y recargando v2.2...', 'info');
+            showToast('Limpiando caché de Safari/GitHub Pages y recargando v2.3...', 'info');
             try {
                 if ('serviceWorker' in navigator) {
                     const registrations = await navigator.serviceWorker.getRegistrations();
@@ -2005,6 +2537,7 @@
                     exportedAt: new Date().toISOString(),
                     settings: appState.settings,
                     weeklyLogs: appState.weeklyLogs,
+                    weeklyHistoryV23: appState.weeklyLogs,
                     workouts
                 };
 
@@ -2041,9 +2574,10 @@
                 document.getElementById('setting-fc-max').value = appState.settings.fcMax;
                 document.getElementById('setting-fc-basal').value = appState.settings.fcBasal;
 
-                if (data.weeklyLogs) {
-                    appState.weeklyLogs = data.weeklyLogs;
-                    localStorage.setItem(STORAGE_KEYS.WEEKLY_LOGS, JSON.stringify(appState.weeklyLogs));
+                const importedWeekly = data.weeklyHistoryV23 || data.weeklyLogs;
+                if (importedWeekly) {
+                    appState.weeklyLogs = importedWeekly;
+                    localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V23, JSON.stringify(appState.weeklyLogs));
                 }
 
                 await clearAllWorkoutsFromIDB();
@@ -2088,6 +2622,8 @@
 
             if (tabName === 'dashboard' && appState.leafletMap) {
                 setTimeout(() => appState.leafletMap.invalidateSize(), 120);
+            } else if (tabName === 'weekly') {
+                refreshAutonomicTabUI();
             } else if (tabName === 'aireport') {
                 generateAndCopyAIReport(false);
             } else if (tabName === 'settings') {
@@ -2334,7 +2870,8 @@
 
         function refreshAllViews() {
             refreshDashboardUI();
-            updateRhrStressIndicator();
+            updateWeeklyFormLiveIndicators();
+            refreshAutonomicTabUI();
             generateAndCopyAIReport(false);
         }
 
