@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RunLab AI">
+    <meta name="theme-color" content="#090D16">
+    <title>RunLab Pro — WorkOutDoors .FIT Analytics & AI Coach</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter & JetBrains Mono for Sports Telemetry -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Leaflet.js CSS & JS for OpenStreetMap GPS Rendering -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        obsidian: '#090D16',
+                        panel: '#111827',
+                        panelLight: '#1E293B',
+                        z2green: '#10B981',
+                        vamcyan: '#06B6D4',
+                        trimporange: '#F59E0B',
+                        alertred: '#F43F5E'
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        /* Custom Mobile-First & iPhone PWA Styling */
+        :root {
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        body {
+            background-color: #090D16;
+            color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+        .mono-metric {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090D16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
+        /* Dark Mode OpenStreetMap Filter for High-Contrast GPS Track */
+        .leaflet-container {
+            background: #0B1120 !important;
+            font-family: 'Inter', sans-serif;
+        }
+        .leaflet-tile-pane {
+            filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%);
+        }
+        /* Range Slider Custom Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 999px;
+            background: #1E293B;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #10B981;
+            margin-top: -8px;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+            border: 2px solid #ECFDF5;
+        }
+        /* Safe Area Padding for iPhone Bottom Bar */
+        .pb-safe {
+            padding-bottom: calc(5.5rem + var(--safe-bottom));
+        }
+        .bottom-nav-safe {
+            padding-bottom: max(0.65rem, var(--safe-bottom));
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.65; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- TOP HEADER BAR (Sticky Mobile-First & Desktop Responsive) -->
+    <header class="sticky top-0 z-30 bg-obsidian/90 backdrop-blur-xl border-b border-slate-800/80 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i class="ph-bold ph-person-simple-run text-slate-950 text-2xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white">RunLab <span class="text-emerald-400">Pro</span></h1>
+                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">PWA Local</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">Motor Científico .FIT (WorkOutDoors) • Karvonen Z2 • TRIMP • VAM</p>
+                </div>
+            </div>
+
+            <!-- Live Physiological Pill Summary -->
+            <div class="flex items-center gap-2">
+                <button onclick="switchTab('settings')" class="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs transition active:scale-95" title="Configuración Fisiológica">
+                    <span class="flex items-center gap-1 text-rose-400 font-mono font-semibold">
+                        <i class="ph-fill ph-heart-beat"></i>
+                        <span id="header-z2-pill">Z2: 134-147</span>
+                    </span>
+                    <span class="text-slate-500">|</span>
+                    <span class="text-cyan-400 font-mono font-semibold" id="header-vam-pill">VAM: --</span>
+                </button>
+
+                <!-- Quick Upload .FIT Trigger -->
+                <label for="fit-file-input" class="cursor-pointer flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 transition">
+                    <i class="ph-bold ph-upload-simple text-base"></i>
+                    <span>Subir .FIT</span>
+                </label>
+                <input id="fit-file-input" type="file" accept=".fit,.FIT" multiple class="hidden" onchange="handleFitUpload(event)">
+            </div>
+        </div>
+    </header>
+
+    <!-- 42-DAY ROLLING INTENSITY ALERT BANNER (Shown dynamically if VAM is expired or missing) -->
+    <div id="vam-expired-banner" class="hidden bg-rose-950/80 border-b border-rose-500/40 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+                <i class="ph-fill ph-warning-octagon text-rose-400 text-2xl shrink-0 animate-pulse-subtle"></i>
+                <div>
+                    <p class="text-xs sm:text-sm font-bold text-rose-200">
+                        Datos de intensidad caducados. Se recomienda test VAM de 5 min
+                    </p>
+                    <p class="text-[11px] text-rose-300/80" id="vam-expired-subtext">
+                        No se ha detectado ningún pico sostenido de 5-6 min en los últimos 42 días. Ritmos Z4 y Z5 anulados por seguridad fisiológica.
+                    </p>
+                </div>
+            </div>
+            <button onclick="simulateWorkout('vam_test')" class="shrink-0 text-xs font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/40 rounded-lg px-3 py-1.5 transition active:scale-95">
+                <i class="ph-bold ph-lightning mr-1"></i>Simular Test VAM 5m
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 pt-4 pb-safe">
+
+        <!-- ==========================================
+             TAB 1: DASHBOARD & SESIONES (.FIT + MAPA)
+             ========================================== -->
+        <section id="tab-dashboard" class="space-y-5">
+
+            <!-- Quick Demo / WorkOutDoors Simulator Bar -->
+            <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                        <i class="ph-bold ph-Watch text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Importador Local WorkOutDoors (.FIT)</h2>
+                        <p class="text-[11px] text-slate-400">Sube tus archivos <code class="text-emerald-400">.fit</code> reales o genera sesiones de prueba con telemetría segundo a segundo.</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <button onclick="simulateWorkout('z2_long')" class="flex-1 sm:flex-initial text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 rounded-xl px-3 py-2 transition active:scale-95">
+                        + Tirada Larga Z2 (Fatiga Cadencia)
+                    </button>
+                    <button onclick="simulateWorkout('vam_test')" class="flex-1 sm:flex-initial text-xs font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 rounded-xl px-3 py-2 transition active:scale-95">
+                        + Pico VAM 5 min (Hoy)
+                    </button>
+                    <button onclick="simulateExpiredVamScenario()" class="flex-1 sm:flex-initial text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-xl px-3 py-2 transition active:scale-95" title="Fuerza que el último test VAM tenga más de 42 días">
+                        Simular VAM &gt;42 días
+                    </button>
+                    <button onclick="downloadSampleBinaryFit()" class="flex-1 sm:flex-initial text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl px-3 py-2 transition active:scale-95" title="Descarga un archivo .fit binario real para probar el botón Subir .FIT">
+                        <i class="ph-bold ph-download-simple mr-1"></i>Descargar .FIT Binario
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI CARDS: WEEKLY SUMMARY & PHYSIOLOGICAL METRICS -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- KPI 1: Volumen Semanal -->
+                <div class="bg-panel border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
+                        <span>VOLUMEN SEMANAL</span>
+                        <i class="ph-duotone ph-road-horizon text-emerald-400 text-lg"></i>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span id="kpi-week-km" class="mono-metric text-2xl sm:text-3xl font-bold text-white">0.0</span>
+                        <span class="text-xs text-slate-400 font-mono">km</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+                        <span id="kpi-week-time" class="mono-metric text-slate-300">0h 00m</span>
+                        <span id="kpi-week-sessions" class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">0 sesiones</span>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Eficiencia Aeróbica Z2 (Karvonen) -->
+                <div class="bg-panel border border-emerald-500/30 rounded-2xl p-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-emerald-300 text-xs font-semibold mb-1">
+                        <span>EFICIENCIA Z2 (KARVONEN)</span>
+                        <i class="ph-duotone ph-heartbeat text-emerald-400 text-lg"></i>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span id="kpi-z2-pace" class="mono-metric text-2xl sm:text-3xl font-bold text-emerald-400">--:--</span>
+                        <span class="text-xs text-slate-400 font-mono">/km</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span id="kpi-z2-range-label" class="font-mono text-emerald-300/90">134-147 ppm</span>
+                        <span class="text-slate-400" title="Descarta los primeros y últimos 10 min">Sin 10' cal/enf</span>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Carga TRIMP Semanal -->
+                <div class="bg-panel border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
+                        <span>CARGA TRIMP (SEMANA)</span>
+                        <i class="ph-duotone ph-fire text-amber-400 text-lg"></i>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span id="kpi-week-trimp" class="mono-metric text-2xl sm:text-3xl font-bold text-amber-400">0</span>
+                        <span class="text-xs text-slate-400 font-mono">pts</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span id="kpi-trimp-status" class="text-amber-300 font-medium">Carga óptima</span>
+                        <span class="text-slate-400 font-mono">Banister</span>
+                    </div>
+                </div>
+
+                <!-- KPI 4: Pico VAM & Ventana 42 Días -->
+                <div id="kpi-vam-card" class="bg-panel border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-medium mb-1">
+                        <span>VAM (5-6 MIN) & Z4/Z5</span>
+                        <i class="ph-duotone ph-gauge text-cyan-400 text-lg"></i>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span id="kpi-vam-pace" class="mono-metric text-2xl sm:text-3xl font-bold text-cyan-400">--:--</span>
+                        <span class="text-xs text-slate-400 font-mono">/km</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-[11px]">
+                        <span id="kpi-vam-zones" class="font-mono text-slate-300">Z4: --:--</span>
+                        <span id="kpi-vam-age" class="px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono">-- días</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VAM & INTENSITY ZONES PANEL (Dynamic 42-Day Window Status) -->
+            <div class="bg-panel border border-slate-800 rounded-2xl p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                    <div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="ph-fill ph-speedometer text-cyan-400 text-lg"></i>
+                            Zonas de Intensidad Dinámicas (Karvonen + Pico VAM)
+                        </h3>
+                        <p class="text-xs text-slate-400">Calculadas en tiempo real desde tu FC Basal (<span id="zone-header-basal" class="font-mono text-slate-200">57</span> ppm), FC Máx (<span id="zone-header-max" class="font-mono text-slate-200">185</span> ppm) y mejor pico VAM de los últimos 42 días.</p>
+                    </div>
+                    <div id="vam-validity-badge" class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                        VAM Vigente
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                    <!-- Z2 Karvonen Box -->
+                    <div class="bg-slate-900/90 border border-emerald-500/30 rounded-xl p-3.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Zona 2 • Base Aeróbica</span>
+                            <span class="text-[11px] font-mono bg-emerald-500/15 text-emerald-300 px-2 py-0.5 rounded">60-70% FC Res</span>
+                        </div>
+                        <div class="mt-2 flex items-baseline justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400">Rango Cardíaco Objetivo</p>
+                                <p id="card-z2-hr" class="mono-metric text-xl font-bold text-white">134 - 147 <span class="text-xs font-normal text-slate-400">ppm</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[11px] text-slate-400">Ritmo Eficiencia Semanal</p>
+                                <p id="card-z2-pace" class="mono-metric text-xl font-bold text-emerald-400">--:-- <span class="text-xs font-normal text-slate-400">/km</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Z4 Threshold Box -->
+                    <div id="box-z4" class="bg-slate-900/90 border border-amber-500/30 rounded-xl p-3.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Zona 4 • Umbral (80-85% VAM)</span>
+                            <span class="text-[11px] font-mono bg-amber-500/15 text-amber-300 px-2 py-0.5 rounded">Umbral Anaeróbico</span>
+                        </div>
+                        <div class="mt-2 flex items-baseline justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400">Ritmo Objetivo Z4</p>
+                                <p id="card-z4-pace" class="mono-metric text-xl font-bold text-amber-300">--:-- - --:-- <span class="text-xs font-normal text-slate-400">/km</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[11px] text-slate-400">FC Estimada (80-88%)</p>
+                                <p id="card-z4-hr" class="mono-metric text-sm font-semibold text-slate-300">159 - 170 ppm</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Z5 VO2Max Box -->
+                    <div id="box-z5" class="bg-slate-900/90 border border-rose-500/30 rounded-xl p-3.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-rose-400">Zona 5 • VO2máx (90-100% VAM)</span>
+                            <span class="text-[11px] font-mono bg-rose-500/15 text-rose-300 px-2 py-0.5 rounded">Potencia Aeróbica</span>
+                        </div>
+                        <div class="mt-2 flex items-baseline justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400">Ritmo Objetivo Z5</p>
+                                <p id="card-z5-pace" class="mono-metric text-xl font-bold text-rose-300">--:-- - --:-- <span class="text-xs font-normal text-slate-400">/km</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[11px] text-slate-400">Pico VAM Detectado</p>
+                                <p id="card-vam-speed" class="mono-metric text-sm font-semibold text-cyan-300">-- km/h</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAP & SELECTED WORKOUT DEEP TELEMETRY -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <!-- Left Column: Leaflet GPS Map & Telemetry Breakdown (7 cols) -->
+                <div class="lg:col-span-7 bg-panel border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Ruta GPS OpenStreetMap</span>
+                            <h3 id="selected-workout-title" class="text-base font-bold text-white mt-0.5">Selecciona o sube un entrenamiento .FIT</h3>
+                            <p id="selected-workout-subtitle" class="text-xs text-slate-400">El trazado destaca en verde los tramos centrales y en gris los 10 min de calentamiento/enfriamiento.</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-[11px]">
+                            <span class="flex items-center gap-1 text-slate-300"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block"></span>Cal/Enf (10m)</span>
+                            <span class="flex items-center gap-1 text-emerald-300"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>Núcleo Z2</span>
+                        </div>
+                    </div>
+
+                    <!-- Map Container -->
+                    <div id="map-container" class="w-full h-72 sm:h-80 relative z-10 bg-slate-950"></div>
+
+                    <!-- Selected Session Analytical Breakdown -->
+                    <div class="p-4 bg-slate-900/70 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
+                            <p class="text-[10px] text-slate-400 uppercase">Ritmo Z2 Puro (Sin ±10m)</p>
+                            <p id="detail-z2-pace" class="mono-metric text-lg font-bold text-emerald-400 mt-0.5">--:-- /km</p>
+                            <p id="detail-z2-seconds" class="text-[10px] text-slate-400 font-mono">0s en rango Karvonen</p>
+                        </div>
+                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
+                            <p class="text-[10px] text-slate-400 uppercase">FC Media / Máx</p>
+                            <p id="detail-hr" class="mono-metric text-lg font-bold text-rose-400 mt-0.5">-- / -- ppm</p>
+                            <p id="detail-trimp" class="text-[10px] text-amber-300 font-mono">TRIMP: -- pts</p>
+                        </div>
+                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
+                            <p class="text-[10px] text-slate-400 uppercase">Mejor Pico 5 Min (VAM)</p>
+                            <p id="detail-peak5m" class="mono-metric text-lg font-bold text-cyan-400 mt-0.5">--:-- /km</p>
+                            <p id="detail-peak5m-hr" class="text-[10px] text-slate-400 font-mono">FC pico: -- ppm</p>
+                        </div>
+                        <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80">
+                            <p class="text-[10px] text-slate-400 uppercase">Deriva Cadencia (Final)</p>
+                            <p id="detail-cadence-drift" class="mono-metric text-lg font-bold text-white mt-0.5">-- spm</p>
+                            <p id="detail-cadence-status" class="text-[10px] text-slate-400 font-mono">Sin fatiga cruzada</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Stored .FIT Workouts List in IndexedDB (5 cols) -->
+                <div class="lg:col-span-5 bg-panel border border-slate-800 rounded-2xl p-4 flex flex-col max-h-[540px]">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <i class="ph-bold ph-database text-emerald-400"></i>
+                                Historial Local (.FIT en IndexedDB)
+                            </h3>
+                            <p class="text-[11px] text-slate-400">Toca cualquier sesión para inspeccionar su ruta GPS y telemetría Z2.</p>
+                        </div>
+                        <span id="workouts-count-badge" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300">0 archivos</span>
+                    </div>
+
+                    <div id="workouts-list" class="flex-1 overflow-y-auto space-y-2.5 mt-3 pr-1">
+                        <!-- Dynamically populated workout cards -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 2: ENTRADA DE DATOS MANUALES (SEMANAL)
+             ========================================== -->
+        <section id="tab-weekly" class="hidden space-y-5">
+            <div class="bg-panel border border-slate-800 rounded-2xl p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-800">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">Control de Fatiga y Antropometría</span>
+                        <h2 class="text-lg font-bold text-white mt-1">Registro Manual de la Semana</h2>
+                        <p class="text-xs text-slate-400">Estos biomarcadores alimentan el contexto fisiológico del Reporte IA sin alterar tu FC Basal de Karvonen.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-slate-400 font-mono">Semana ISO:</label>
+                        <input type="week" id="weekly-iso-picker" onchange="loadWeeklyLogForSelectedWeek()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <form id="weekly-form" onsubmit="saveWeeklyManualData(event)" class="space-y-5 mt-5">
+                    <!-- RPE Slider (1-10) -->
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="input-rpe" class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                                <i class="ph-fill ph-gauge text-amber-400 text-base"></i>
+                                RPE Medio de la Semana (Esfuerzo Percibido 1-10)
+                            </label>
+                            <span id="rpe-value-badge" class="mono-metric text-base font-bold px-3 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40">6.5 / 10</span>
+                        </div>
+                        <input id="input-rpe" type="range" min="1" max="10" step="0.5" value="6.5" oninput="updateRpeBadge(this.value)" class="w-full cursor-pointer">
+                        <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+                            <span>1 (Muy Suave)</span>
+                            <span>5 (Moderado)</span>
+                            <span>7 (Exigente)</span>
+                            <span>10 (Agotamiento)</span>
+                        </div>
+                    </div>
+
+                    <!-- Autonomic Nervous System Metrics: Weekly Resting HR & HRV -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+                            <label for="input-weekly-rhr" class="block text-xs font-bold uppercase tracking-wider text-slate-200">
+                                FC en Reposo Media Semanal (ppm)
+                            </label>
+                            <p class="text-[11px] text-slate-400 mt-0.5 mb-3">
+                                <i class="ph-bold ph-info text-cyan-400"></i> Chivato de estrés autónomo (NO modifica tu FC Basal de <span id="weekly-basal-ref" class="font-mono text-emerald-400">57</span> ppm).
+                            </p>
+                            <div class="flex items-center gap-3">
+                                <input id="input-weekly-rhr" type="number" min="30" max="120" step="1" placeholder="59" oninput="updateRhrStressIndicator()" required class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-base font-mono text-white">
+                                <span id="rhr-delta-badge" class="shrink-0 text-xs font-mono px-2.5 py-2 rounded-xl bg-slate-800 text-slate-300">+2 ppm vs Basal</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+                            <label for="input-weekly-hrv" class="block text-xs font-bold uppercase tracking-wider text-slate-200">
+                                VFC / HRV Media Semanal (ms)
+                            </label>
+                            <p class="text-[11px] text-slate-400 mt-0.5 mb-3">
+                                Variabilidad de la Frecuencia Cardíaca matutina o nocturna (rMSSD / SDNN en ms).
+                            </p>
+                            <div class="relative">
+                                <input id="input-weekly-hrv" type="number" min="10" max="250" step="1" placeholder="68" required class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-base font-mono text-white">
+                                <span class="absolute right-3.5 top-3 text-xs font-mono text-slate-400">ms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anthropometric Metrics: Weight (kg) & Waist (cm) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+                            <label for="input-weekly-weight" class="block text-xs font-bold uppercase tracking-wider text-slate-200">
+                                Peso Corporal Medio (kg)
+                            </label>
+                            <p class="text-[11px] text-slate-400 mt-0.5 mb-3">Promedio semanal en ayunas para estimar relación W/kg y gasto energético.</p>
+                            <div class="relative">
+                                <input id="input-weekly-weight" type="number" min="35" max="180" step="0.1" placeholder="71.4" required class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-base font-mono text-white">
+                                <span class="absolute right-3.5 top-3 text-xs font-mono text-slate-400">kg</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+                            <label for="input-weekly-waist" class="block text-xs font-bold uppercase tracking-wider text-slate-200">
+                                Perímetro de Cintura (cm)
+                            </label>
+                            <p class="text-[11px] text-slate-400 mt-0.5 mb-3">Marcador de recomposición corporal e inflamación visceral.</p>
+                            <div class="relative">
+                                <input id="input-weekly-waist" type="number" min="50" max="160" step="0.1" placeholder="78.5" required class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-base font-mono text-white">
+                                <span class="absolute right-3.5 top-3 text-xs font-mono text-slate-400">cm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strength Training Notes -->
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+                        <label for="input-strength-notes" class="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1">
+                            Notas de Entrenamientos de Fuerza y Sensaciones Musculares
+                        </label>
+                        <p class="text-[11px] text-slate-400 mb-2.5">
+                            Se correlacionará automáticamente con las caídas de cadencia al final de tus tiradas largas para detectar fatiga muscular cruzada.
+                        </p>
+                        <textarea id="input-strength-notes" rows="3" placeholder="Ej: Subida de pesos en polea y sentadilla búlgara el martes. Ligera sobrecarga en sóleos el jueves." class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl p-3.5 text-sm text-white placeholder-slate-500"></textarea>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+                        <button type="submit" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition">
+                            <i class="ph-bold ph-floppy-disk text-lg"></i>
+                            <span>Guardar Biomarcadores de la Semana</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 3: EXPORTACIÓN DE REPORTE PARA IA
+             ========================================== -->
+        <section id="tab-aireport" class="hidden space-y-5">
+            <div class="bg-panel border border-slate-800 rounded-2xl p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Prompt Estructurado para AI Coach</span>
+                        <h2 class="text-lg font-bold text-white mt-1">Generador de Reporte Científico para IA</h2>
+                        <p class="text-xs text-slate-400">Compila volumen, TRIMP, tendencia de Eficiencia Z2 Karvonen, fatiga neuromecánica (cadencia), VAM y biomarcadores.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="generateAndCopyAIReport(true)" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 active:scale-95 text-slate-950 font-extrabold text-sm px-5 py-3.5 rounded-xl shadow-lg shadow-emerald-500/25 transition">
+                            <i class="ph-bold ph-sparkle text-lg"></i>
+                            <span>Generar Reporte IA y Copiar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Summary Pills Inside Report View -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-4">
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
+                            <i class="ph-bold ph-trend-up text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-slate-400">Tendencia Eficiencia Z2</p>
+                            <p id="report-preview-z2" class="mono-metric text-sm font-bold text-white">--</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
+                            <i class="ph-bold ph-person-simple-walk text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-slate-400">Fatiga Muscular Cruzada</p>
+                            <p id="report-preview-fatigue" class="mono-metric text-sm font-bold text-white">--</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0">
+                            <i class="ph-bold ph-heart-half text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-slate-400">Estado Autónomo (FC Rep vs Basal)</p>
+                            <p id="report-preview-rhr" class="mono-metric text-sm font-bold text-white">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Structured Text Block Output -->
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-mono text-slate-400">Bloque de texto listo para pegar en ChatGPT / Claude / Gemini:</span>
+                        <button onclick="copyReportTextarea()" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                            <i class="ph-bold ph-copy"></i> Copiar texto
+                        </button>
+                    </div>
+                    <textarea id="ai-report-textarea" readonly rows="18" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-cyan-500"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 4: AJUSTES DEL ATLETA, BACKUP & ANTI-CACHÉ
+             ========================================== -->
+        <section id="tab-settings" class="hidden space-y-5">
+            <!-- 1. Athlete Physiological Settings (LocalStorage) -->
+            <div class="bg-panel border border-slate-800 rounded-2xl p-5">
+                <div class="pb-4 border-b border-slate-800">
+                    <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Variables Fisiológicas Dinámicas (LocalStorage)</span>
+                    <h2 class="text-lg font-bold text-white mt-1">Panel de Configuración del Atleta</h2>
+                    <p class="text-xs text-slate-400">Al modificar la FC Máxima o la FC en Reposo Basal, la app recalcula instantáneamente los umbrales de Karvonen, el ritmo Z2 segundo a segundo de todos tus archivos <code class="text-emerald-400">.fit</code> y el TRIMP.</p>
+                </div>
+
+                <form onsubmit="saveAthleteSettings(event)" class="mt-5 space-y-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Max HR Input -->
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+                            <label for="setting-fc-max" class="block text-xs font-bold uppercase tracking-wider text-rose-400">
+                                Frecuencia Cardíaca Máxima (FC Máx)
+                            </label>
+                            <p class="text-[11px] text-slate-400 mt-0.5 mb-3">Techo fisiológico real observado en prueba de esfuerzo o competición.</p>
+                            <div class="relative">
+                                <input id="setting-fc-max" type="number" min="120" max="230" step="1" required oninput="previewKarvonenSettings()" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-4 py-3 text-xl font-mono font-bold text-white">
+                                <span class="absolute right-4 top-3.5 text-xs font-mono text-slate-400">ppm</span>
+                            </div>
+                        </div>
+
+                        <!-- Basal Resting HR Input -->
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+                            <label for="setting-fc-basal" class="block text-xs font-bold uppercase tracking-wider text-emerald-400">
+                                FC en Reposo Basal (FC Basal)
+                            </label>
+                            <p class="text-[11px] text-slate-400 mt-0.5 mb-3">Valor basal estable para la fórmula de Reserva Cardíaca de Karvonen.</p>
+                            <div class="relative">
+                                <input id="setting-fc-basal" type="number" min="30" max="110" step="1" required oninput="previewKarvonenSettings()" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-4 py-3 text-xl font-mono font-bold text-white">
+                                <span class="absolute right-4 top-3.5 text-xs font-mono text-slate-400">ppm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Formula Preview Card -->
+                    <div class="bg-slate-950 border border-emerald-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <span class="text-[11px] font-mono uppercase text-emerald-400">Fórmula de Karvonen Activa (60% - 70% FC Reserva)</span>
+                            <p id="settings-karvonen-explanation" class="text-xs text-slate-300 mt-1 font-mono">
+                                FC Reserva = 185 - 57 = 128 ppm → Z2 = [57 + 0.60×128, 57 + 0.70×128]
+                            </p>
+                        </div>
+                        <div class="shrink-0 bg-emerald-500/15 border border-emerald-500/40 rounded-xl px-4 py-2 text-center">
+                            <p class="text-[10px] uppercase font-mono text-emerald-300">Rango Z2 Resultante</p>
+                            <p id="settings-karvonen-preview" class="mono-metric text-xl font-extrabold text-white">134 - 147 ppm</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition">
+                            <i class="ph-bold ph-check-circle text-lg"></i>
+                            <span>Guardar Variables y Recalcular Historial .FIT</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 5. Maintenance & Data Security (Anti-Cache & Local JSON Backup) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Local Backup Export / Import (.JSON) -->
+                <div class="bg-panel border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Seguridad de Datos Local</span>
+                        <h3 class="text-base font-bold text-white mt-1.5">Copia de Seguridad Completa (.JSON)</h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Exporta todos tus entrenamientos <code class="text-cyan-300">.fit</code> procesados (IndexedDB), registros semanales de fatiga y ajustes fisiológicos (LocalStorage) en un único archivo <code class="text-cyan-300">.json</code> para proteger tu historial en iOS/Safari.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+                        <button onclick="exportDatabaseBackup()" class="flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm py-3 px-4 rounded-xl transition">
+                            <i class="ph-bold ph-download-simple text-base"></i>
+                            <span>Exportar Backup .JSON</span>
+                        </button>
+                        <label for="backup-json-input" class="cursor-pointer flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white border border-slate-600 font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition">
+                            <i class="ph-bold ph-upload-simple text-base text-cyan-400"></i>
+                            <span>Importar Backup .JSON</span>
+                        </label>
+                        <input id="backup-json-input" type="file" accept=".json,application/json" class="hidden" onchange="importDatabaseBackup(event)">
+                    </div>
+                </div>
+
+                <!-- Anti-Cache Service Worker Cleaner & Reset -->
+                <div class="bg-panel border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30">Mantenimiento PWA & GitHub Pages</span>
+                        <h3 class="text-base font-bold text-white mt-1.5">Control Anti-Caché y Service Worker</h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Si despliegas una nueva versión en GitHub Pages, pulsa <strong>Forzar Actualización de App</strong> para desregistrar el Service Worker, purgar <code class="text-rose-300">CacheStorage</code> y recargar el código fresco sin perder tu base de datos IndexedDB.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+                        <button onclick="forceAppUpdateAntiCache()" class="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-xs sm:text-sm py-3 px-4 rounded-xl transition">
+                            <i class="ph-bold ph-arrows-clockwise text-base"></i>
+                            <span>Forzar Actualización App</span>
+                        </button>
+                        <button onclick="openResetDatabaseModal()" class="flex items-center justify-center gap-2 bg-rose-950/60 hover:bg-rose-900/70 active:scale-95 text-rose-200 border border-rose-500/40 font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition">
+                            <i class="ph-bold ph-trash text-base text-rose-400"></i>
+                            <span>Vaciar Base de Datos</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture & GitHub Pages Deployment Files Helper -->
+            <div class="bg-panel border border-slate-800 rounded-2xl p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="ph-bold ph-git-branch text-emerald-400"></i>
+                            Estructura de Archivos PWA para GitHub Pages
+                        </h3>
+                        <p class="text-xs text-slate-400">Esta aplicación ya inyecta su propio <code class="text-emerald-400">manifest.json</code> y <code class="text-emerald-400">sw.js</code> dinámicamente. Si deseas descargar los archivos sueltos para tu repositorio en GitHub Pages, usa estos accesos:</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="downloadAuxiliaryFile('manifest.json')" class="text-xs font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 px-3 py-2 rounded-xl transition">
+                            Descargar manifest.json
+                        </button>
+                        <button onclick="downloadAuxiliaryFile('sw.js')" class="text-xs font-mono bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 px-3 py-2 rounded-xl transition">
+                            Descargar sw.js
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- CUSTOM CONFIRMATION MODAL (No native confirm/alert used) -->
+    <div id="custom-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-panel border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+                    <i class="ph-bold ph-warning text-xl"></i>
+                </div>
+                <div>
+                    <h3 id="modal-title" class="text-base font-bold text-white">Confirmar acción</h3>
+                    <p id="modal-desc" class="text-xs text-slate-400 mt-0.5">¿Estás seguro de continuar?</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2.5 pt-2">
+                <button onclick="closeCustomModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300">
+                    Cancelar
+                </button>
+                <button id="modal-confirm-btn" class="px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-xs font-bold text-slate-950">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-16 right-4 left-4 sm:left-auto sm:w-96 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+    <!-- BOTTOM TOUCH NAVIGATION BAR (iPhone Mobile-First Priority) -->
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-obsidian/95 backdrop-blur-xl border-t border-slate-800/90 bottom-nav-safe">
+        <div class="max-w-xl mx-auto grid grid-cols-4 gap-1 px-2 pt-1.5">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-emerald-400 bg-emerald-500/10 font-semibold transition active:scale-95">
+                <i class="ph-fill ph-chart-polar text-xl"></i>
+                <span class="text-[11px] mt-0.5">Analítica .FIT</span>
+            </button>
+            <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
+                <i class="ph-bold ph-clipboard-text text-xl"></i>
+                <span class="text-[11px] mt-0.5">Fatiga Semanal</span>
+            </button>
+            <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
+                <i class="ph-bold ph-robot text-xl"></i>
+                <span class="text-[11px] mt-0.5">Reporte IA</span>
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
+                <i class="ph-bold ph-sliders-horizontal text-xl"></i>
+                <span class="text-[11px] mt-0.5">Ajustes / Datos</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- =========================================================================
+         CORE APPLICATION LOGIC: SPORTS DATA SCIENCE ENGINE, .FIT PARSER & STORAGE
+         ========================================================================= -->
+    <script>
+        /*************************************************************************
+         * 0. PWA MANIFEST & SERVICE WORKER INITIALIZATION
+         *************************************************************************/
+        const PWA_MANIFEST_JSON = {
+            name: "RunLab Pro — Analítica .FIT & Entrenador IA",
+            short_name: "RunLab Pro",
+            description: "Analizador científico local de archivos .fit (WorkOutDoors) con Eficiencia Z2 Karvonen, TRIMP, VAM y Reporte para IA.",
+            start_url: "./index.html",
+            display: "standalone",
+            background_color: "#090D16",
+            theme_color: "#090D16",
+            orientation: "portrait-primary",
+            icons: [
+                {
+                    src: "https://placehold.co/192x192/10b981/090d16.png?text=RL",
+                    sizes: "192x192",
+                    type: "image/png"
+                },
+                {
+                    src: "https://placehold.co/512x512/10b981/090d16.png?text=RunLab",
+                    sizes: "512x512",
+                    type: "image/png"
+                }
+            ]
+        };
+
+        const SERVICE_WORKER_CODE = `
+const CACHE_NAME = 'runlab-pro-v1.0.4';
+const ASSETS = ['./', './index.html'];
+
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS).catch(() => {}))
+    );
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((keys) =>
+            Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+        ).then(() => self.clients.claim())
+    );
+});
+
+self.addEventListener('fetch', (event) => {
+    if (event.request.method !== 'GET') return;
+    event.respondWith(
+        fetch(event.request)
+            .then((networkResponse) => {
+                const clone = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)).catch(() => {});
+                return networkResponse;
+            })
+            .catch(() => caches.match(event.request))
+    );
+});
+`;
+
+        function setupPWA() {
+            try {
+                const manifestBlob = new Blob([JSON.stringify(PWA_MANIFEST_JSON, null, 2)], { type: 'application/json' });
+                const manifestURL = URL.createObjectURL(manifestBlob);
+                const link = document.createElement('link');
+                link.rel = 'manifest';
+                link.href = manifestURL;
+                document.head.appendChild(link);
+            } catch (e) {
+                console.warn('No se pudo inyectar el manifest dinámico:', e);
+            }
+        }
+
+        /*************************************************************************
+         * 1. STATE & LOCALSTORAGE PHYSIOLOGICAL SETTINGS
+         *************************************************************************/
+        const STORAGE_KEYS = {
+            SETTINGS: 'runlab_athlete_settings_v1',
+            WEEKLY_LOGS: 'runlab_weekly_logs_v1'
+        };
+
+        const IDB_CONFIG = {
+            NAME: 'RunLabProDB',
+            VERSION: 1,
+            STORE_WORKOUTS: 'workouts'
+        };
+
+        let appState = {
+            settings: {
+                fcMax: 185,
+                fcBasal: 57
+            },
+            workouts: [], // Loaded from IndexedDB, sorted newest first
+            selectedWorkoutId: null,
+            weeklyLogs: {}, // Keyed by ISO week e.g. "2026-W45"
+            leafletMap: null,
+            mapLayers: []
+        };
+
+        function loadSettingsFromLocalStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed.fcMax && parsed.fcBasal) {
+                        appState.settings.fcMax = Number(parsed.fcMax);
+                        appState.settings.fcBasal = Number(parsed.fcBasal);
+                    }
+                } else {
+                    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appState.settings));
+                }
+            } catch (err) {
+                console.error('Error leyendo ajustes en LocalStorage:', err);
+            }
+            document.getElementById('setting-fc-max').value = appState.settings.fcMax;
+            document.getElementById('setting-fc-basal').value = appState.settings.fcBasal;
+            previewKarvonenSettings();
+        }
+
+        function getKarvonenZones(fcMax = appState.settings.fcMax, fcBasal = appState.settings.fcBasal) {
+            const reserve = Math.max(20, fcMax - fcBasal);
+            const z2Min = Math.round(fcBasal + reserve * 0.60);
+            const z2Max = Math.round(fcBasal + reserve * 0.70);
+            const z4MinHr = Math.round(fcBasal + reserve * 0.80);
+            const z4MaxHr = Math.round(fcBasal + reserve * 0.88);
+            return { reserve, z2Min, z2Max, z4MinHr, z4MaxHr };
+        }
+
+        function previewKarvonenSettings() {
+            const maxInput = Number(document.getElementById('setting-fc-max').value) || 185;
+            const basalInput = Number(document.getElementById('setting-fc-basal').value) || 57;
+            const { reserve, z2Min, z2Max } = getKarvonenZones(maxInput, basalInput);
+
+            document.getElementById('settings-karvonen-explanation').textContent =
+                `FC Reserva = ${maxInput} - ${basalInput} = ${reserve} ppm → Z2 = [${basalInput} + 60% (${z2Min}), ${basalInput} + 70% (${z2Max})]`;
+            document.getElementById('settings-karvonen-preview').textContent = `${z2Min} - ${z2Max} ppm`;
+        }
+
+        async function saveAthleteSettings(event) {
+            event.preventDefault();
+            const newMax = Number(document.getElementById('setting-fc-max').value);
+            const newBasal = Number(document.getElementById('setting-fc-basal').value);
+
+            if (newBasal >= newMax - 25) {
+                showToast('La FC Basal debe ser al menos 25 ppm inferior a la FC Máxima.', 'error');
+                return;
+            }
+
+            appState.settings.fcMax = newMax;
+            appState.settings.fcBasal = newBasal;
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appState.settings));
+
+            // Re-analyze all stored workouts dynamically using the new physiological variables
+            for (const workout of appState.workouts) {
+                workout.metrics = analyzeWorkoutStream(workout.records, workout.startTime, appState.settings);
+                await saveWorkoutToIDB(workout);
+            }
+
+            refreshAllViews();
+            showToast(`Variables actualizadas (Z2 Karvonen: ${getKarvonenZones().z2Min}-${getKarvonenZones().z2Max} ppm). Historial recalculado.`, 'success');
+        }
+
+        /*************************************************************************
+         * 2. INDEXEDDB STORAGE LAYER FOR .FIT WORKOUTS
+         *************************************************************************/
+        function openIDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(IDB_CONFIG.NAME, IDB_CONFIG.VERSION);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(IDB_CONFIG.STORE_WORKOUTS)) {
+                        const store = db.createObjectStore(IDB_CONFIG.STORE_WORKOUTS, { keyPath: 'id' });
+                        store.createIndex('startTime', 'startTime', { unique: false });
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function saveWorkoutToIDB(workoutObj) {
+            const db = await openIDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_CONFIG.STORE_WORKOUTS, 'readwrite');
+                tx.objectStore(IDB_CONFIG.STORE_WORKOUTS).put(workoutObj);
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function getAllWorkoutsFromIDB() {
+            const db = await openIDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_CONFIG.STORE_WORKOUTS, 'readonly');
+                const req = tx.objectStore(IDB_CONFIG.STORE_WORKOUTS).getAll();
+                req.onsuccess = () => {
+                    const list = req.result || [];
+                    list.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+                    resolve(list);
+                };
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function deleteWorkoutFromIDB(id) {
+            const db = await openIDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_CONFIG.STORE_WORKOUTS, 'readwrite');
+                tx.objectStore(IDB_CONFIG.STORE_WORKOUTS).delete(id);
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function clearAllWorkoutsFromIDB() {
+            const db = await openIDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_CONFIG.STORE_WORKOUTS, 'readwrite');
+                tx.objectStore(IDB_CONFIG.STORE_WORKOUTS).clear();
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        /*************************************************************************
+         * 3. SPORTS DATA SCIENCE ENGINE (KARVONEN Z2, TRIMP, VAM, CADENCE DRIFT)
+         *************************************************************************/
+        /**
+         * Formats speed in m/s to running pace string "M:SS" per km
+         */
+        function speedToPaceString(speedMs) {
+            if (!speedMs || speedMs <= 0.4) return '--:--';
+            const secPerKm = 1000 / speedMs;
+            const mins = Math.floor(secPerKm / 60);
+            const secs = Math.round(secPerKm % 60);
+            if (secs === 60) return `${mins + 1}:00`;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function paceSecondsToString(secPerKm) {
+            if (!secPerKm || !isFinite(secPerKm) || secPerKm <= 0) return '--:--';
+            const mins = Math.floor(secPerKm / 60);
+            const secs = Math.round(secPerKm % 60);
+            if (secs === 60) return `${mins + 1}:00`;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatDurationHMS(totalSeconds) {
+            const s = Math.max(0, Math.round(totalSeconds || 0));
+            const hrs = Math.floor(s / 3600);
+            const mins = Math.floor((s % 3600) / 60);
+            const secs = s % 60;
+            if (hrs > 0) {
+                return `${hrs}h ${mins.toString().padStart(2, '0')}m`;
+            }
+            return `${mins}m ${secs.toString().padStart(2, '0')}s`;
+        }
+
+        /**
+         * Core Physiological & Biomechanical Analyzer on second-by-second records
+         * Each record in `records`: { t (elapsed sec), hr (bpm), speed (m/s), cad (spm), lat, lon }
+         */
+        function analyzeWorkoutStream(records, startTimeISO, settings = appState.settings) {
+            if (!records || records.length === 0) {
+                return null;
+            }
+
+            const { fcMax, fcBasal } = settings;
+            const { z2Min, z2Max } = getKarvonenZones(fcMax, fcBasal);
+
+            const totalDurationSec = records[records.length - 1].t - records[0].t || records.length;
+            let totalDistanceMeters = 0;
+            let hrSum = 0;
+            let hrCount = 0;
+            let maxHrObserved = 0;
+
+            // 1. Overall Distance & HR statistics
+            for (let i = 0; i < records.length; i++) {
+                const r = records[i];
+                const dt = i === 0 ? 1 : Math.max(0.5, Math.min(10, r.t - records[i - 1].t));
+                if (r.speed && r.speed > 0) {
+                    totalDistanceMeters += r.speed * dt;
+                }
+                if (r.hr && r.hr > 35) {
+                    hrSum += r.hr;
+                    hrCount++;
+                    if (r.hr > maxHrObserved) maxHrObserved = r.hr;
+                }
+            }
+
+            const avgHr = hrCount > 0 ? Math.round(hrSum / hrCount) : 0;
+            const avgSpeedMs = totalDurationSec > 0 ? totalDistanceMeters / totalDurationSec : 0;
+
+            // 2. AEROBIC EFFICIENCY (Z2 KARVONEN)
+            // Rule: Discard first 10 minutes (600s) and last 10 minutes (600s) of the .fit
+            const warmupCutoff = records[0].t + 600;
+            const cooldownCutoff = records[records.length - 1].t - 600;
+            const hasEnoughDurationForTrim = totalDurationSec > 1260; // > 21 mins
+
+            let z2SpeedSum = 0;
+            let z2TimeSec = 0;
+            let z2HrSum = 0;
+            let coreTimeSec = 0;
+
+            for (let i = 0; i < records.length; i++) {
+                const r = records[i];
+                const dt = i === 0 ? 1 : Math.max(0.5, Math.min(10, r.t - records[i - 1].t));
+
+                const isInsideCoreWindow = hasEnoughDurationForTrim
+                    ? (r.t >= warmupCutoff && r.t <= cooldownCutoff)
+                    : false;
+
+                if (isInsideCoreWindow) {
+                    coreTimeSec += dt;
+                    if (r.hr >= z2Min && r.hr <= z2Max && r.speed > 1.2) {
+                        z2SpeedSum += r.speed * dt;
+                        z2TimeSec += dt;
+                        z2HrSum += r.hr * dt;
+                    }
+                }
+            }
+
+            const z2AvgSpeedMs = z2TimeSec >= 30 ? (z2SpeedSum / z2TimeSec) : 0;
+            const z2AvgPaceSec = z2AvgSpeedMs > 0 ? (1000 / z2AvgSpeedMs) : null;
+            const z2AvgHr = z2TimeSec >= 30 ? Math.round(z2HrSum / z2TimeSec) : null;
+            const z2RatioPercent = coreTimeSec > 0 ? Math.round((z2TimeSec / coreTimeSec) * 100) : 0;
+
+            // 3. TRAINING LOAD (TRIMP - Banister Exponential Formula using Dynamic FC Basal & FC Max)
+            const durationMinutes = totalDurationSec / 60;
+            const hrReserveRatio = Math.max(0, Math.min(1.15, (avgHr - fcBasal) / Math.max(20, fcMax - fcBasal)));
+            const trimp = Math.round(durationMinutes * hrReserveRatio * 0.64 * Math.exp(1.92 * hrReserveRatio));
+
+            // 4. VAM (MAXIMAL AEROBIC SPEED) PEAK DETECTOR (Sustained 5 to 6 minutes = 300s-360s)
+            // Uses sliding window of 300 seconds to find highest sustained speed with elevated cardiac effort (>= 82% FCmax)
+            let best5mSpeedMs = 0;
+            let best5mAvgHr = 0;
+            let startIdx = 0;
+            let windowDist = 0;
+            let windowHrWeighted = 0;
+
+            for (let endIdx = 0; endIdx < records.length; endIdx++) {
+                const dtEnd = endIdx === 0 ? 1 : Math.max(0.5, Math.min(10, records[endIdx].t - records[endIdx - 1].t));
+                windowDist += (records[endIdx].speed || 0) * dtEnd;
+                windowHrWeighted += (records[endIdx].hr || 0) * dtEnd;
+
+                while (records[endIdx].t - records[startIdx].t > 300 && startIdx < endIdx) {
+                    const dtStart = startIdx === 0 ? 1 : Math.max(0.5, Math.min(10, records[startIdx].t - records[startIdx - 1].t));
+                    windowDist -= (records[startIdx].speed || 0) * dtStart;
+                    windowHrWeighted -= (records[startIdx].hr || 0) * dtStart;
+                    startIdx++;
+                }
+
+                const spanSec = records[endIdx].t - records[startIdx].t;
+                if (spanSec >= 295 && spanSec <= 365) {
+                    const candidateSpeed = windowDist / spanSec;
+                    const candidateHr = windowHrWeighted / spanSec;
+                    if (candidateSpeed > best5mSpeedMs) {
+                        best5mSpeedMs = candidateSpeed;
+                        best5mAvgHr = Math.round(candidateHr);
+                    }
+                }
+            }
+
+            // A 5-6 min peak qualifies as a true VAM Peak/Test if HR reached >= 84% of FCMax (or speed >= 3.6 m/s at high effort)
+            const isVamPeakQualified = best5mSpeedMs >= 3.3 && best5mAvgHr >= Math.round(fcMax * 0.84);
+
+            // 5. CROSS-MUSCULAR FATIGUE DETECTION (Cadence Drop at the end of runs)
+            // Compares initial active running cadence (after 5m warmup) vs final 20% of the run
+            const activeCadenceRecords = records.filter(r => r.speed > 1.8 && r.cad && r.cad > 120);
+            let initialCadence = 0;
+            let finalCadence = 0;
+            let cadenceDropSpm = 0;
+            let hasCrossFatigue = false;
+
+            if (activeCadenceRecords.length >= 60) {
+                const sliceCount = Math.max(15, Math.floor(activeCadenceRecords.length * 0.25));
+                const firstSlice = activeCadenceRecords.slice(0, sliceCount);
+                const lastSlice = activeCadenceRecords.slice(-sliceCount);
+
+                initialCadence = Math.round(firstSlice.reduce((acc, r) => acc + r.cad, 0) / firstSlice.length);
+                finalCadence = Math.round(lastSlice.reduce((acc, r) => acc + r.cad, 0) / lastSlice.length);
+                cadenceDropSpm = finalCadence - initialCadence; // Negative means cadence dropped
+
+                // Flag cross-muscular fatigue if cadence drops by 5 spm or more on runs >= 35 min
+                if (cadenceDropSpm <= -5 && totalDurationSec >= 2100) {
+                    hasCrossFatigue = true;
+                }
+            }
+
+            return {
+                totalDurationSec: Math.round(totalDurationSec),
+                totalDistanceKm: Number((totalDistanceMeters / 1000).toFixed(2)),
+                avgSpeedMs,
+                avgPaceStr: speedToPaceString(avgSpeedMs),
+                avgHr,
+                maxHrObserved,
+                z2MinUsed: z2Min,
+                z2MaxUsed: z2Max,
+                hasEnoughDurationForTrim,
+                z2TimeSec: Math.round(z2TimeSec),
+                z2RatioPercent,
+                z2AvgSpeedMs,
+                z2AvgPaceSec,
+                z2AvgPaceStr: z2AvgPaceSec ? paceSecondsToString(z2AvgPaceSec) : '--:--',
+                z2AvgHr,
+                trimp,
+                best5mSpeedMs,
+                best5mPaceStr: best5mSpeedMs > 0 ? speedToPaceString(best5mSpeedMs) : '--:--',
+                best5mAvgHr,
+                isVamPeakQualified,
+                initialCadence,
+                finalCadence,
+                cadenceDropSpm,
+                hasCrossFatigue
+            };
+        }
+
+        /**
+         * Evaluates the 42-Day Rolling Intensity Window across all workouts
+         */
+        function evaluateVamRollingWindow() {
+            const now = new Date();
+            const windowMs = 42 * 24 * 60 * 60 * 1000;
+
+            let bestVamWorkout = null;
+            let bestVamSpeedMs = 0;
+            let mostRecentVamAnyAge = null;
+
+            for (const w of appState.workouts) {
+                if (!w.metrics) continue;
+                if (w.metrics.isVamPeakQualified || w.isExplicitVamTest) {
+                    const wDate = new Date(w.startTime);
+                    const ageMs = now - wDate;
+                    if (!mostRecentVamAnyAge || wDate > new Date(mostRecentVamAnyAge.startTime)) {
+                        mostRecentVamAnyAge = w;
+                    }
+                    if (ageMs <= windowMs && ageMs >= -86400000) {
+                        if (w.metrics.best5mSpeedMs > bestVamSpeedMs) {
+                            bestVamSpeedMs = w.metrics.best5mSpeedMs;
+                            bestVamWorkout = w;
+                        }
+                    }
+                }
+            }
+
+            if (!bestVamWorkout || bestVamSpeedMs <= 0) {
+                const daysSinceLast = mostRecentVamAnyAge
+                    ? Math.floor((now - new Date(mostRecentVamAnyAge.startTime)) / (1000 * 60 * 60 * 24))
+                    : null;
+                return {
+                    isValid: false,
+                    daysAgo: daysSinceLast,
+                    vamSpeedKmh: null,
+                    vamPaceStr: '--:--',
+                    z4PaceRangeStr: '--:-- - --:--',
+                    z5PaceRangeStr: '--:-- - --:--'
+                };
+            }
+
+            const daysAgo = Math.max(0, Math.floor((now - new Date(bestVamWorkout.startTime)) / (1000 * 60 * 60 * 24)));
+            const vamSpeedKmh = (bestVamSpeedMs * 3.6).toFixed(1);
+            const vamPaceStr = speedToPaceString(bestVamSpeedMs);
+
+            // Z4 Threshold: 80% - 85% of VAM
+            const z4SlowMs = bestVamSpeedMs * 0.80;
+            const z4FastMs = bestVamSpeedMs * 0.85;
+            const z4PaceRangeStr = `${speedToPaceString(z4FastMs)} - ${speedToPaceString(z4SlowMs)}`;
+
+            // Z5 VO2max: 90% - 100% of VAM
+            const z5SlowMs = bestVamSpeedMs * 0.90;
+            const z5FastMs = bestVamSpeedMs * 1.00;
+            const z5PaceRangeStr = `${speedToPaceString(z5FastMs)} - ${speedToPaceString(z5SlowMs)}`;
+
+            return {
+                isValid: true,
+                daysAgo,
+                workoutTitle: bestVamWorkout.title,
+                vamSpeedMs: bestVamSpeedMs,
+                vamSpeedKmh,
+                vamPaceStr,
+                z4PaceRangeStr,
+                z5PaceRangeStr
+            };
+        }
+
+        /*************************************************************************
+         * 4. LOCAL .FIT FILE PARSER (ESM fit-file-parser + NATIVE BINARY FALLBACK)
+         *************************************************************************/
+        let externalFitParserClass = null;
+
+        // Preload fit-file-parser from ESM CDN asynchronously if online
+        (async function preloadFitParser() {
+            try {
+                const mod = await import('https://esm.sh/fit-file-parser@1.9.0');
+                externalFitParserClass = mod.default || mod.FitParser || mod;
+            } catch (e) {
+                console.info('fit-file-parser CDN no disponible, activo motor binario .FIT nativo integrado.');
+            }
+        })();
+
+        /**
+         * Native Binary .FIT Protocol Decoder (Garmin / WorkOutDoors FIT SDK standard)
+         * Parses binary ArrayBuffer directly without external servers
+         */
+        function parseFitBinaryNative(arrayBuffer) {
+            const view = new DataView(arrayBuffer);
+            const byteLen = view.byteLength;
+            if (byteLen < 14) throw new Error('Archivo .fit demasiado corto.');
+
+            const headerSize = view.getUint8(0);
+            const dataSize = view.getUint32(4, true);
+            const magic = String.fromCharCode(view.getUint8(8), view.getUint8(9), view.getUint8(10), view.getUint8(11));
+            if (magic !== '.FIT') {
+                throw new Error('Firma binaria .FIT inválida.');
+            }
+
+            let offset = headerSize;
+            const endOffset = Math.min(byteLen, headerSize + dataSize);
+            const localDefs = {};
+            const rawRecords = [];
+            const FIT_EPOCH_OFFSET_SEC = 631065600; // Seconds between 1970-01-01 and 1989-12-31
+            let lastTimestamp = null;
+
+            while (offset < endOffset) {
+                const recordHeader = view.getUint8(offset++);
+                const isCompressedTimestamp = (recordHeader & 0x80) !== 0;
+
+                if (isCompressedTimestamp) {
+                    const localMsgType = (recordHeader >> 5) & 0x03;
+                    const timeOffset = recordHeader & 0x1F;
+                    if (lastTimestamp !== null) {
+                        lastTimestamp = (lastTimestamp & 0xFFFFFFE0) + timeOffset;
+                        if (timeOffset < (lastTimestamp & 0x1F)) lastTimestamp += 32;
+                    }
+                    const def = localDefs[localMsgType];
+                    if (!def) break;
+                    const rec = readFitDataMessage(view, offset, def, lastTimestamp);
+                    offset = rec.nextOffset;
+                    if (def.globalMsgNum === 20 && rec.data) rawRecords.push(rec.data);
+                    continue;
+                }
+
+                const isDefinition = (recordHeader & 0x40) !== 0;
+                const hasDeveloperData = (recordHeader & 0x20) !== 0;
+                const localMsgType = recordHeader & 0x0F;
+
+                if (isDefinition) {
+                    offset++; // reserved
+                    const arch = view.getUint8(offset++); // 0 = little-endian, 1 = big-endian
+                    const littleEndian = arch === 0;
+                    const globalMsgNum = view.getUint16(offset, littleEndian);
+                    offset += 2;
+                    const numFields = view.getUint8(offset++);
+                    const fields = [];
+                    for (let i = 0; i < numFields; i++) {
+                        const fieldNum = view.getUint8(offset++);
+                        const size = view.getUint8(offset++);
+                        const baseType = view.getUint8(offset++);
+                        fields.push({ fieldNum, size, baseType });
+                    }
+                    let devFields = [];
+                    if (hasDeveloperData) {
+                        const numDevFields = view.getUint8(offset++);
+                        for (let i = 0; i < numDevFields; i++) {
+                            const fNum = view.getUint8(offset++);
+                            const size = view.getUint8(offset++);
+                            const devIdx = view.getUint8(offset++);
+                            devFields.push({ fNum, size, devIdx });
+                        }
+                    }
+                    localDefs[localMsgType] = { littleEndian, globalMsgNum, fields, devFields };
+                } else {
+                    const def = localDefs[localMsgType];
+                    if (!def) break;
+                    const rec = readFitDataMessage(view, offset, def, lastTimestamp);
+                    offset = rec.nextOffset;
+                    if (rec.data && rec.data.timestamp) lastTimestamp = rec.data.timestamp;
+                    if (def.globalMsgNum === 20 && rec.data) {
+                        rawRecords.push(rec.data);
+                    }
+                }
+            }
+
+            if (rawRecords.length === 0) {
+                throw new Error('No se encontraron registros de actividad (Msg 20) en el archivo .FIT.');
+            }
+
+            const firstTs = rawRecords[0].timestamp || Math.floor(Date.now() / 1000 - FIT_EPOCH_OFFSET_SEC);
+            const startTimeISO = new Date((firstTs + FIT_EPOCH_OFFSET_SEC) * 1000).toISOString();
+
+            const normalizedRecords = rawRecords.map((r, idx) => {
+                const elapsedSec = r.timestamp ? Math.max(0, r.timestamp - firstTs) : idx;
+                return {
+                    t: elapsedSec,
+                    hr: r.hr || 0,
+                    speed: r.speed || 0,
+                    cad: r.cadence || 0,
+                    lat: r.lat,
+                    lon: r.lon
+                };
+            });
+
+            return { startTimeISO, records: normalizedRecords };
+        }
+
+        function readFitDataMessage(view, offset, def, fallbackTimestamp) {
+            const le = def.littleEndian;
+            let data = { timestamp: fallbackTimestamp };
+
+            for (const f of def.fields) {
+                if (offset + f.size > view.byteLength) {
+                    return { nextOffset: view.byteLength, data: null };
+                }
+                const fNum = f.fieldNum;
+                if (fNum === 253 && f.size === 4) {
+                    const ts = view.getUint32(offset, le);
+                    if (ts !== 0xFFFFFFFF) data.timestamp = ts;
+                } else if (fNum === 0 && f.size === 4) {
+                    const latSemi = view.getInt32(offset, le);
+                    if (latSemi !== 0x7FFFFFFF) data.lat = Number((latSemi * (180 / Math.pow(2, 31))).toFixed(6));
+                } else if (fNum === 1 && f.size === 4) {
+                    const lonSemi = view.getInt32(offset, le);
+                    if (lonSemi !== 0x7FFFFFFF) data.lon = Number((lonSemi * (180 / Math.pow(2, 31))).toFixed(6));
+                } else if (fNum === 3 && f.size === 1) {
+                    const hr = view.getUint8(offset);
+                    if (hr !== 0xFF) data.hr = hr;
+                } else if (fNum === 4 && f.size === 1) {
+                    const cad = view.getUint8(offset);
+                    if (cad !== 0xFF) {
+                        // WorkOutDoors / Garmin stores running cadence as strides/min (e.g. 86 = 172 spm)
+                        data.cadence = cad < 115 ? cad * 2 : cad;
+                    }
+                } else if (fNum === 6 && f.size === 2) {
+                    const rawSpd = view.getUint16(offset, le);
+                    if (rawSpd !== 0xFFFF && !data.speed) data.speed = Number((rawSpd / 1000).toFixed(3));
+                } else if (fNum === 73 && f.size === 4) {
+                    const enhSpd = view.getUint32(offset, le);
+                    if (enhSpd !== 0xFFFFFFFF) data.speed = Number((enhSpd / 1000).toFixed(3));
+                }
+                offset += f.size;
+            }
+
+            for (const df of def.devFields) {
+                offset += df.size;
+            }
+
+            return { nextOffset: offset, data };
+        }
+
+        /**
+         * Parses an uploaded .FIT file using fit-file-parser first, falling back to native binary parser
+         */
+        async function parseFitFileBuffer(arrayBuffer, fileName) {
+            if (externalFitParserClass) {
+                try {
+                    const parser = new externalFitParserClass({
+                        force: true,
+                        speedUnit: 'm/s',
+                        lengthUnit: 'm',
+                        elapsedRecordField: true,
+                        mode: 'list'
+                    });
+                    const parsedData = await new Promise((resolve, reject) => {
+                        parser.parse(arrayBuffer, (err, data) => {
+                            if (err) reject(err);
+                            else resolve(data);
+                        });
+                    });
+
+                    if (parsedData && parsedData.records && parsedData.records.length > 10) {
+                        const firstRec = parsedData.records[0];
+                        const startTs = firstRec.timestamp ? new Date(firstRec.timestamp).getTime() : Date.now();
+                        const records = parsedData.records.map((r, i) => {
+                            const recTs = r.timestamp ? new Date(r.timestamp).getTime() : startTs + i * 1000;
+                            const elapsedSec = r.elapsed_time !== undefined
+                                ? Math.round(r.elapsed_time)
+                                : Math.max(0, Math.round((recTs - startTs) / 1000));
+                            const rawCad = r.cadence || 0;
+                            const spm = rawCad > 0 && rawCad < 115 ? rawCad * 2 : rawCad;
+                            let lat = r.position_lat;
+                            let lon = r.position_long;
+                            // Convert semicircles if fit-file-parser returned raw integers
+                            if (lat && Math.abs(lat) > 180) lat = lat * (180 / Math.pow(2, 31));
+                            if (lon && Math.abs(lon) > 180) lon = lon * (180 / Math.pow(2, 31));
+
+                            return {
+                                t: elapsedSec,
+                                hr: Math.round(r.heart_rate || 0),
+                                speed: Number((r.enhanced_speed ?? r.speed ?? 0).toFixed(3)),
+                                cad: Math.round(spm),
+                                lat: lat ? Number(lat.toFixed(6)) : undefined,
+                                lon: lon ? Number(lon.toFixed(6)) : undefined
+                            };
+                        });
+                        return {
+                            startTimeISO: new Date(startTs).toISOString(),
+                            records
+                        };
+                    }
+                } catch (err) {
+                    console.warn('Fallback al decodificador binario nativo .FIT:', err);
+                }
+            }
+            return parseFitBinaryNative(arrayBuffer);
+        }
+
+        async function handleFitUpload(event) {
+            const files = Array.from(event.target.files || []);
+            if (files.length === 0) return;
+
+            for (const file of files) {
+                try {
+                    const buffer = await file.arrayBuffer();
+                    const parsed = await parseFitFileBuffer(buffer, file.name);
+                    const metrics = analyzeWorkoutStream(parsed.records, parsed.startTimeISO, appState.settings);
+
+                    const cleanName = file.name.replace(/\.fit$/i, '');
+                    const workoutObj = {
+                        id: 'fit_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                        title: `WorkOutDoors: ${cleanName}`,
+                        fileName: file.name,
+                        startTime: parsed.startTimeISO,
+                        records: parsed.records,
+                        metrics
+                    };
+
+                    await saveWorkoutToIDB(workoutObj);
+                    appState.workouts.unshift(workoutObj);
+                    appState.selectedWorkoutId = workoutObj.id;
+                    showToast(`Archivo ${file.name} analizado (${metrics.totalDistanceKm} km • Z2: ${metrics.z2AvgPaceStr}/km).`, 'success');
+                } catch (err) {
+                    console.error('Error procesando .FIT:', err);
+                    showToast(`Error al leer ${file.name}: ${err.message}`, 'error');
+                }
+            }
+
+            event.target.value = '';
+            appState.workouts.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            refreshAllViews();
+        }
+
+        /**
+         * Generates a genuine binary .FIT file in-memory so the user can download and test real .FIT file upload
+         */
+        function generateBinaryFitBuffer() {
+            const numRecords = 2400; // 40-minute run
+            const recordSize = 19; // timestamp(4) + lat(4) + lon(4) + hr(1) + cad(1) + speed(2) + msgHeader(1)
+            const defMsgSize = 1 + 1 + 1 + 2 + 1 + (6 * 3); // 24 bytes
+            const dataPayloadSize = defMsgSize + numRecords * 18;
+            const totalSize = 14 + dataPayloadSize + 2;
+
+            const buf = new ArrayBuffer(totalSize);
+            const view = new DataView(buf);
+
+            // 1. FIT 14-byte Header
+            view.setUint8(0, 14); // header size
+            view.setUint8(1, 0x10); // protocol version
+            view.setUint16(2, 2014, true); // profile version
+            view.setUint32(4, dataPayloadSize, true);
+            view.setUint8(8, '.'.charCodeAt(0));
+            view.setUint8(9, 'F'.charCodeAt(0));
+            view.setUint8(10, 'I'.charCodeAt(0));
+            view.setUint8(11, 'T'.charCodeAt(0));
+            view.setUint16(12, 0, true);
+
+            let offset = 14;
+            // 2. Definition Message for Local Msg 0 -> Global Msg 20 (Record)
+            view.setUint8(offset++, 0x40); // Definition header, local 0
+            view.setUint8(offset++, 0); // reserved
+            view.setUint8(offset++, 0); // little endian
+            view.setUint16(offset, 20, true); // Global Msg 20 (Record)
+            offset += 2;
+            view.setUint8(offset++, 6); // 6 fields
+
+            // Fields: 253 (timestamp,4,uint32), 0 (lat,4,sint32), 1 (lon,4,sint32), 3 (hr,1,uint8), 4 (cad,1,uint8), 6 (speed,2,uint16)
+            const fieldSpecs = [
+                [253, 4, 134],
+                [0, 4, 133],
+                [1, 4, 133],
+                [3, 1, 2],
+                [4, 1, 2],
+                [6, 2, 132]
+            ];
+            for (const [fNum, sz, bType] of fieldSpecs) {
+                view.setUint8(offset++, fNum);
+                view.setUint8(offset++, sz);
+                view.setUint8(offset++, bType);
+            }
+
+            const FIT_EPOCH_OFFSET_SEC = 631065600;
+            const startFitTs = Math.floor(Date.now() / 1000) - FIT_EPOCH_OFFSET_SEC - 3600;
+            const centerLat = 40.4153; // Parque del Retiro, Madrid
+            const centerLon = -3.6845;
+
+            for (let i = 0; i < numRecords; i++) {
+                view.setUint8(offset++, 0x00); // Data message header, local 0
+                view.setUint32(offset, startFitTs + i, true);
+                offset += 4;
+
+                const angle = (i / numRecords) * Math.PI * 4;
+                const lat = centerLat + Math.sin(angle) * 0.008;
+                const lon = centerLon + Math.cos(angle) * 0.011;
+                const latSemi = Math.round(lat * (Math.pow(2, 31) / 180));
+                const lonSemi = Math.round(lon * (Math.pow(2, 31) / 180));
+
+                view.setInt32(offset, latSemi, true);
+                offset += 4;
+                view.setInt32(offset, lonSemi, true);
+                offset += 4;
+
+                // Heart rate: warmup 600s, core Z2 (138-144 bpm), cooldown 600s
+                let hr = 140 + Math.round(Math.sin(i / 45) * 4);
+                if (i < 600) hr = 115 + Math.round((i / 600) * 23);
+                else if (i > numRecords - 600) hr = 135 - Math.round(((i - (numRecords - 600)) / 600) * 15);
+
+                const cadHalf = 86; // 172 spm
+                const speedMmSec = 3420 + Math.round(Math.sin(i / 30) * 90); // ~4:52 /km
+
+                view.setUint8(offset++, hr);
+                view.setUint8(offset++, cadHalf);
+                view.setUint16(offset, speedMmSec, true);
+                offset += 2;
+            }
+
+            view.setUint16(offset, 0, true); // CRC placeholder
+            return buf;
+        }
+
+        function downloadSampleBinaryFit() {
+            const buf = generateBinaryFitBuffer();
+            const blob = new Blob([buf], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'WorkOutDoors_Retiro_Z2.fit';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            showToast('Archivo binario WorkOutDoors_Retiro_Z2.fit descargado. ¡Súbelo con el botón "Subir .FIT"!', 'success');
+        }
+
+        /*************************************************************************
+         * 5. WORKOUTDOORS TELEMETRY SIMULATOR & DEMO SEEDING
+         *************************************************************************/
+        function buildSyntheticWorkout({ title, daysAgo, durationSec, type, settings }) {
+            const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+            const { z2Min, z2Max } = getKarvonenZones(settings.fcMax, settings.fcBasal);
+            const targetZ2Hr = Math.round((z2Min + z2Max) / 2);
+
+            // GPS Loop coordinates (Madrid Casa de Campo / Madrid Río scenic loops)
+            const baseLat = type === 'vam_test' ? 40.4075 : 40.4180;
+            const baseLon = type === 'vam_test' ? -3.7210 : -3.7420;
+            const stepSec = 5; // 5-second sampling for compact IndexedDB storage
+            const records = [];
+
+            for (let t = 0; t <= durationSec; t += stepSec) {
+                const progress = t / durationSec;
+                const theta = progress * Math.PI * 2;
+                const lat = Number((baseLat + Math.sin(theta) * 0.014 + Math.cos(theta * 3) * 0.002).toFixed(6));
+                const lon = Number((baseLon + Math.cos(theta) * 0.019 + Math.sin(theta * 2) * 0.002).toFixed(6));
+
+                let hr = targetZ2Hr;
+                let speed = 3.38; // ~4:55 /km
+                let cad = 174;
+
+                if (type === 'z2_long') {
+                    // First 10m warmup, core Z2, last 10m cooldown + cross-muscular cadence drop in final 25%
+                    if (t < 600) {
+                        hr = settings.fcBasal + 48 + Math.round((t / 600) * 28);
+                        speed = 3.05 + (t / 600) * 0.30;
+                        cad = 172;
+                    } else if (t > durationSec - 600) {
+                        hr = targetZ2Hr - 8;
+                        speed = 3.12;
+                        cad = 165;
+                    } else {
+                        hr = targetZ2Hr + Math.round(Math.sin(t / 90) * 3);
+                        speed = 3.41 + Math.sin(t / 120) * 0.06; // ~4:53 /km in Z2
+                        // Simulate neuromuscular cadence drop after 70% of long run
+                        cad = progress > 0.72 ? 165 : 175;
+                    }
+                } else if (type === 'z2_easy') {
+                    if (t < 600) {
+                        hr = settings.fcBasal + 50 + Math.round((t / 600) * 24);
+                        speed = 3.10;
+                    } else if (t > durationSec - 600) {
+                        hr = targetZ2Hr - 10;
+                        speed = 3.15;
+                    } else {
+                        hr = targetZ2Hr - 1 + Math.round(Math.cos(t / 75) * 3);
+                        speed = 3.34 + Math.cos(t / 110) * 0.05; // ~4:59 /km
+                        cad = 173;
+                    }
+                } else if (type === 'vam_test') {
+                    // Warmup 10 min, then 5m30s maximal aerobic speed VAM peak (4.55 m/s = 3:40/km, HR 93% FCMax), then Z2 + cooldown
+                    if (t >= 660 && t <= 1000) {
+                        hr = Math.round(settings.fcMax * 0.94);
+                        speed = 4.54; // 3:40 /km VAM peak!
+                        cad = 186;
+                    } else if (t < 600 || t > durationSec - 600) {
+                        hr = targetZ2Hr - 12;
+                        speed = 3.05;
+                        cad = 170;
+                    } else {
+                        hr = targetZ2Hr + 1;
+                        speed = 3.36;
+                        cad = 174;
+                    }
+                }
+
+                records.push({ t, hr, speed: Number(speed.toFixed(3)), cad, lat, lon });
+            }
+
+            const startTimeISO = startDate.toISOString();
+            const metrics = analyzeWorkoutStream(records, startTimeISO, settings);
+
+            return {
+                id: 'sim_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                title,
+                fileName: `${title.toLowerCase().replace(/\s+/g, '_')}.fit`,
+                startTime: startTimeISO,
+                isExplicitVamTest: type === 'vam_test',
+                records,
+                metrics
+            };
+        }
+
+        async function simulateWorkout(kind) {
+            let workout = null;
+            if (kind === 'z2_long') {
+                workout = buildSyntheticWorkout({
+                    title: 'Tirada Larga Z2 Casa de Campo (75m)',
+                    daysAgo: 1,
+                    durationSec: 4500, // 75 min
+                    type: 'z2_long',
+                    settings: appState.settings
+                });
+            } else if (kind === 'vam_test') {
+                workout = buildSyntheticWorkout({
+                    title: 'Test VAM 5 min + Base Aeróbica',
+                    daysAgo: 0,
+                    durationSec: 2700, // 45 min
+                    type: 'vam_test',
+                    settings: appState.settings
+                });
+            }
+
+            if (workout) {
+                await saveWorkoutToIDB(workout);
+                appState.workouts.unshift(workout);
+                appState.workouts.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+                appState.selectedWorkoutId = workout.id;
+                refreshAllViews();
+                showToast(`Sesión "${workout.title}" añadida y procesada.`, 'success');
+            }
+        }
+
+        async function simulateExpiredVamScenario() {
+            // Moves any existing VAM peak workouts to 48 days ago so the 42-day rolling window alert triggers
+            let modified = 0;
+            const expiredDate = new Date(Date.now() - 48 * 24 * 60 * 60 * 1000).toISOString();
+
+            for (const w of appState.workouts) {
+                if (w.metrics && (w.metrics.isVamPeakQualified || w.isExplicitVamTest)) {
+                    w.startTime = expiredDate;
+                    await saveWorkoutToIDB(w);
+                    modified++;
+                }
+            }
+
+            if (modified === 0) {
+                const oldVam = buildSyntheticWorkout({
+                    title: 'Test VAM Antiguo (Hace 48 días)',
+                    daysAgo: 48,
+                    durationSec: 2700,
+                    type: 'vam_test',
+                    settings: appState.settings
+                });
+                await saveWorkoutToIDB(oldVam);
+                appState.workouts.push(oldVam);
+            }
+
+            appState.workouts.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            refreshAllViews();
+            showToast('Ventana móvil de 42 días simulada: último test VAM datado hace 48 días. Z4/Z5 anuladas.', 'warning');
+        }
+
+        /*************************************************************************
+         * 6. LEAFLET.JS + OPENSTREETMAP GPS ROUTE RENDERER
+         *************************************************************************/
+        function initLeafletMap() {
+            if (appState.leafletMap) return;
+            appState.leafletMap = L.map('map-container', {
+                zoomControl: true,
+                attributionControl: true
+            }).setView([40.4168, -3.7038], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(appState.leafletMap);
+        }
+
+        function renderWorkoutOnMap(workout) {
+            initLeafletMap();
+            const map = appState.leafletMap;
+
+            // Clear existing layers
+            appState.mapLayers.forEach(layer => map.removeLayer(layer));
+            appState.mapLayers = [];
+
+            if (!workout || !workout.records || workout.records.length === 0) return;
+
+            const gpsPoints = workout.records.filter(r => r.lat !== undefined && r.lon !== undefined);
+            if (gpsPoints.length < 2) return;
+
+            const firstT = workout.records[0].t;
+            const lastT = workout.records[workout.records.length - 1].t;
+            const warmupEnd = firstT + 600;
+            const cooldownStart = lastT - 600;
+
+            const warmupLatLngs = [];
+            const coreLatLngs = [];
+            const cooldownLatLngs = [];
+
+            for (const p of gpsPoints) {
+                if (p.t < warmupEnd) {
+                    warmupLatLngs.push([p.lat, p.lon]);
+                } else if (p.t > cooldownStart) {
+                    cooldownLatLngs.push([p.lat, p.lon]);
+                } else {
+                    coreLatLngs.push([p.lat, p.lon]);
+                }
+            }
+
+            if (warmupLatLngs.length > 1) {
+                const l1 = L.polyline(warmupLatLngs, { color: '#94A3B8', weight: 4, opacity: 0.7, dashArray: '6, 6' }).addTo(map);
+                appState.mapLayers.push(l1);
+            }
+            if (coreLatLngs.length > 1) {
+                const l2 = L.polyline(coreLatLngs, { color: '#10B981', weight: 5, opacity: 0.95 }).addTo(map);
+                appState.mapLayers.push(l2);
+            } else {
+                const allLatLngs = gpsPoints.map(p => [p.lat, p.lon]);
+                const lAll = L.polyline(allLatLngs, { color: '#10B981', weight: 5, opacity: 0.95 }).addTo(map);
+                appState.mapLayers.push(lAll);
+            }
+            if (cooldownLatLngs.length > 1) {
+                const l3 = L.polyline(cooldownLatLngs, { color: '#94A3B8', weight: 4, opacity: 0.7, dashArray: '6, 6' }).addTo(map);
+                appState.mapLayers.push(l3);
+            }
+
+            // Start & Finish markers
+            const startPt = [gpsPoints[0].lat, gpsPoints[0].lon];
+            const endPt = [gpsPoints[gpsPoints.length - 1].lat, gpsPoints[gpsPoints.length - 1].lon];
+
+            const startMarker = L.circleMarker(startPt, {
+                radius: 6,
+                fillColor: '#10B981',
+                color: '#090D16',
+                weight: 2,
+                fillOpacity: 1
+            }).bindPopup(`<b>Inicio</b><br>${workout.title}`).addTo(map);
+
+            const endMarker = L.circleMarker(endPt, {
+                radius: 6,
+                fillColor: '#F43F5E',
+                color: '#090D16',
+                weight: 2,
+                fillOpacity: 1
+            }).bindPopup(`<b>Meta</b><br>${workout.metrics.totalDistanceKm} km`).addTo(map);
+
+            appState.mapLayers.push(startMarker, endMarker);
+
+            const bounds = L.latLngBounds(gpsPoints.map(p => [p.lat, p.lon]));
+            map.fitBounds(bounds, { padding: [24, 24] });
+        }
+
+        /*************************************************************************
+         * 7. WEEKLY MANUAL DATA ENTRY (RPE, WEEKLY RHR, HRV, WEIGHT, WAIST, STRENGTH)
+         *************************************************************************/
+        function getCurrentISOWeekString(dateObj = new Date()) {
+            const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
+        }
+
+        function loadWeeklyLogsFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_LOGS);
+                if (raw) {
+                    appState.weeklyLogs = JSON.parse(raw);
+                } else {
+                    const currentWeek = getCurrentISOWeekString();
+                    appState.weeklyLogs = {
+                        [currentWeek]: {
+                            rpe: 6.5,
+                            weeklyRhr: 59,
+                            hrv: 68,
+                            weight: 71.4,
+                            waist: 78.5,
+                            strengthNotes: 'Subida de pesos en polea y sentadilla búlgara (martes). Trabajo excéntrico de gemelo/sóleo (jueves).'
+                        }
+                    };
+                    localStorage.setItem(STORAGE_KEYS.WEEKLY_LOGS, JSON.stringify(appState.weeklyLogs));
+                }
+            } catch (e) {
+                console.error('Error cargando registros semanales:', e);
+            }
+
+            const picker = document.getElementById('weekly-iso-picker');
+            if (!picker.value) {
+                picker.value = getCurrentISOWeekString();
+            }
+            loadWeeklyLogForSelectedWeek();
+        }
+
+        function loadWeeklyLogForSelectedWeek() {
+            const weekKey = document.getElementById('weekly-iso-picker').value || getCurrentISOWeekString();
+            const entry = appState.weeklyLogs[weekKey] || {
+                rpe: 6.0,
+                weeklyRhr: appState.settings.fcBasal + 2,
+                hrv: 65,
+                weight: 71.5,
+                waist: 79.0,
+                strengthNotes: ''
+            };
+
+            document.getElementById('input-rpe').value = entry.rpe;
+            updateRpeBadge(entry.rpe);
+            document.getElementById('input-weekly-rhr').value = entry.weeklyRhr;
+            document.getElementById('input-weekly-hrv').value = entry.hrv;
+            document.getElementById('input-weekly-weight').value = entry.weight;
+            document.getElementById('input-weekly-waist').value = entry.waist;
+            document.getElementById('input-strength-notes').value = entry.strengthNotes;
+            updateRhrStressIndicator();
+        }
+
+        function updateRpeBadge(val) {
+            const num = Number(val);
+            const badge = document.getElementById('rpe-value-badge');
+            badge.textContent = `${num.toFixed(1)} / 10`;
+            if (num >= 8) {
+                badge.className = 'mono-metric text-base font-bold px-3 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40';
+            } else if (num >= 6) {
+                badge.className = 'mono-metric text-base font-bold px-3 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40';
+            } else {
+                badge.className = 'mono-metric text-base font-bold px-3 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+            }
+        }
+
+        function updateRhrStressIndicator() {
+            const weeklyRhr = Number(document.getElementById('input-weekly-rhr').value) || appState.settings.fcBasal;
+            const basal = appState.settings.fcBasal;
+            const diff = weeklyRhr - basal;
+            const sign = diff > 0 ? `+${diff}` : `${diff}`;
+            const badge = document.getElementById('rhr-delta-badge');
+            document.getElementById('weekly-basal-ref').textContent = basal;
+
+            if (diff >= 4) {
+                badge.textContent = `${sign} ppm vs Basal (Alerta estrés)`;
+                badge.className = 'shrink-0 text-xs font-mono px-2.5 py-2 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40';
+            } else if (diff >= 2) {
+                badge.textContent = `${sign} ppm vs Basal (Fatiga leve)`;
+                badge.className = 'shrink-0 text-xs font-mono px-2.5 py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40';
+            } else {
+                badge.textContent = `${sign} ppm vs Basal (Asimilado)`;
+                badge.className = 'shrink-0 text-xs font-mono px-2.5 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+            }
+        }
+
+        function saveWeeklyManualData(event) {
+            event.preventDefault();
+            const weekKey = document.getElementById('weekly-iso-picker').value || getCurrentISOWeekString();
+            appState.weeklyLogs[weekKey] = {
+                rpe: Number(document.getElementById('input-rpe').value),
+                weeklyRhr: Number(document.getElementById('input-weekly-rhr').value),
+                hrv: Number(document.getElementById('input-weekly-hrv').value),
+                weight: Number(document.getElementById('input-weekly-weight').value),
+                waist: Number(document.getElementById('input-weekly-waist').value),
+                strengthNotes: document.getElementById('input-strength-notes').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem(STORAGE_KEYS.WEEKLY_LOGS, JSON.stringify(appState.weeklyLogs));
+            refreshAllViews();
+            showToast(`Datos manuales de la semana ${weekKey} guardados. Reporte IA actualizado.`, 'success');
+        }
+
+        /*************************************************************************
+         * 8. AI COACH STRUCTURED REPORT GENERATOR & CLIPBOARD EXPORTER
+         *************************************************************************/
+        function getWorkoutsForCurrentWeek() {
+            const now = new Date();
+            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const recent = appState.workouts.filter(w => new Date(w.startTime) >= sevenDaysAgo);
+            return recent.length > 0 ? recent : appState.workouts;
+        }
+
+        function buildAICoachReportText() {
+            const { fcMax, fcBasal } = appState.settings;
+            const { z2Min, z2Max, z4MinHr, z4MaxHr } = getKarvonenZones(fcMax, fcBasal);
+            const weekWorkouts = getWorkoutsForCurrentWeek();
+            const weekKey = document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
+            const manual = appState.weeklyLogs[weekKey] || {
+                rpe: 6.5,
+                weeklyRhr: fcBasal + 2,
+                hrv: 68,
+                weight: 71.4,
+                waist: 78.5,
+                strengthNotes: 'Sin notas registradas.'
+            };
+
+            // 1. Volume & TRIMP accumulation
+            let totalKm = 0;
+            let totalDurationSec = 0;
+            let totalTrimp = 0;
+            let weightedZ2SpeedSum = 0;
+            let totalZ2Seconds = 0;
+
+            const sessionLines = [];
+            const fatigueAlerts = [];
+
+            // Sort chronological for trend analysis
+            const chronological = [...weekWorkouts].sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
+            for (const w of chronological) {
+                const m = w.metrics;
+                if (!m) continue;
+                totalKm += m.totalDistanceKm;
+                totalDurationSec += m.totalDurationSec;
+                totalTrimp += m.trimp;
+
+                if (m.z2TimeSec >= 30 && m.z2AvgSpeedMs > 0) {
+                    weightedZ2SpeedSum += m.z2AvgSpeedMs * m.z2TimeSec;
+                    totalZ2Seconds += m.z2TimeSec;
+                }
+
+                const dateStr = new Date(w.startTime).toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' });
+                sessionLines.push(
+                    `  - [${dateStr}] ${w.title}: ${m.totalDistanceKm} km (${formatDurationHMS(m.totalDurationSec)}) | FC Media: ${m.avgHr} ppm | Ritmo Z2 Puro (sin ±10m): ${m.z2AvgPaceStr}/km (${m.z2RatioPercent}% núcleo en Z2) | TRIMP: ${m.trimp} pts | Cadencia: ${m.initialCadence}->${m.finalCadence} spm`
+                );
+
+                if (m.hasCrossFatigue) {
+                    fatigueAlerts.push(
+                        `ALERTA FATIGA MUSCULAR CRUZADA en "${w.title}": Caída brusca de cadencia de ${m.initialCadence} spm a ${m.finalCadence} spm (${m.cadenceDropSpm} spm) en el tramo final.`
+                    );
+                }
+            }
+
+            const meanZ2SpeedMs = totalZ2Seconds > 0 ? (weightedZ2SpeedSum / totalZ2Seconds) : 0;
+            const meanZ2PaceStr = meanZ2SpeedMs > 0 ? speedToPaceString(meanZ2SpeedMs) : '--:--';
+
+            // Z2 Efficiency Trend between first and last Z2 session of the week
+            const z2Sessions = chronological.filter(w => w.metrics && w.metrics.z2AvgPaceSec);
+            let z2TrendText = 'Estable (1 sola sesión Z2 evaluada)';
+            if (z2Sessions.length >= 2) {
+                const firstPace = z2Sessions[0].metrics.z2AvgPaceSec;
+                const lastPace = z2Sessions[z2Sessions.length - 1].metrics.z2AvgPaceSec;
+                const diffSec = Math.round(lastPace - firstPace);
+                if (diffSec < -2) {
+                    z2TrendText = `MEJORA AERÓBICA (${Math.abs(diffSec)}s/km más rápido al mismo rango cardíaco ${z2Min}-${z2Max} ppm)`;
+                } else if (diffSec > 2) {
+                    z2TrendText = `DERIVA / FATIGA (+${diffSec}s/km más lento para sostener ${z2Min}-${z2Max} ppm)`;
+                } else {
+                    z2TrendText = `ESTABLE (${meanZ2PaceStr}/km dentro de ${z2Min}-${z2Max} ppm)`;
+                }
+            }
+
+            // VAM & 42-day window
+            const vamStatus = evaluateVamRollingWindow();
+            const rhrDelta = manual.weeklyRhr - fcBasal;
+            const rhrSign = rhrDelta > 0 ? `+${rhrDelta}` : `${rhrDelta}`;
+
+            // Update preview pills on the AI Report tab
+            const elZ2Preview = document.getElementById('report-preview-z2');
+            const elFatiguePreview = document.getElementById('report-preview-fatigue');
+            const elRhrPreview = document.getElementById('report-preview-rhr');
+            if (elZ2Preview) elZ2Preview.textContent = `${meanZ2PaceStr} /km (${z2Min}-${z2Max} ppm)`;
+            if (elFatiguePreview) {
+                elFatiguePreview.textContent = fatigueAlerts.length > 0 ? `${fatigueAlerts.length} sesión con caída spm` : 'Cadencia estable';
+                elFatiguePreview.className = fatigueAlerts.length > 0 ? 'mono-metric text-sm font-bold text-rose-400' : 'mono-metric text-sm font-bold text-emerald-400';
+            }
+            if (elRhrPreview) {
+                elRhrPreview.textContent = `${manual.weeklyRhr} ppm (${rhrSign} vs Basal ${fcBasal})`;
+            }
+
+            const reportLines = [
+                `===================================================================`,
+                `REPORTE CIENTÍFICO DE ENTRENAMIENTO RUNNING — RUNLAB PRO (SEMANA ${weekKey})`,
+                `===================================================================`,
+                `Rol solicitado a la IA: Actúa como mi Fisiólogo del Ejercicio y Entrenador de Running de Alto Rendimiento. Analiza los siguientes datos objetivos extraídos de mis archivos .FIT (WorkOutDoors) y mis biomarcadores semanales para ajustar la carga de la próxima semana.`,
+                ``,
+                `1. PARÁMETROS FISIOLÓGICOS BASE (FÓRMULA DE KARVONEN ACTIVA)`,
+                `- FC Máxima configurada: ${fcMax} ppm`,
+                `- FC en Reposo Basal configurada: ${fcBasal} ppm (Reserva Cardíaca: ${fcMax - fcBasal} ppm)`,
+                `- Rango Z2 Estricto (60%-70% FC Reserva): ${z2Min} - ${z2Max} ppm`,
+                ``,
+                `2. VOLUMEN TOTAL Y CARGA INTERNA (TRIMP ACUMULADO)`,
+                `- Sesiones procesadas: ${weekWorkouts.length} entrenamientos`,
+                `- Volumen Total: ${totalKm.toFixed(2)} km`,
+                `- Tiempo Total en Movimiento: ${formatDurationHMS(totalDurationSec)}`,
+                `- Carga Interna Acumulada (TRIMP Banister): ${totalTrimp} puntos`,
+                ``,
+                `3. TENDENCIA DE EFICIENCIA AERÓBICA Z2 (SIN 10 MIN CALENTAMIENTO NI 10 MIN ENFRIAMIENTO)`,
+                `- Ritmo Medio Exacto en Rango Karvonen (${z2Min}-${z2Max} ppm): ${meanZ2PaceStr} min/km`,
+                `- Tiempo Neto Acumulado en Z2 Puro (núcleo): ${formatDurationHMS(totalZ2Seconds)}`,
+                `- Tendencia Intra-Semanal Z2: ${z2TrendText}`,
+                `- Desglose por Sesión (.FIT):`,
+                ...(sessionLines.length > 0 ? sessionLines : ['  - Sin sesiones registradas en el periodo.']),
+                ``,
+                `4. BIOMARCADORES DE RECUPERACIÓN, SISTEMA NERVIOSO AUTÓNOMO Y ANTROPOMETRÍA`,
+                `- FC en Reposo Media de la Semana: ${manual.weeklyRhr} ppm (${rhrSign} ppm respecto a FC Basal de ${fcBasal} ppm -> ${Math.abs(rhrDelta) >= 4 ? 'ALERTA ESTRÉS SIMPÁTICO' : 'Asimilación fisiológica normal'})`,
+                `- VFC / HRV Media Semanal: ${manual.hrv} ms`,
+                `- RPE Medio Semanal (Esfuerzo Percibido): ${manual.rpe} / 10`,
+                `- Peso Corporal Medio: ${manual.weight} kg | Perímetro de Cintura: ${manual.waist} cm`,
+                ``,
+                `5. DETECCIÓN DE FATIGA MUSCULAR CRUZADA Y ENTRENAMIENTO DE FUERZA`,
+                `- Notas de Fuerza de la Semana: "${manual.strengthNotes || 'Sin notas'}"`,
+                `- Análisis Neuromecánico de Cadencia (último 25% de tiradas largas):`,
+                ...(fatigueAlerts.length > 0
+                    ? fatigueAlerts.map(a => `  * ${a}`)
+                    : ['  * Sin caídas críticas de cadencia al final de las tiradas. Buena tolerancia muscular periférica.']),
+                ``,
+                `6. VELOCIDAD AERÓBICA MÁXIMA (VAM 5-6 MIN) Y VENTANA MÓVIL DE 42 DÍAS`,
+                ...(vamStatus.isValid
+                    ? [
+                        `- Estado de Intensidad: VIGENTE (Detectado hace ${vamStatus.daysAgo} días en "${vamStatus.workoutTitle}")`,
+                        `- Pico VAM Sostenido (5-6 min): ${vamStatus.vamPaceStr} min/km (${vamStatus.vamSpeedKmh} km/h)`,
+                        `- Zona 4 Estimada (Umbral Anaeróbico 80-85% VAM): ${vamStatus.z4PaceRangeStr} min/km (FC ref: ${z4MinHr}-${z4MaxHr} ppm)`,
+                        `- Zona 5 Estimada (VO2máx 90-100% VAM): ${vamStatus.z5PaceRangeStr} min/km`
+                    ]
+                    : [
+                        `- ALERTA CRÍTICA: "Datos de intensidad caducados. Se recomienda test VAM de 5 min" (>42 días sin pico VAM válido).`,
+                        `- Zonas Z4 y Z5: ANULADAS hasta completar nuevo test de campo de 5 minutos.`
+                    ]),
+                `===================================================================`
+            ];
+
+            return reportLines.join('\n');
+        }
+
+        function generateAndCopyAIReport(shouldCopy = false) {
+            const text = buildAICoachReportText();
+            const textarea = document.getElementById('ai-report-textarea');
+            if (textarea) {
+                textarea.value = text;
+            }
+            if (shouldCopy) {
+                copyTextToClipboard(text);
+            }
+        }
+
+        function copyReportTextarea() {
+            const textarea = document.getElementById('ai-report-textarea');
+            if (!textarea.value) {
+                generateAndCopyAIReport(true);
+            } else {
+                copyTextToClipboard(textarea.value);
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Reporte Científico para IA copiado al portapapeles.', 'success');
+            } catch (err) {
+                showToast('No se pudo copiar automáticamente. Selecciónalo desde el cuadro de texto.', 'warning');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        /*************************************************************************
+         * 9. MAINTENANCE & DATA SAFETY (ANTI-CACHE SW CLEANER + JSON BACKUP)
+         *************************************************************************/
+        async function forceAppUpdateAntiCache() {
+            showToast('Purgando Service Workers y CacheStorage... Recargando aplicación.', 'info');
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const reg of registrations) {
+                        await reg.unregister();
+                    }
+                }
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    for (const key of keys) {
+                        await caches.delete(key);
+                    }
+                }
+            } catch (e) {
+                console.warn('Error limpiando caché:', e);
+            }
+            setTimeout(() => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('nocache', Date.now());
+                window.location.replace(url.toString());
+            }, 600);
+        }
+
+        async function exportDatabaseBackup() {
+            try {
+                const workouts = await getAllWorkoutsFromIDB();
+                const backupPayload = {
+                    app: 'RunLab Pro PWA',
+                    version: '1.0.0',
+                    exportedAt: new Date().toISOString(),
+                    settings: appState.settings,
+                    weeklyLogs: appState.weeklyLogs,
+                    workouts
+                };
+
+                const jsonStr = JSON.stringify(backupPayload, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const dateStamp = new Date().toISOString().slice(0, 10);
+                a.href = url;
+                a.download = `runlab_backup_${dateStamp}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+
+                showToast(`Backup exportado con éxito (${workouts.length} sesiones .FIT y ajustes).`, 'success');
+            } catch (err) {
+                showToast('Error al exportar la copia de seguridad: ' + err.message, 'error');
+            }
+        }
+
+        async function importDatabaseBackup(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+
+                if (!data.settings || !Array.isArray(data.workouts)) {
+                    throw new Error('Formato de archivo .json no válido para RunLab Pro.');
+                }
+
+                // Restore settings
+                appState.settings = {
+                    fcMax: Number(data.settings.fcMax) || 185,
+                    fcBasal: Number(data.settings.fcBasal) || 57
+                };
+                localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appState.settings));
+                document.getElementById('setting-fc-max').value = appState.settings.fcMax;
+                document.getElementById('setting-fc-basal').value = appState.settings.fcBasal;
+
+                // Restore weekly logs
+                if (data.weeklyLogs) {
+                    appState.weeklyLogs = data.weeklyLogs;
+                    localStorage.setItem(STORAGE_KEYS.WEEKLY_LOGS, JSON.stringify(appState.weeklyLogs));
+                }
+
+                // Restore workouts into IndexedDB and recalculate metrics with current settings
+                await clearAllWorkoutsFromIDB();
+                for (const w of data.workouts) {
+                    w.metrics = analyzeWorkoutStream(w.records, w.startTime, appState.settings);
+                    await saveWorkoutToIDB(w);
+                }
+
+                appState.workouts = await getAllWorkoutsFromIDB();
+                appState.selectedWorkoutId = appState.workouts[0]?.id || null;
+                loadWeeklyLogForSelectedWeek();
+                refreshAllViews();
+                showToast(`Copia de seguridad restaurada: ${appState.workouts.length} entrenamientos importados.`, 'success');
+            } catch (err) {
+                showToast('Error al importar backup .JSON: ' + err.message, 'error');
+            }
+            event.target.value = '';
+        }
+
+        function downloadAuxiliaryFile(fileType) {
+            let content = '';
+            let filename = '';
+            let mime = 'text/plain';
+
+            if (fileType === 'manifest.json') {
+                content = JSON.stringify(PWA_MANIFEST_JSON, null, 2);
+                filename = 'manifest.json';
+                mime = 'application/json';
+            } else if (fileType === 'sw.js') {
+                content = SERVICE_WORKER_CODE.trim();
+                filename = 'sw.js';
+                mime = 'application/javascript';
+            }
+
+            const blob = new Blob([content], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            showToast(`Archivo ${filename} descargado para tu repositorio.`, 'info');
+        }
+
+        /*************************************************************************
+         * 10. UI RENDERING, TAB NAVIGATION & MODALS
+         *************************************************************************/
+        function switchTab(tabName) {
+            const tabs = ['dashboard', 'weekly', 'aireport', 'settings'];
+            for (const t of tabs) {
+                const section = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    section.classList.remove('hidden');
+                    navBtn.className = 'nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-emerald-400 bg-emerald-500/10 font-semibold transition active:scale-95';
+                } else {
+                    section.classList.add('hidden');
+                    navBtn.className = 'nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition active:scale-95';
+                }
+            }
+
+            if (tabName === 'dashboard' && appState.leafletMap) {
+                setTimeout(() => appState.leafletMap.invalidateSize(), 120);
+            } else if (tabName === 'aireport') {
+                generateAndCopyAIReport(false);
+            } else if (tabName === 'settings') {
+                previewKarvonenSettings();
+            }
+        }
+
+        function selectWorkout(id) {
+            appState.selectedWorkoutId = id;
+            refreshDashboardUI();
+        }
+
+        async function deleteSingleWorkout(id, event) {
+            event.stopPropagation();
+            await deleteWorkoutFromIDB(id);
+            appState.workouts = appState.workouts.filter(w => w.id !== id);
+            if (appState.selectedWorkoutId === id) {
+                appState.selectedWorkoutId = appState.workouts[0]?.id || null;
+            }
+            refreshAllViews();
+            showToast('Entrenamiento eliminado del historial local.', 'info');
+        }
+
+        function refreshDashboardUI() {
+            const { fcMax, fcBasal } = appState.settings;
+            const { z2Min, z2Max, z4MinHr, z4MaxHr } = getKarvonenZones(fcMax, fcBasal);
+
+            // Header pills
+            document.getElementById('header-z2-pill').textContent = `Z2: ${z2Min}-${z2Max}`;
+            document.getElementById('zone-header-basal').textContent = fcBasal;
+            document.getElementById('zone-header-max').textContent = fcMax;
+            document.getElementById('card-z2-hr').innerHTML = `${z2Min} - ${z2Max} <span class="text-xs font-normal text-slate-400">ppm</span>`;
+            document.getElementById('kpi-z2-range-label').textContent = `${z2Min}-${z2Max} ppm`;
+            document.getElementById('card-z4-hr').textContent = `${z4MinHr} - ${z4MaxHr} ppm`;
+
+            // Weekly Aggregations
+            const weekWorkouts = getWorkoutsForCurrentWeek();
+            let weekKm = 0;
+            let weekSec = 0;
+            let weekTrimp = 0;
+            let z2SpeedWeighted = 0;
+            let z2SecTotal = 0;
+
+            for (const w of weekWorkouts) {
+                if (!w.metrics) continue;
+                weekKm += w.metrics.totalDistanceKm;
+                weekSec += w.metrics.totalDurationSec;
+                weekTrimp += w.metrics.trimp;
+                if (w.metrics.z2TimeSec >= 30 && w.metrics.z2AvgSpeedMs > 0) {
+                    z2SpeedWeighted += w.metrics.z2AvgSpeedMs * w.metrics.z2TimeSec;
+                    z2SecTotal += w.metrics.z2TimeSec;
+                }
+            }
+
+            const weekZ2PaceStr = z2SecTotal > 0 ? speedToPaceString(z2SpeedWeighted / z2SecTotal) : '--:--';
+
+            document.getElementById('kpi-week-km').textContent = weekKm.toFixed(1);
+            document.getElementById('kpi-week-time').textContent = formatDurationHMS(weekSec);
+            document.getElementById('kpi-week-sessions').textContent = `${weekWorkouts.length} sesiones`;
+            document.getElementById('kpi-z2-pace').textContent = weekZ2PaceStr;
+            document.getElementById('card-z2-pace').innerHTML = `${weekZ2PaceStr} <span class="text-xs font-normal text-slate-400">/km</span>`;
+            document.getElementById('kpi-week-trimp').textContent = weekTrimp;
+
+            const trimpStatusEl = document.getElementById('kpi-trimp-status');
+            if (weekTrimp > 450) {
+                trimpStatusEl.textContent = 'Carga muy alta';
+                trimpStatusEl.className = 'text-rose-400 font-semibold';
+            } else if (weekTrimp >= 180) {
+                trimpStatusEl.textContent = 'Carga óptima';
+                trimpStatusEl.className = 'text-emerald-400 font-semibold';
+            } else {
+                trimpStatusEl.textContent = 'Carga de descarga';
+                trimpStatusEl.className = 'text-cyan-300 font-medium';
+            }
+
+            // VAM & 42-Day Rolling Window Evaluation
+            const vamStatus = evaluateVamRollingWindow();
+            const expiredBanner = document.getElementById('vam-expired-banner');
+            const validityBadge = document.getElementById('vam-validity-badge');
+
+            if (vamStatus.isValid) {
+                expiredBanner.classList.add('hidden');
+                document.getElementById('header-vam-pill').textContent = `VAM: ${vamStatus.vamPaceStr}`;
+                document.getElementById('kpi-vam-pace').textContent = vamStatus.vamPaceStr;
+                document.getElementById('kpi-vam-pace').className = 'mono-metric text-2xl sm:text-3xl font-bold text-cyan-400';
+                document.getElementById('kpi-vam-zones').textContent = `Z4: ${vamStatus.z4PaceRangeStr}`;
+                document.getElementById('kpi-vam-age').textContent = `Hace ${vamStatus.daysAgo}d`;
+                document.getElementById('kpi-vam-age').className = 'px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono';
+
+                document.getElementById('card-z4-pace').innerHTML = `${vamStatus.z4PaceRangeStr} <span class="text-xs font-normal text-slate-400">/km</span>`;
+                document.getElementById('card-z5-pace').innerHTML = `${vamStatus.z5PaceRangeStr} <span class="text-xs font-normal text-slate-400">/km</span>`;
+                document.getElementById('card-vam-speed').textContent = `${vamStatus.vamSpeedKmh} km/h (${vamStatus.vamPaceStr}/km)`;
+
+                validityBadge.textContent = `VAM Vigente (${42 - vamStatus.daysAgo} días restantes)`;
+                validityBadge.className = 'self-start sm:self-auto px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+            } else {
+                expiredBanner.classList.remove('hidden');
+                document.getElementById('header-vam-pill').textContent = `VAM: CADUCADO`;
+                document.getElementById('kpi-vam-pace').textContent = 'ANULADO';
+                document.getElementById('kpi-vam-pace').className = 'mono-metric text-xl sm:text-2xl font-bold text-rose-400';
+                document.getElementById('kpi-vam-zones').textContent = 'Z4/Z5 anuladas';
+                document.getElementById('kpi-vam-age').textContent = vamStatus.daysAgo !== null ? `Hace ${vamStatus.daysAgo}d (>42d)` : 'Sin test';
+                document.getElementById('kpi-vam-age').className = 'px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono';
+
+                document.getElementById('card-z4-pace').innerHTML = `ANULADO <span class="text-xs font-normal text-rose-300/80">(Test &gt;42d)</span>`;
+                document.getElementById('card-z5-pace').innerHTML = `ANULADO <span class="text-xs font-normal text-rose-300/80">(Test &gt;42d)</span>`;
+                document.getElementById('card-vam-speed').textContent = 'Requiere test VAM 5 min';
+
+                validityBadge.textContent = 'Datos de intensidad caducados (>42 días)';
+                validityBadge.className = 'self-start sm:self-auto px-3 py-1 rounded-full text-xs font-mono font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+            }
+
+            // Render Workouts List
+            const listEl = document.getElementById('workouts-list');
+            document.getElementById('workouts-count-badge').textContent = `${appState.workouts.length} sesiones`;
+
+            if (appState.workouts.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-10 px-4 border border-dashed border-slate-800 rounded-xl">
+                        <i class="ph-duotone ph-file-ArrowUp text-3xl text-slate-500"></i>
+                        <p class="text-xs text-slate-300 font-semibold mt-2">No hay entrenamientos .FIT almacenados</p>
+                        <p class="text-[11px] text-slate-500 mt-1">Usa el botón "Subir .FIT" o genera una sesión demo arriba.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!appState.selectedWorkoutId || !appState.workouts.some(w => w.id === appState.selectedWorkoutId)) {
+                appState.selectedWorkoutId = appState.workouts[0].id;
+            }
+
+            listEl.innerHTML = appState.workouts.map(w => {
+                const m = w.metrics;
+                const isSelected = w.id === appState.selectedWorkoutId;
+                const dateFormatted = new Date(w.startTime).toLocaleDateString('es-ES', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+
+                return `
+                    <div onclick="selectWorkout('${w.id}')" class="cursor-pointer rounded-xl p-3.5 border transition ${
+                        isSelected
+                            ? 'bg-slate-800/95 border-emerald-500/60 shadow-md shadow-emerald-500/10'
+                            : 'bg-slate-900/70 hover:bg-slate-800/50 border-slate-800'
+                    }">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="text-xs font-bold text-white">${w.title}</span>
+                                    ${m.isVamPeakQualified || w.isExplicitVamTest ? '<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Pico VAM</span>' : ''}
+                                    ${m.hasCrossFatigue ? '<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Fatiga Cadencia</span>' : ''}
+                                </div>
+                                <p class="text-[11px] text-slate-400 font-mono mt-0.5">${dateFormatted} • ${m.totalDistanceKm} km • ${formatDurationHMS(m.totalDurationSec)}</p>
+                            </div>
+                            <button onclick="deleteSingleWorkout('${w.id}', event)" class="text-slate-500 hover:text-rose-400 p-1 rounded-lg transition" title="Eliminar entrenamiento">
+                                <i class="ph-bold ph-trash text-sm"></i>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-slate-800/80 text-[11px] font-mono">
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">Ritmo Z2 Puro</span>
+                                <span class="text-emerald-400 font-bold">${m.z2AvgPaceStr}/km</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">FC Media</span>
+                                <span class="text-rose-300 font-semibold">${m.avgHr} ppm</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">Carga TRIMP</span>
+                                <span class="text-amber-300 font-semibold">${m.trimp} pts</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Selected Workout Detail & Map update
+            const selected = appState.workouts.find(w => w.id === appState.selectedWorkoutId);
+            if (selected && selected.metrics) {
+                const sm = selected.metrics;
+                document.getElementById('selected-workout-title').textContent = selected.title;
+                document.getElementById('selected-workout-subtitle').textContent =
+                    `${new Date(selected.startTime).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })} • ${sm.totalDistanceKm} km (${formatDurationHMS(sm.totalDurationSec)}) • Rango Karvonen evaluado: ${sm.z2MinUsed}-${sm.z2MaxUsed} ppm`;
+
+                document.getElementById('detail-z2-pace').textContent = `${sm.z2AvgPaceStr} /km`;
+                document.getElementById('detail-z2-seconds').textContent = sm.hasEnoughDurationForTrim
+                    ? `${formatDurationHMS(sm.z2TimeSec)} en Z2 (${sm.z2RatioPercent}% núcleo)`
+                    : 'Sesión <21 min (sin recorte 10m+10m)';
+                document.getElementById('detail-hr').textContent = `${sm.avgHr} / ${sm.maxHrObserved} ppm`;
+                document.getElementById('detail-trimp').textContent = `TRIMP: ${sm.trimp} pts`;
+                document.getElementById('detail-peak5m').textContent = `${sm.best5mPaceStr} /km`;
+                document.getElementById('detail-peak5m-hr').textContent = `FC pico 5m: ${sm.best5mAvgHr} ppm ${sm.isVamPeakQualified ? '(VAM)' : ''}`;
+
+                const driftSign = sm.cadenceDropSpm > 0 ? `+${sm.cadenceDropSpm}` : `${sm.cadenceDropSpm}`;
+                document.getElementById('detail-cadence-drift').textContent = `${sm.initialCadence} → ${sm.finalCadence} spm`;
+                const cadStatusEl = document.getElementById('detail-cadence-status');
+                if (sm.hasCrossFatigue) {
+                    cadStatusEl.textContent = `Caída ${driftSign} spm (Fatiga cruzada)`;
+                    cadStatusEl.className = 'text-[10px] text-rose-400 font-mono font-semibold';
+                } else {
+                    cadStatusEl.textContent = `Deriva ${driftSign} spm (Estable)`;
+                    cadStatusEl.className = 'text-[10px] text-emerald-400 font-mono';
+                }
+
+                renderWorkoutOnMap(selected);
+            }
+        }
+
+        function refreshAllViews() {
+            refreshDashboardUI();
+            updateRhrStressIndicator();
+            generateAndCopyAIReport(false);
+        }
+
+        /*************************************************************************
+         * 11. CUSTOM MODAL & TOAST SYSTEM
+         *************************************************************************/
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let colors = 'bg-slate-900/95 border-slate-700 text-white';
+            let icon = 'ph-info text-cyan-400';
+
+            if (type === 'success') {
+                colors = 'bg-emerald-950/95 border-emerald-500/50 text-emerald-100';
+                icon = 'ph-check-circle text-emerald-400';
+            } else if (type === 'error') {
+                colors = 'bg-rose-950/95 border-rose-500/50 text-rose-100';
+                icon = 'ph-warning-circle text-rose-400';
+            } else if (type === 'warning') {
+                colors = 'bg-amber-950/95 border-amber-500/50 text-amber-100';
+                icon = 'ph-warning text-amber-400';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 p-3.5 rounded-xl border shadow-xl backdrop-blur-md text-xs font-medium transition-all duration-300 ${colors}`;
+            toast.innerHTML = `
+                <i class="ph-fill ${icon} text-lg shrink-0"></i>
+                <span class="flex-1 leading-snug">${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3800);
+        }
+
+        function openResetDatabaseModal() {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-title').textContent = '¿Vaciar historial de entrenamientos?';
+            document.getElementById('modal-desc').textContent = 'Se eliminarán las sesiones .FIT guardadas en IndexedDB. Tus ajustes fisiológicos de FC Máx y Basal se mantendrán.';
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            confirmBtn.onclick = async () => {
+                await clearAllWorkoutsFromIDB();
+                appState.workouts = [];
+                appState.selectedWorkoutId = null;
+                closeCustomModal();
+                refreshAllViews();
+                showToast('Base de datos IndexedDB vaciada correctamente.', 'info');
+            };
+            modal.classList.remove('hidden');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        /*************************************************************************
+         * 12. APP BOOTSTRAP ON WINDOW LOAD
+         *************************************************************************/
+        window.onload = async function () {
+            setupPWA();
+            loadSettingsFromLocalStorage();
+            loadWeeklyLogsFromStorage();
+            initLeafletMap();
+
+            try {
+                appState.workouts = await getAllWorkoutsFromIDB();
+                // Seed initial realistic WorkOutDoors sessions on first visit so all features can be inspected right away
+                if (appState.workouts.length === 0) {
+                    const demo1 = buildSyntheticWorkout({
+                        title: 'Tirada Larga Z2 Casa de Campo',
+                        daysAgo: 1,
+                        durationSec: 4200, // 70 min
+                        type: 'z2_long',
+                        settings: appState.settings
+                    });
+                    const demo2 = buildSyntheticWorkout({
+                        title: 'Rodaje Aeróbico Madrid Río',
+                        daysAgo: 3,
+                        durationSec: 3000, // 50 min
+                        type: 'z2_easy',
+                        settings: appState.settings
+                    });
+                    const demo3 = buildSyntheticWorkout({
+                        title: 'Sesión Pico VAM 5 min + Z2',
+                        daysAgo: 5,
+                        durationSec: 2700, // 45 min
+                        type: 'vam_test',
+                        settings: appState.settings
+                    });
+
+                    await saveWorkoutToIDB(demo1);
+                    await saveWorkoutToIDB(demo2);
+                    await saveWorkoutToIDB(demo3);
+                    appState.workouts = [demo1, demo2, demo3];
+                } else {
+                    // Recalculate dynamically with stored settings
+                    for (const w of appState.workouts) {
+                        w.metrics = analyzeWorkoutStream(w.records, w.startTime, appState.settings);
+                    }
+                }
+            } catch (err) {
+                console.error('Error iniciando IndexedDB:', err);
+            }
+
+            refreshAllViews();
+        };
+    </script>
+</body>
+</html>
