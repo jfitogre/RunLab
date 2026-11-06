@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="RunLab Pro">
-    <meta name="theme-color" content="#090D16">
-    <title>RunLab Pro v2.1 — WorkOutDoors .FIT Analytics & AI Coach</title>
+    <meta name="theme-color" content="#0b0f17">
+    <title>RunLab Pro v2.2 — WorkOutDoors .FIT Analytics & AI Coach</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -111,6 +111,25 @@
         .bottom-nav-safe {
             padding-bottom: max(0.5rem, var(--safe-bottom));
         }
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: #0b0f17;
+            border-bottom: 1px solid #1e293b;
+            padding-top: max(calc(env(safe-area-inset-top, 0px) + 12px), 14px);
+        }
+        @supports (-webkit-touch-callout: none) {
+            /* Specific targeting for iOS Safari & iPhone PWA to clear the Notch / Dynamic Island and iOS top blur completely */
+            .app-header {
+                padding-top: max(calc(env(safe-area-inset-top, 47px) + 10px), 54px);
+            }
+        }
+        @media (display-mode: standalone) {
+            .app-header {
+                padding-top: max(calc(env(safe-area-inset-top, 47px) + 10px), 54px);
+            }
+        }
         @keyframes pulse-subtle {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.65; }
@@ -122,10 +141,10 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950 w-full overflow-x-hidden">
 
-    <!-- TOP HEADER BAR (Strict iPhone Viewport Fit - Zero Horizontal Overflow) -->
-    <header class="sticky top-0 z-30 bg-obsidian/95 backdrop-blur-xl border-b border-slate-800/80 px-3 py-2 w-full">
+    <!-- TOP HEADER BAR (iPhone Notch & iOS Top Blur Safe Area Protected - v2.2) -->
+    <header class="app-header px-3 pb-2.5 w-full">
         <div class="max-w-5xl mx-auto flex items-center justify-between gap-2 w-full">
-            <!-- Left: Brand + Visible Version Badge v2.1 + Z2 Indicator -->
+            <!-- Left: Brand + Visible Version Badge v2.2 + Z2 Indicator -->
             <div class="flex items-center gap-2 min-w-0">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
                     <i class="ph-bold ph-person-simple-run text-slate-950 text-base"></i>
@@ -133,7 +152,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
                         <h1 class="font-extrabold text-sm tracking-tight text-white truncate">RunLab <span class="text-emerald-400">Pro</span></h1>
-                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.1</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.2</span>
                     </div>
                     <button onclick="switchTab('settings')" class="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-200 font-mono truncate">
                         <i class="ph-fill ph-heart text-rose-400 text-[10px]"></i>
@@ -479,7 +498,7 @@
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Variables Fisiológicas (LocalStorage)</span>
                         <h2 class="text-base font-bold text-white mt-1">Configuración del Atleta</h2>
                     </div>
-                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Versión v2.1</span>
+                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Versión v2.2</span>
                 </div>
 
                 <form onsubmit="saveAthleteSettings(event)" class="mt-3.5 space-y-3.5">
@@ -548,7 +567,7 @@
             </div>
 
             <div class="text-center py-2 text-[11px] font-mono text-slate-500">
-                RunLab Pro <strong class="text-emerald-400">v2.1</strong> • Motor .FIT Local + Regresión Lineal Z2
+                RunLab Pro <strong class="text-emerald-400">v2.2</strong> • Motor .FIT Local + Regresión Lineal Z2
             </div>
         </section>
     </main>
@@ -600,20 +619,20 @@
             </button>
             <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition active:scale-95">
                 <i class="ph-bold ph-sliders-horizontal text-base"></i>
-                <span class="text-[10px] mt-0.5">Ajustes v2.1</span>
+                <span class="text-[10px] mt-0.5">Ajustes v2.2</span>
             </button>
         </div>
     </nav>
 
     <!-- =========================================================================
-         CORE APPLICATION LOGIC v2.1: CLEAN, VERIFIED & ZERO DEMO CLUTTER
+         CORE APPLICATION LOGIC v2.2: CLEAN, VERIFIED & ZERO DEMO CLUTTER
          ========================================================================= -->
     <script>
-        const APP_VERSION = '2.1';
+        const APP_VERSION = '2.2';
 
         const PWA_MANIFEST_JSON = {
-            name: "RunLab Pro v2.1 — Analítica .FIT",
-            short_name: "RunLab v2.1",
+            name: "RunLab Pro v2.2 — Analítica .FIT",
+            short_name: "RunLab v2.2",
             description: "Analizador científico local de archivos .fit (WorkOutDoors) con Eficiencia Z2 Karvonen, Regresión Lineal, TRIMP y VAM.",
             start_url: "./index.html",
             display: "standalone",
@@ -1887,7 +1906,7 @@
 
             const reportLines = [
                 `===================================================================`,
-                `REPORTE CIENTÍFICO DE ENTRENAMIENTO RUNNING — RUNLAB PRO v2.1 (${weekKey})`,
+                `REPORTE CIENTÍFICO DE ENTRENAMIENTO RUNNING — RUNLAB PRO v2.2 (${weekKey})`,
                 `===================================================================`,
                 `Actúa como mi Fisiólogo del Ejercicio y Entrenador de Running. Analiza los siguientes datos extraídos de mis archivos .FIT (WorkOutDoors) y mis biomarcadores semanales:`,
                 ``,
@@ -1957,7 +1976,7 @@
          * REAL CACHE-BUSTING FOR iOS SAFARI / GITHUB PAGES & JSON BACKUP
          *************************************************************************/
         async function forceAppUpdateAntiCache() {
-            showToast('Limpiando caché de Safari/GitHub Pages y recargando v2.1...', 'info');
+            showToast('Limpiando caché de Safari/GitHub Pages y recargando v2.2...', 'info');
             try {
                 if ('serviceWorker' in navigator) {
                     const registrations = await navigator.serviceWorker.getRegistrations();
