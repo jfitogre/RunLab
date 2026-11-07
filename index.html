@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="RunLab Pro">
     <meta name="theme-color" content="#0b0f17">
-    <title>RunLab Pro v2.4 — Analítica .FIT & Entrenador IA</title>
+    <title>RunLab Pro v2.5 — Analítica .FIT & Entrenador IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +40,7 @@
 </head>
 <body class="min-h-screen flex flex-col w-full overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
 
-    <!-- STICKY HEADER (iPhone Notch Safe-Area Protected - v2.4) -->
+    <!-- STICKY HEADER (iPhone Notch Safe-Area Protected - v2.5) -->
     <header class="app-header px-3 pb-2.5 w-full">
         <div class="max-w-5xl mx-auto flex items-center justify-between gap-2 w-full">
             <div class="flex items-center gap-2 min-w-0">
@@ -50,7 +50,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
                         <h1 class="font-extrabold text-sm tracking-tight text-white truncate">RunLab <span class="text-emerald-400">Pro</span></h1>
-                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.4</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.5</span>
                     </div>
                     <button onclick="switchTab('settings')" class="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-200 font-mono truncate">
                         <i class="ph-fill ph-heart text-rose-400 text-[10px]"></i>
@@ -268,7 +268,7 @@
             </div>
         </section>
 
-        <!-- TAB 2: VFC (INTERVALO APPLE SALUD) & DIAGNÓSTICO AUTONÓMICO -->
+        <!-- TAB 2: VFC, RECUPERACIÓN CARDÍACA & DIAGNÓSTICO AUTONÓMICO -->
         <section id="tab-weekly" class="hidden space-y-3.5 w-full">
             <!-- PLEWS / BUCHHEIT AUTONOMIC DIAGNOSIS CARD -->
             <div class="bg-panel border border-slate-800 rounded-xl p-3.5 space-y-3">
@@ -284,10 +284,10 @@
                 </div>
 
                 <div id="autonomic-diagnosis-box" class="bg-slate-900/90 border border-emerald-500/30 rounded-xl p-3 text-xs text-slate-200 leading-relaxed">
-                    Analizando tu VFC (Punto Medio + Oscilación Interdiaria) frente a la línea base móvil de 4 semanas...
+                    Analizando tu VFC (Punto Medio + Oscilación Interdiaria), FC Reposo y Recuperación Cardíaca frente a la línea base móvil de 4 semanas...
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2.5">
                         <span class="text-[10px] text-slate-400 uppercase font-semibold block">Punto Medio VFC</span>
                         <div class="flex items-baseline justify-between mt-1">
@@ -295,6 +295,15 @@
                             <span id="auto-kpi-hrv-delta" class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Base</span>
                         </div>
                         <p id="auto-kpi-hrv-base" class="text-[10px] text-slate-400 font-mono mt-0.5">Base 4 sem: -- ms</p>
+                    </div>
+
+                    <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2.5">
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold block">Recup. Cardíaca</span>
+                        <div class="flex items-baseline justify-between mt-1">
+                            <p id="auto-kpi-hrr-val" class="mono-metric text-lg font-bold text-emerald-400">-- LPM</p>
+                            <span class="text-[10px] font-mono text-slate-400">Post-entreno</span>
+                        </div>
+                        <p id="auto-kpi-hrr-desc" class="text-[10px] text-slate-400 font-mono mt-0.5">Reactivación vagal</p>
                     </div>
 
                     <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-2.5">
@@ -334,7 +343,7 @@
                 </div>
             </div>
 
-            <!-- WEEKLY FORM WITH APPLE HEALTH DAILY AVERAGE INTERVAL INPUT -->
+            <!-- WEEKLY FORM WITH VFC, RHR AND CARDIAC RECOVERY (LPM) -->
             <div class="bg-panel border border-slate-800 rounded-xl p-3.5">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
                     <div>
@@ -348,7 +357,8 @@
                 </div>
 
                 <form id="weekly-form" onsubmit="saveWeeklyManualData(event)" class="space-y-3 mt-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- 1. VFC PROMEDIO DIARIO -->
                         <div class="bg-slate-900/80 border border-cyan-500/30 rounded-xl p-3">
                             <div class="flex items-center justify-between gap-1">
                                 <label for="input-weekly-hrv" class="block text-xs font-bold uppercase text-cyan-300">VFC Promedio Diario (Apple Salud)</label>
@@ -361,16 +371,27 @@
                             </div>
                             <div class="mt-2 bg-slate-950/90 border border-slate-800 rounded-lg p-2 flex flex-wrap items-center justify-between gap-1 text-[10px] font-mono">
                                 <span id="hrv-parsed-mid" class="text-emerald-400 font-bold">Punto Medio VFC: 54.5 ms</span>
-                                <span id="hrv-parsed-amp" class="text-cyan-300">Oscilación Interdiaria: 33 ms</span>
+                                <span id="hrv-parsed-amp" class="text-cyan-300">Oscilación: 33 ms</span>
                             </div>
                         </div>
 
+                        <!-- 2. FC REPOSO MEDIA SEMANAL -->
                         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
                             <label for="input-weekly-rhr" class="block text-xs font-bold uppercase text-rose-300">FC Reposo Media Semanal (ppm)</label>
                             <p class="text-[10px] text-slate-400 mb-2">No altera tu FC Basal (<span id="weekly-basal-ref" class="font-mono text-emerald-400">57</span> ppm).</p>
                             <div class="flex items-center gap-2">
                                 <input id="input-weekly-rhr" type="number" min="30" max="120" step="1" required oninput="updateWeeklyFormLiveIndicators()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono font-bold text-white">
                                 <span id="rhr-delta-badge" class="shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-slate-800 text-slate-300">+2 ppm</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. RECUPERACIÓN CARDÍACA MEDIA (LPM) -->
+                        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+                            <label for="input-weekly-hrr" class="block text-xs font-bold uppercase text-emerald-300">Recuperación Cardíaca Media (LPM)</label>
+                            <p class="text-[10px] text-slate-400 mb-2">Caída de pulso tras 1-2 min post-ejercicio (Apple Salud).</p>
+                            <div class="flex items-center gap-2">
+                                <input id="input-weekly-hrr" type="number" min="1" max="120" step="1" placeholder="28" required oninput="updateWeeklyFormLiveIndicators()" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-lg px-3 py-2 text-sm font-mono font-bold text-white">
+                                <span id="hrr-status-badge" class="shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-slate-800 text-emerald-300">LPM</span>
                             </div>
                         </div>
                     </div>
@@ -414,7 +435,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-800">
                     <div>
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300">Prompt Entrenador IA</span>
-                        <h2 class="text-base font-bold text-white mt-1">Reporte Semanal Estructurado (v2.4)</h2>
+                        <h2 class="text-base font-bold text-white mt-1">Reporte Semanal Estructurado (v2.5)</h2>
                     </div>
                     <button onclick="generateAndCopyAIReport(true)" class="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md active:scale-95 transition">
                         <i class="ph-bold ph-copy text-base"></i>
@@ -432,16 +453,16 @@
                         <p id="report-preview-fatigue" class="mono-metric text-xs font-bold text-white mt-0.5">--</p>
                     </div>
                     <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5">
-                        <p class="text-[10px] text-slate-400">FC Reposo Semanal vs Basal</p>
+                        <p class="text-[10px] text-slate-400">FC Reposo & Recup. Cardíaca</p>
                         <p id="report-preview-rhr" class="mono-metric text-xs font-bold text-cyan-300 mt-0.5">--</p>
                     </div>
                 </div>
 
-                <textarea id="ai-report-textarea" readonly rows="18" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-[11px] text-slate-200 leading-relaxed focus:outline-none"></textarea>
+                <textarea id="ai-report-textarea" readonly rows="19" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-[11px] text-slate-200 leading-relaxed focus:outline-none"></textarea>
             </div>
         </section>
 
-        <!-- TAB 4: AJUSTES v2.4 & SEGURIDAD -->
+        <!-- TAB 4: AJUSTES v2.5 & SEGURIDAD -->
         <section id="tab-settings" class="hidden space-y-4 w-full">
             <div class="bg-panel border border-slate-800 rounded-xl p-4">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -449,7 +470,7 @@
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Fisiología Dinámica</span>
                         <h2 class="text-base font-bold text-white mt-1">Configuración del Atleta</h2>
                     </div>
-                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.4</span>
+                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.5</span>
                 </div>
 
                 <form onsubmit="saveAthleteSettings(event)" class="mt-3.5 space-y-3.5">
@@ -553,17 +574,19 @@
             </button>
             <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition">
                 <i class="ph-bold ph-sliders-horizontal text-base"></i>
-                <span class="text-[10px] mt-0.5">Ajustes v2.4</span>
+                <span class="text-[10px] mt-0.5">Ajustes v2.5</span>
             </button>
         </div>
     </nav>
 
     <script>
-        const APP_VERSION = '2.4';
+        const APP_VERSION = '2.5';
         const STORAGE_KEYS = {
-            SETTINGS: 'runlab_settings_v24',
+            SETTINGS: 'runlab_settings_v25',
+            SETTINGS_V24: 'runlab_settings_v24',
             SETTINGS_LEGACY: 'runlab_athlete_settings_v1',
-            WEEKLY_HISTORY: 'runlab_weekly_history_v24',
+            WEEKLY_HISTORY: 'runlab_weekly_history_v25',
+            WEEKLY_HISTORY_V24: 'runlab_weekly_history_v24',
             WEEKLY_HISTORY_V23: 'runlab_weekly_history_v23'
         };
         const IDB_CONFIG = { NAME: 'RunLabProDB', VERSION: 1, STORE_WORKOUTS: 'workouts' };
@@ -580,8 +603,8 @@
         function setupPWA() {
             try {
                 const manifest = {
-                    name: "RunLab Pro v2.4",
-                    short_name: "RunLab v2.4",
+                    name: "RunLab Pro v2.5",
+                    short_name: "RunLab v2.5",
                     start_url: "./index.html",
                     display: "standalone",
                     background_color: "#090D16",
@@ -608,7 +631,7 @@
 
         function loadSettingsFromLocalStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS) || localStorage.getItem(STORAGE_KEYS.SETTINGS_LEGACY);
+                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V24) || localStorage.getItem(STORAGE_KEYS.SETTINGS_LEGACY);
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (parsed.fcMax && parsed.fcBasal) {
@@ -1170,7 +1193,6 @@
             const getX = i => weeks.length === 1 ? padL + plotW / 2 : padL + (i / (weeks.length - 1)) * plotW;
             const getY = sec => padT + ((sec - minP) / rng) * plotH;
 
-            // Grid lines
             ctx.strokeStyle = '#1E293B';
             ctx.lineWidth = 1;
             ctx.font = '10px JetBrains Mono, monospace';
@@ -1182,7 +1204,6 @@
                 ctx.fillText(paceSecondsToString(p), padL - 6, y + 3);
             });
 
-            // Regression dashed line
             if (reg.hasRegression) {
                 ctx.save();
                 ctx.strokeStyle = reg.slopeSecPerWeek <= 0 ? '#06B6D4' : '#F59E0B';
@@ -1195,7 +1216,6 @@
                 ctx.restore();
             }
 
-            // Pace curve
             if (weeks.length > 1) {
                 ctx.strokeStyle = '#10B981';
                 ctx.lineWidth = 2.5;
@@ -1204,7 +1224,6 @@
                 ctx.stroke();
             }
 
-            // Nodes
             ctx.textAlign = 'center';
             weeks.forEach((w, i) => {
                 const x = getX(i), y = getY(w.paceSec);
@@ -1280,14 +1299,14 @@
 
         function loadWeeklyLogsFromStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V23);
+                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V24) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V23);
                 if (raw) {
                     appState.weeklyLogs = JSON.parse(raw) || {};
                 } else {
                     const cw = getCurrentISOWeekString();
                     const p = parseHrvIntervalInput('38-71');
                     appState.weeklyLogs = {
-                        [cw]: { weeklyRhr: appState.settings.fcBasal + 2, hrv: p.mid, hrvInterval: p.intervalStr, hrvMin: p.min, hrvMax: p.max, hrvAmp: p.amp, weight: 71.4, waist: 78.5, strengthNotes: '' }
+                        [cw]: { weeklyRhr: appState.settings.fcBasal + 2, hrr: 28, hrv: p.mid, hrvInterval: p.intervalStr, hrvMin: p.min, hrvMax: p.max, hrvAmp: p.amp, weight: 71.4, waist: 78.5, strengthNotes: '' }
                     };
                 }
                 localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY, JSON.stringify(appState.weeklyLogs));
@@ -1304,6 +1323,7 @@
                     weekKey,
                     label: weekKey.replace(/^\d{4}-/, ''),
                     weeklyRhr: Number(d.weeklyRhr) || appState.settings.fcBasal,
+                    hrr: d.hrr !== undefined && d.hrr !== '' ? Number(d.hrr) : 28,
                     hrv: p.mid,
                     hrvInterval: p.intervalStr,
                     hrvMin: p.min,
@@ -1336,9 +1356,11 @@
             const { fcBasal } = appState.settings;
             const saved = appState.weeklyLogs[selectedKey];
             const parsedHrv = parseHrvIntervalInput(saved ? (saved.hrvInterval || saved.hrv) : (document.getElementById('input-weekly-hrv')?.value || '38-71'));
+            const rawHrrInput = document.getElementById('input-weekly-hrr')?.value;
 
             const currentEntry = {
                 weeklyRhr: saved ? Number(saved.weeklyRhr) : (Number(document.getElementById('input-weekly-rhr')?.value) || (fcBasal + 2)),
+                hrr: saved && saved.hrr !== undefined && saved.hrr !== '' ? Number(saved.hrr) : (rawHrrInput !== undefined && rawHrrInput !== '' ? Number(rawHrrInput) : 28),
                 hrv: parsedHrv.mid,
                 hrvInterval: parsedHrv.intervalStr,
                 hrvMin: parsedHrv.min,
@@ -1372,16 +1394,16 @@
             const physioEffort = computeAutomaticPhysiologicalEffort(weekWorkouts);
 
             let statusLevel = 'green', statusTitle = 'Asimilación Óptima';
-            let statusSummary = `Punto Medio VFC: ${currentEntry.hrv} ms [Intervalo ${currentEntry.hrvInterval} ms | Oscilación: ${currentEntry.hrvAmp} ms]. Variación vs Base 4 sem (${baselineHrv} ms): ${deltaHrvPct >= 0 ? '+' : ''}${deltaHrvPct}%. FC Reposo: ${currentEntry.weeklyRhr} ppm (${rhrDelta >= 0 ? '+' : ''}${rhrDelta} ppm vs basal).`;
+            let statusSummary = `Punto Medio VFC: ${currentEntry.hrv} ms [Intervalo ${currentEntry.hrvInterval} ms | Oscilación: ${currentEntry.hrvAmp} ms]. Variación vs Base 4 sem (${baselineHrv} ms): ${deltaHrvPct >= 0 ? '+' : ''}${deltaHrvPct}%. FC Reposo: ${currentEntry.weeklyRhr} ppm (${rhrDelta >= 0 ? '+' : ''}${rhrDelta} ppm vs basal) | Recuperación Cardíaca: ${currentEntry.hrr} LPM.`;
 
             if (deltaHrvPct <= -8 || (deltaHrvPct <= -5 && rhrDelta >= 4) || rhrDelta >= 5) {
                 statusLevel = 'red';
                 statusTitle = 'Sobrecarga Autonómica';
-                statusSummary = `ALERTA ROJA: Caída de VFC (${deltaHrvPct}% vs base ${baselineHrv} ms) o elevación de FC Reposo (+${rhrDelta} ppm). Priorizar descarga.`;
+                statusSummary = `ALERTA ROJA: Caída de VFC (${deltaHrvPct}% vs base ${baselineHrv} ms) o elevación de FC Reposo (+${rhrDelta} ppm) con Recuperación Cardíaca de ${currentEntry.hrr} LPM. Priorizar descarga.`;
             } else if (deltaHrvPct <= -5 || rhrDelta >= 3 || currentEntry.highOscillation) {
                 statusLevel = 'amber';
                 statusTitle = currentEntry.highOscillation ? 'Fatiga Simpática / Oscilación Alta (>35 ms)' : 'Fatiga Simpática Moderada';
-                statusSummary = `PRECAUCIÓN: Punto Medio VFC ${currentEntry.hrv} ms (${deltaHrvPct}% vs base), Oscilación Interdiaria de ${currentEntry.hrvAmp} ms y FC Reposo a +${rhrDelta} ppm.`;
+                statusSummary = `PRECAUCIÓN: Punto Medio VFC ${currentEntry.hrv} ms (${deltaHrvPct}% vs base), Oscilación Interdiaria de ${currentEntry.hrvAmp} ms, FC Reposo a +${rhrDelta} ppm y Recuperación Cardíaca de ${currentEntry.hrr} LPM.`;
             }
 
             return { weekKey: selectedKey, currentEntry, hasPriorBaseline, baselineHrv, deltaHrvPct, rhrDelta, hrvSlopeMsPerWeek, weekTrimp, trimpToHrvRatio, physioEffort, statusLevel, statusTitle, statusSummary };
@@ -1393,12 +1415,14 @@
             const last = allWeeks[allWeeks.length - 1];
             const entry = appState.weeklyLogs[weekKey] || {
                 weeklyRhr: last ? last.weeklyRhr : (appState.settings.fcBasal + 2),
+                hrr: last && last.hrr !== undefined ? last.hrr : 28,
                 hrvInterval: last ? last.hrvInterval : '38-71',
                 weight: last ? last.weight : 71.4,
                 waist: last ? last.waist : 78.5,
                 strengthNotes: ''
             };
             document.getElementById('input-weekly-rhr').value = entry.weeklyRhr;
+            document.getElementById('input-weekly-hrr').value = entry.hrr !== undefined ? entry.hrr : 28;
             document.getElementById('input-weekly-hrv').value = entry.hrvInterval || entry.hrv || '38-71';
             document.getElementById('input-weekly-weight').value = entry.weight;
             document.getElementById('input-weekly-waist').value = entry.waist;
@@ -1410,25 +1434,36 @@
         function updateWeeklyFormLiveIndicators() {
             const parsed = parseHrvIntervalInput(document.getElementById('input-weekly-hrv')?.value || '38-71');
             const weeklyRhr = Number(document.getElementById('input-weekly-rhr')?.value) || appState.settings.fcBasal;
+            const weeklyHrr = Number(document.getElementById('input-weekly-hrr')?.value) || 0;
             const basal = appState.settings.fcBasal;
 
             document.getElementById('hrv-parsed-mid').textContent = `Punto Medio VFC: ${parsed.mid} ms`;
             const ampEl = document.getElementById('hrv-parsed-amp');
-            ampEl.textContent = `Oscilación Interdiaria: ${parsed.amp} ms${parsed.highOscillation ? ' (Alta >35ms)' : ' (Estable)'}`;
+            ampEl.textContent = `Oscilación: ${parsed.amp} ms${parsed.highOscillation ? ' (Alta >35ms)' : ' (Estable)'}`;
             ampEl.className = parsed.highOscillation ? 'text-amber-300 font-bold' : 'text-cyan-300';
 
             const rhrDiff = weeklyRhr - basal;
             document.getElementById('weekly-basal-ref').textContent = basal;
             document.getElementById('rhr-delta-badge').textContent = `${rhrDiff >= 0 ? '+' : ''}${rhrDiff} ppm`;
             document.getElementById('hrv-delta-badge').textContent = `${parsed.mid} ms`;
+
+            const hrrBadge = document.getElementById('hrr-status-badge');
+            if (hrrBadge) {
+                hrrBadge.textContent = weeklyHrr > 0 ? `${weeklyHrr} LPM` : 'LPM';
+                hrrBadge.className = weeklyHrr >= 25
+                    ? 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-emerald-500/15 text-emerald-300'
+                    : 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-amber-500/15 text-amber-300';
+            }
         }
 
         function saveWeeklyManualData(event) {
             event.preventDefault();
             const weekKey = document.getElementById('weekly-iso-picker').value || getCurrentISOWeekString();
             const parsed = parseHrvIntervalInput(document.getElementById('input-weekly-hrv').value);
+            const hrrVal = Number(document.getElementById('input-weekly-hrr').value);
             appState.weeklyLogs[weekKey] = {
                 weeklyRhr: Number(document.getElementById('input-weekly-rhr').value),
+                hrr: hrrVal,
                 hrv: parsed.mid,
                 hrvInterval: parsed.intervalStr,
                 hrvMin: parsed.min,
@@ -1442,7 +1477,7 @@
             document.getElementById('input-weekly-hrv').value = parsed.intervalStr;
             localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY, JSON.stringify(appState.weeklyLogs));
             refreshAllViews();
-            showToast(`Semana ${weekKey} guardada (Punto Medio VFC: ${parsed.mid} ms).`, 'success');
+            showToast(`Semana ${weekKey} guardada (VFC: ${parsed.mid} ms | Rec. Cardíaca: ${hrrVal} LPM).`, 'success');
         }
 
         function renderWeeklyHrvTrendChart() {
@@ -1477,12 +1512,10 @@
             const getX = i => n === 1 ? padL + plotW / 2 : padL + (i / (n - 1)) * plotW;
             const getY = v => padT + ((maxV - v) / rng) * plotH;
 
-            // Normal band ±5%
             const yTop = getY(meanHrv * 1.05), yBot = getY(meanHrv * 0.95);
             ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
             ctx.fillRect(padL, yTop, plotW, Math.max(4, yBot - yTop));
 
-            // Interval vertical bars + midpoint curve
             weeks.forEach((w, i) => {
                 const x = getX(i);
                 if (w.hrvMax > w.hrvMin) {
@@ -1544,6 +1577,8 @@
             document.getElementById('auto-kpi-hrv-val').textContent = `${diag.currentEntry.hrv} ms`;
             document.getElementById('auto-kpi-hrv-delta').textContent = diag.hasPriorBaseline ? `${diag.deltaHrvPct >= 0 ? '+' : ''}${diag.deltaHrvPct}%` : 'Base';
             document.getElementById('auto-kpi-hrv-base').textContent = `Base: ${diag.baselineHrv} ms • Rango: ${diag.currentEntry.hrvInterval} ms`;
+            document.getElementById('auto-kpi-hrr-val').textContent = `${diag.currentEntry.hrr} LPM`;
+            document.getElementById('auto-kpi-hrr-desc').textContent = diag.currentEntry.hrr >= 25 ? 'Tono vagal óptimo' : 'Recuperación lenta';
             document.getElementById('auto-kpi-trimp-hrv').textContent = `${diag.trimpToHrvRatio}`;
             document.getElementById('auto-kpi-trimp-hrv-desc').textContent = `${diag.weekTrimp} TRIMP / ${diag.currentEntry.hrv} ms`;
             document.getElementById('auto-kpi-physio-effort').textContent = `${diag.physioEffort.score10} / 10`;
@@ -1558,9 +1593,9 @@
             listEl.innerHTML = sortedDesc.map(item => `
                 <div onclick="document.getElementById('weekly-iso-picker').value='${item.weekKey}';loadWeeklyLogForSelectedWeek();" class="cursor-pointer rounded-xl p-2.5 border bg-slate-900/70 hover:bg-slate-800/60 border-slate-800 flex items-center justify-between gap-2">
                     <div class="text-xs font-mono">
-                        <strong class="text-white">${item.weekKey}</strong> • <span class="text-cyan-300">VFC: ${item.hrv} ms [${item.hrvInterval}]</span> • <span class="text-rose-300">FC: ${item.weeklyRhr} ppm</span>
+                        <strong class="text-white">${item.weekKey}</strong> • <span class="text-cyan-300">VFC: ${item.hrv} ms [${item.hrvInterval}]</span> • <span class="text-rose-300">FC: ${item.weeklyRhr} ppm</span> • <span class="text-emerald-300">Rec: ${item.hrr} LPM</span>
                     </div>
-                    <span class="text-[10px] font-mono text-slate-400">${item.weight}kg | ${item.waist}cm</span>
+                    <span class="text-[10px] font-mono text-slate-400 shrink-0">${item.weight}kg | ${item.waist}cm</span>
                 </div>
             `).join('');
         }
@@ -1604,10 +1639,10 @@
 
             document.getElementById('report-preview-z2').textContent = `${meanZ2PaceStr} /km (${z2Min}-${z2Max} ppm)`;
             document.getElementById('report-preview-fatigue').textContent = `${manual.hrv} ms [${manual.hrvInterval} ms]`;
-            document.getElementById('report-preview-rhr').textContent = `${manual.weeklyRhr} ppm (${autoDiag.rhrDelta >= 0 ? '+' : ''}${autoDiag.rhrDelta} vs Basal)`;
+            document.getElementById('report-preview-rhr').textContent = `${manual.weeklyRhr} ppm | Rec: ${manual.hrr} LPM`;
 
             return [
-                `=== REPORTE SEMANAL RUNLAB PRO v2.4 (${weekKey}) ===`,
+                `=== REPORTE SEMANAL RUNLAB PRO v2.5 (${weekKey}) ===`,
                 `1. VARIABLES FISIOLÓGICAS (KARVONEN)`,
                 `- FC Máxima: ${fcMax} ppm | FC Basal: ${fcBasal} ppm | Z2 (60-70% FCR): ${z2Min}-${z2Max} ppm`,
                 ``,
@@ -1619,11 +1654,12 @@
                 `- Ritmo Medio Z2: ${meanZ2PaceStr} min/km | Pendiente Regresión Lineal: ${reg.hasRegression ? reg.slopeSecPerWeek + ' s/km por semana' : '1ª semana base'}`,
                 ...(sessionLines.length ? sessionLines : ['  - Sin sesiones.']),
                 ``,
-                `4. ESTADO AUTONÓMICO (PLEWS/BUCHHEIT + INTERVALO APPLE SALUD)`,
+                `4. ESTADO AUTONÓMICO Y BIOMARCADORES (PLEWS/BUCHHEIT + APPLE SALUD)`,
                 `- Diagnóstico: ${autoDiag.statusTitle.toUpperCase()}`,
                 `- VFC Promedio Diario (Apple Salud): Intervalo ${manual.hrvInterval} ms | Punto Medio VFC: ${manual.hrv} ms | Oscilación Interdiaria: ${manual.hrvAmp} ms`,
                 `- Línea Base Móvil (4 sem): ${autoDiag.baselineHrv} ms (Desviación: ${autoDiag.deltaHrvPct >= 0 ? '+' : ''}${autoDiag.deltaHrvPct}% | Pendiente VFC: ${autoDiag.hrvSlopeMsPerWeek} ms/sem)`,
                 `- FC Reposo Semanal: ${manual.weeklyRhr} ppm (${autoDiag.rhrDelta >= 0 ? '+' : ''}${autoDiag.rhrDelta} ppm vs Basal) | Ratio Coste Autonómico (TRIMP/VFC): ${autoDiag.trimpToHrvRatio}`,
+                `- Recuperación Cardíaca: ${manual.hrr} LPM`,
                 `- Antropometría: Peso ${manual.weight} kg | Cintura ${manual.waist} cm`,
                 `- Fuerza: "${manual.strengthNotes || 'Sin notas'}"`,
                 `- Fatiga Muscular Cruzada (Cadencia): ${fatigueAlerts.length ? fatigueAlerts.join(' ') : 'Sin caídas significativas de cadencia.'}`,
@@ -1649,7 +1685,7 @@
 
         /* MAINTENANCE & BACKUP */
         async function forceAppUpdateAntiCache() {
-            showToast('Limpiando caché y recargando v2.4...', 'info');
+            showToast('Limpiando caché y recargando v2.5...', 'info');
             try {
                 if ('serviceWorker' in navigator) {
                     const regs = await navigator.serviceWorker.getRegistrations();
@@ -1660,7 +1696,7 @@
                     for (const k of keys) await caches.delete(k);
                 }
             } catch (e) {}
-            setTimeout(() => { window.location.href = window.location.pathname + '?v=2.4_' + Date.now(); }, 350);
+            setTimeout(() => { window.location.href = window.location.pathname + '?v=2.5_' + Date.now(); }, 350);
         }
 
         async function exportDatabaseBackup() {
