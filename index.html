@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="RunLab Pro">
     <meta name="theme-color" content="#0b0f17">
-    <title>RunLab Pro v2.6 — Analítica .FIT & Entrenador IA</title>
+    <title>RunLab Pro v2.7 — Analítica .FIT & Entrenador IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
                         <h1 class="font-extrabold text-sm tracking-tight text-white truncate">RunLab <span class="text-emerald-400">Pro</span></h1>
-                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.6</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.7</span>
                     </div>
                     <button onclick="switchTab('settings')" class="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-200 font-mono truncate">
                         <i class="ph-fill ph-heart text-rose-400 text-[10px]"></i>
@@ -385,13 +385,21 @@
                 </form>
             </div>
 
-            <!-- SAVED WEEKS LIST -->
+            <!-- SAVED WEEKS LIST (WITH EDIT & DELETE BUTTONS) -->
             <div class="bg-panel border border-slate-800 rounded-xl p-3.5">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                    <h3 class="text-xs font-bold text-white">Historial de Semanas Guardadas</h3>
-                    <span id="weekly-history-count" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">0 sem.</span>
+                <div class="flex items-center justify-between pb-2 border-b border-slate-800 gap-2">
+                    <div>
+                        <h3 class="text-xs font-bold text-white">Historial de Semanas Guardadas</h3>
+                        <p class="text-[10px] text-slate-400">Toca <strong>✏️</strong> para cargar/corregir o <strong>🗑️</strong> para borrar una semana.</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <span id="weekly-history-count" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">0 sem.</span>
+                        <button type="button" onclick="clearAllWeeklyHistory()" class="text-[10px] font-mono font-semibold px-2 py-1 rounded bg-rose-950/70 hover:bg-rose-900 text-rose-300 border border-rose-500/30 transition">
+                            Vaciar historial
+                        </button>
+                    </div>
                 </div>
-                <div id="weekly-history-list" class="space-y-2 mt-2.5 max-h-64 overflow-y-auto"></div>
+                <div id="weekly-history-list" class="space-y-2 mt-2.5 max-h-72 overflow-y-auto"></div>
             </div>
         </section>
 
@@ -503,19 +511,34 @@
                 <div id="svg-chart-effort" class="w-full pt-2"></div>
             </div>
 
-            <!-- 7. ANTROPOMETRÍA SEMANAL: PESO MEDIO (KG) Y CINTURA (CM) -->
+            <!-- 7. PESO CORPORAL MEDIO SEMANAL (KG) -->
             <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                            <i class="ph-bold ph-ruler text-purple-400 text-sm"></i>
-                            7. Antropometría Semanal: Peso Medio (kg) y Cintura (cm)
+                            <i class="ph-bold ph-scales text-emerald-400 text-sm"></i>
+                            7. Peso Corporal Medio Semanal (kg) y Regresión Lineal
                         </h3>
-                        <span id="anthro-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-purple-300">-- kg / -- cm</span>
+                        <span id="weight-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-emerald-300">-- kg/sem</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-mono">Verde = Peso (kg) • Cian = Perímetro Cintura (cm)</span>
+                    <span class="text-[10px] text-slate-400 font-mono">Evolución semanal del peso medio en ayunas (kg)</span>
                 </div>
-                <div id="svg-chart-anthro" class="w-full pt-2"></div>
+                <div id="svg-chart-weight" class="w-full pt-2"></div>
+            </div>
+
+            <!-- 8. PERÍMETRO DE CINTURA SEMANAL (CM) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-ruler text-cyan-400 text-sm"></i>
+                            8. Perímetro de Cintura Semanal (cm) y Regresión Lineal
+                        </h3>
+                        <span id="waist-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300">-- cm/sem</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">Evolución semanal del perímetro abdominal (cm)</span>
+                </div>
+                <div id="svg-chart-waist" class="w-full pt-2"></div>
             </div>
         </section>
 
@@ -525,7 +548,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-800">
                     <div>
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300">Prompt Entrenador IA</span>
-                        <h2 class="text-base font-bold text-white mt-1">Reporte Semanal Estructurado (v2.6)</h2>
+                        <h2 class="text-base font-bold text-white mt-1">Reporte Semanal Estructurado (v2.7)</h2>
                     </div>
                     <button onclick="generateAndCopyAIReport(true)" class="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md active:scale-95 transition">
                         <i class="ph-bold ph-copy text-base"></i>
@@ -552,7 +575,7 @@
             </div>
         </section>
 
-        <!-- TAB 5: AJUSTES v2.6 & SEGURIDAD -->
+        <!-- TAB 5: AJUSTES v2.7 & SEGURIDAD -->
         <section id="tab-settings" class="hidden space-y-4 w-full">
             <div class="bg-panel border border-slate-800 rounded-xl p-4">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -560,7 +583,7 @@
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Fisiología Dinámica</span>
                         <h2 class="text-base font-bold text-white mt-1">Configuración del Atleta</h2>
                     </div>
-                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.6</span>
+                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.7</span>
                 </div>
 
                 <form onsubmit="saveAthleteSettings(event)" class="mt-3.5 space-y-3.5">
@@ -647,40 +670,41 @@
     <!-- TOAST CONTAINER -->
     <div id="toast-container" class="fixed top-16 right-3 left-3 sm:left-auto sm:w-80 z-50 pointer-events-none flex flex-col gap-1.5"></div>
 
-    <!-- BOTTOM NAVIGATION BAR (5 TABS MOBILE-FIRST IPHONE FIT) -->
+    <!-- BOTTOM NAVIGATION BAR (5 TABS MOBILE-FIRST IPHONE FIT WITH STACKED LABELS) -->
     <nav class="fixed bottom-0 inset-x-0 z-40 bg-obsidian/95 backdrop-blur-xl border-t border-slate-800/90 bottom-nav-safe w-full">
-        <div class="max-w-lg mx-auto grid grid-cols-5 gap-0.5 px-1.5 pt-1">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-emerald-400 bg-emerald-500/10 font-semibold transition min-w-0">
+        <div class="max-w-lg mx-auto grid grid-cols-5 gap-1.5 px-2 pt-1.5">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-emerald-400 bg-emerald-500/10 font-semibold transition min-w-0">
                 <i class="ph-fill ph-chart-polar text-base"></i>
-                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Analítica</span>
+                <span class="text-[10px] leading-tight text-center mt-0.5">Analítica<br>.FIT</span>
             </button>
-            <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
+            <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
                 <i class="ph-bold ph-heartbeat text-base"></i>
-                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">VFC / Fatiga</span>
+                <span class="text-[10px] leading-tight text-center mt-0.5">VFC /<br>Fatiga</span>
             </button>
-            <button onclick="switchTab('trends')" id="nav-trends" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
+            <button onclick="switchTab('trends')" id="nav-trends" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
                 <i class="ph-bold ph-trend-up text-base"></i>
-                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Tendencias</span>
+                <span class="text-[10px] leading-tight text-center mt-0.5">Gráficas<br>Tendencia</span>
             </button>
-            <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
+            <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
                 <i class="ph-bold ph-robot text-base"></i>
-                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Reporte IA</span>
+                <span class="text-[10px] leading-tight text-center mt-0.5">Reporte<br>IA</span>
             </button>
-            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
                 <i class="ph-bold ph-sliders-horizontal text-base"></i>
-                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Ajustes v2.6</span>
+                <span class="text-[10px] leading-tight text-center mt-0.5">Ajustes<br>v2.7</span>
             </button>
         </div>
     </nav>
 
     <script>
-        const APP_VERSION = '2.6';
+        const APP_VERSION = '2.7';
         const STORAGE_KEYS = {
-            SETTINGS: 'runlab_settings_v26',
+            SETTINGS: 'runlab_settings_v27',
+            SETTINGS_V26: 'runlab_settings_v26',
             SETTINGS_V25: 'runlab_settings_v25',
             SETTINGS_V24: 'runlab_settings_v24',
             SETTINGS_LEGACY: 'runlab_athlete_settings_v1',
-            WEEKLY_HISTORY: 'runlab_weekly_history_v23',
+            WEEKLY_HISTORY: 'runlab_weekly_history_v27',
             WEEKLY_HISTORY_V25: 'runlab_weekly_history_v25',
             WEEKLY_HISTORY_V24: 'runlab_weekly_history_v24',
             WEEKLY_HISTORY_V23: 'runlab_weekly_history_v23'
@@ -700,8 +724,8 @@
         function setupPWA() {
             try {
                 const manifest = {
-                    name: "RunLab Pro v2.6",
-                    short_name: "RunLab v2.6",
+                    name: "RunLab Pro v2.7",
+                    short_name: "RunLab v2.7",
                     start_url: "./index.html",
                     display: "standalone",
                     background_color: "#090D16",
@@ -728,7 +752,7 @@
 
         function loadSettingsFromLocalStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V25) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V24) || localStorage.getItem(STORAGE_KEYS.SETTINGS_LEGACY);
+                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V26) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V25) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V24) || localStorage.getItem(STORAGE_KEYS.SETTINGS_LEGACY);
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (parsed.fcMax && parsed.fcBasal) {
@@ -1400,14 +1424,59 @@
 
         function loadWeeklyLogsFromStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V25) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V24);
-                if (raw) appState.weeklyLogs = JSON.parse(raw) || {};
+                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V25) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V24) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V23);
+                if (raw) {
+                    const parsed = JSON.parse(raw) || {};
+                    // Clean out any old auto-populated demo week 2026-W45 with VFC 68 & 71.4kg if it wasn't explicitly saved by user
+                    Object.keys(parsed).forEach(k => {
+                        const item = parsed[k];
+                        if (k === '2026-W45' && Number(item.hrv) === 68 && Number(item.weight) === 71.4 && Number(item.waist) === 78.5 && !item.userSavedV27) {
+                            delete parsed[k];
+                        }
+                    });
+                    appState.weeklyLogs = parsed;
+                    localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY, JSON.stringify(appState.weeklyLogs));
+                }
             } catch (e) {
                 appState.weeklyLogs = {};
             }
             const picker = document.getElementById('weekly-iso-picker');
             if (picker && !picker.value) picker.value = getCurrentISOWeekString();
             loadWeeklyLogForSelectedWeek();
+        }
+
+        function deleteWeeklyLogEntry(weekKey, event) {
+            if (event) event.stopPropagation();
+            if (!appState.weeklyLogs[weekKey]) return;
+            delete appState.weeklyLogs[weekKey];
+            localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY, JSON.stringify(appState.weeklyLogs));
+            localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V25, JSON.stringify(appState.weeklyLogs));
+            localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V23, JSON.stringify(appState.weeklyLogs));
+            refreshAllViews();
+            showToast(`Semana ${weekKey} eliminada del historial.`, 'info');
+        }
+
+        function clearAllWeeklyHistory() {
+            const count = Object.keys(appState.weeklyLogs || {}).length;
+            if (count === 0) {
+                showToast('El historial semanal ya está vacío.', 'info');
+                return;
+            }
+            document.getElementById('modal-title').textContent = '¿Vaciar historial de semanas?';
+            document.getElementById('modal-desc').textContent = `Se borrarán las ${count} semanas guardadas en el historial autonómico.`;
+            document.getElementById('modal-input-wrapper').classList.add('hidden');
+            const btn = document.getElementById('modal-confirm-btn');
+            btn.textContent = 'Sí, vaciar';
+            btn.onclick = () => {
+                appState.weeklyLogs = {};
+                localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY, JSON.stringify({}));
+                localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V25, JSON.stringify({}));
+                localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V23, JSON.stringify({}));
+                closeCustomModal();
+                refreshAllViews();
+                showToast('Historial semanal vaciado por completo.', 'info');
+            };
+            document.getElementById('custom-modal').classList.remove('hidden');
         }
 
         function loadWeeklyLogForSelectedWeek() {
@@ -1569,8 +1638,8 @@
                     trimp: wkTrimp,
                     physioEffort: wkEffort,
                     trimpToHrvRatio: log.trimpToHrvRatio !== undefined ? Number(log.trimpToHrvRatio) : wkRatio,
-                    weight: Number(log.weight) || 71.4,
-                    waist: Number(log.waist) || 78.5
+                    weight: log.weight !== undefined && log.weight !== '' ? Number(log.weight) : null,
+                    waist: log.waist !== undefined && log.waist !== '' ? Number(log.waist) : null
                 };
             });
         }
@@ -1591,11 +1660,12 @@
         }
 
         function buildSingleLineSvgChart({ weeks, values, regValues, formatVal, lineColor, regColor, invertY = false, refLineVal = null, refLineLabel = '', minMaxBars = null, bandRange = null }) {
-            const W = 620, H = 185, padL = 48, padR = 24, padT = 26, padB = 28;
+            // Mobile-native coordinate system (360x210) so numbers are crisp and large on iPhone screens
+            const W = 360, H = 210, padL = 52, padR = 20, padT = 32, padB = 32;
             const plotW = W - padL - padR, plotH = H - padT - padB;
             const n = weeks.length;
             if (n === 0) {
-                return `<div class="h-36 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80">Guarda tu semana o activa "Ver Demo 6 Semanas" para visualizar la curva.</div>`;
+                return `<div class="h-40 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80 px-3 text-center">Guarda tu semana en "VFC / Fatiga" o toca "Ver Demo 6 Semanas" para ver la gráfica.</div>`;
             }
 
             const extraVals = [...values, ...(regValues || [])];
@@ -1604,9 +1674,9 @@
             if (bandRange) { extraVals.push(bandRange.low, bandRange.high); }
 
             const rawMin = Math.min(...extraVals), rawMax = Math.max(...extraVals);
-            const padRange = Math.max(1.5, (rawMax - rawMin) * 0.18);
+            const padRange = Math.max(0.8, (rawMax - rawMin) * 0.22);
             const minV = rawMin - padRange, maxV = rawMax + padRange;
-            const span = Math.max(1, maxV - minV);
+            const span = Math.max(0.5, maxV - minV);
 
             const getX = i => n === 1 ? padL + plotW / 2 : Number((padL + (i / (n - 1)) * plotW).toFixed(1));
             const getY = v => {
@@ -1619,20 +1689,20 @@
                 const val = invertY ? (minV + span * r) : (maxV - span * r);
                 const y = getY(val);
                 gridSvg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1E293B" stroke-width="1"/>`;
-                gridSvg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#64748B" font-size="10" font-family="JetBrains Mono, monospace">${formatVal(val)}</text>`;
+                gridSvg += `<text x="${padL - 6}" y="${y + 4}" text-anchor="end" fill="#94A3B8" font-size="11" font-weight="600" font-family="JetBrains Mono, monospace">${formatVal(val)}</text>`;
             });
 
             let bandSvg = '';
             if (bandRange) {
                 const yTop = getY(bandRange.high), yBot = getY(bandRange.low);
-                bandSvg = `<rect x="${padL}" y="${Math.min(yTop, yBot)}" width="${plotW}" height="${Math.max(4, Math.abs(yBot - yTop))}" fill="rgba(16,185,129,0.11)" rx="3"/>`;
+                bandSvg = `<rect x="${padL}" y="${Math.min(yTop, yBot)}" width="${plotW}" height="${Math.max(4, Math.abs(yBot - yTop))}" fill="rgba(16,185,129,0.12)" rx="3"/>`;
             }
 
             let refSvg = '';
             if (refLineVal !== null) {
                 const ry = getY(refLineVal);
                 refSvg = `<line x1="${padL}" y1="${ry}" x2="${W - padR}" y2="${ry}" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
-                          <text x="${W - padR - 4}" y="${ry - 5}" text-anchor="end" fill="#10B981" font-size="9.5" font-family="JetBrains Mono, monospace">${refLineLabel}</text>`;
+                          <text x="${W - padR - 2}" y="${ry - 5}" text-anchor="end" fill="#34D399" font-size="10.5" font-weight="700" font-family="JetBrains Mono, monospace">${refLineLabel}</text>`;
             }
 
             let barsSvg = '';
@@ -1640,31 +1710,35 @@
                 minMaxBars.forEach((b, i) => {
                     if (b.max > b.min) {
                         const x = getX(i);
-                        barsSvg += `<line x1="${x}" y1="${getY(b.max)}" x2="${x}" y2="${getY(b.min)}" stroke="rgba(6,182,212,0.42)" stroke-width="6" stroke-linecap="round"/>`;
+                        barsSvg += `<line x1="${x}" y1="${getY(b.max)}" x2="${x}" y2="${getY(b.min)}" stroke="rgba(6,182,212,0.45)" stroke-width="7" stroke-linecap="round"/>`;
                     }
                 });
             }
 
             let regLineSvg = '';
             if (n > 1 && regValues && regValues.length === n) {
-                regLineSvg = `<line x1="${getX(0)}" y1="${getY(regValues[0])}" x2="${getX(n - 1)}" y2="${getY(regValues[n - 1])}" stroke="${regColor}" stroke-width="2" stroke-dasharray="5,5"/>`;
+                regLineSvg = `<line x1="${getX(0)}" y1="${getY(regValues[0])}" x2="${getX(n - 1)}" y2="${getY(regValues[n - 1])}" stroke="${regColor}" stroke-width="2.2" stroke-dasharray="5,5"/>`;
             }
 
             let pathSvg = '';
             if (n > 1) {
                 const pts = values.map((v, i) => `${getX(i)},${getY(v)}`).join(' ');
-                pathSvg = `<polyline fill="none" stroke="${lineColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>`;
+                pathSvg = `<polyline fill="none" stroke="${lineColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>`;
             }
 
             let nodesSvg = '';
             values.forEach((v, i) => {
                 const x = getX(i), y = getY(v);
-                nodesSvg += `<circle cx="${x}" cy="${y}" r="4.5" fill="${lineColor}" stroke="#090D16" stroke-width="1.5"/>`;
-                nodesSvg += `<text x="${x}" y="${y - 9}" text-anchor="middle" fill="#F8FAFC" font-size="10" font-weight="600" font-family="JetBrains Mono, monospace">${formatVal(v)}</text>`;
-                nodesSvg += `<text x="${x}" y="${H - 7}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono, monospace">${weeks[i].label}</text>`;
+                const labelStr = String(formatVal(v));
+                const boxW = Math.max(30, labelStr.length * 7.4 + 8);
+                const labelY = y < padT + 18 ? y + 18 : y - 12;
+                nodesSvg += `<circle cx="${x}" cy="${y}" r="5" fill="${lineColor}" stroke="#090D16" stroke-width="2"/>`;
+                nodesSvg += `<rect x="${(x - boxW / 2).toFixed(1)}" y="${(labelY - 10).toFixed(1)}" width="${boxW.toFixed(1)}" height="14" rx="4" fill="#090D16" fill-opacity="0.88" stroke="#334155" stroke-width="0.8"/>`;
+                nodesSvg += `<text x="${x}" y="${labelY}" text-anchor="middle" fill="#FFFFFF" font-size="11.5" font-weight="700" font-family="JetBrains Mono, monospace">${labelStr}</text>`;
+                nodesSvg += `<text x="${x}" y="${H - 8}" text-anchor="middle" fill="#CBD5E1" font-size="11" font-weight="600" font-family="JetBrains Mono, monospace">${weeks[i].label}</text>`;
             });
 
-            return `<svg viewBox="0 0 ${W} ${H}" class="w-full h-44 block rounded-lg bg-slate-950/85 border border-slate-800/90 overflow-visible">${gridSvg}${bandSvg}${refSvg}${barsSvg}${regLineSvg}${pathSvg}${nodesSvg}</svg>`;
+            return `<svg viewBox="0 0 ${W} ${H}" class="w-full h-52 sm:h-56 block rounded-xl bg-slate-950/90 border border-slate-800/90 overflow-visible">${gridSvg}${bandSvg}${refSvg}${barsSvg}${regLineSvg}${pathSvg}${nodesSvg}</svg>`;
         }
 
         function renderAllPersonalTrendCharts() {
@@ -1696,23 +1770,24 @@
             }
 
             // 2. HRV MIDPOINT + DAILY INTERVAL BARS + 5% BASELINE BAND
-            const hrvVals = weeks.map(w => w.hrv);
+            const hrvWeeks = weeks.filter(w => w.hrv && w.hrv > 0);
+            const hrvVals = hrvWeeks.map(w => w.hrv);
             const hrvReg = computeLeastSquaresLinearRegression(hrvVals);
             const hrvMean = hrvVals.length > 0 ? hrvVals.reduce((a, b) => a + b, 0) / hrvVals.length : 55;
             const hrvBadge = document.getElementById('hrv-trend-slope-badge');
             if (hrvBadge) {
-                hrvBadge.textContent = hrvReg.hasRegression ? `Regresión: ${hrvReg.slope >= 0 ? '+' : ''}${hrvReg.slope.toFixed(1)} ms/sem` : (hrvVals[0] ? `${hrvVals[0]} ms [${weeks[0].hrvInterval}]` : '--');
+                hrvBadge.textContent = hrvReg.hasRegression ? `Regresión: ${hrvReg.slope >= 0 ? '+' : ''}${hrvReg.slope.toFixed(1)} ms/sem` : (hrvVals[0] ? `${hrvVals[0]} ms [${hrvWeeks[0].hrvInterval}]` : '--');
             }
             const hrvContainer = document.getElementById('svg-chart-hrv');
             if (hrvContainer) {
                 hrvContainer.innerHTML = buildSingleLineSvgChart({
-                    weeks,
+                    weeks: hrvWeeks,
                     values: hrvVals,
                     regValues: hrvReg.regPoints,
-                    formatVal: v => `${Number(v).toFixed(1)}ms`,
+                    formatVal: v => `${Number(v).toFixed(1)}`,
                     lineColor: '#06B6D4',
                     regColor: '#10B981',
-                    minMaxBars: weeks.map(w => ({ min: w.hrvMin, max: w.hrvMax })),
+                    minMaxBars: hrvWeeks.map(w => ({ min: w.hrvMin, max: w.hrvMax })),
                     bandRange: { low: hrvMean * 0.95, high: hrvMean * 1.05 }
                 });
             }
@@ -1735,7 +1810,7 @@
                     lineColor: '#F43F5E',
                     regColor: '#F59E0B',
                     refLineVal: basal,
-                    refLineLabel: `Basal ${basal} ppm`
+                    refLineLabel: `Basal ${basal}`
                 });
             }
 
@@ -1752,7 +1827,7 @@
                     weeks,
                     values: hrrVals,
                     regValues: hrrReg.regPoints,
-                    formatVal: v => `${Math.round(v)} LPM`,
+                    formatVal: v => `${Math.round(v)}`,
                     lineColor: '#10B981',
                     regColor: '#06B6D4'
                 });
@@ -1777,7 +1852,7 @@
                 });
             }
 
-            // 6. AUTOMATIC PHYSIOLOGICAL EFFORT (1-10) & TRIMP BARS
+            // 6. AUTOMATIC PHYSIOLOGICAL EFFORT (1-10) & TRIMP BARS (MOBILE-NATIVE 360x210)
             const effortContainer = document.getElementById('svg-chart-effort');
             const effortBadge = document.getElementById('effort-trend-slope-badge');
             if (effortContainer) {
@@ -1787,10 +1862,10 @@
                     const lastW = weeks[weeks.length - 1];
                     effortBadge.textContent = lastW ? `Última: ${lastW.physioEffort}/10 (${lastW.trimp} TRIMP)` : '--';
                 }
-                const W = 620, H = 185, padL = 46, padR = 24, padT = 26, padB = 28;
+                const W = 360, H = 210, padL = 48, padR = 20, padT = 32, padB = 32;
                 const plotW = W - padL - padR, plotH = H - padT - padB, n = weeks.length;
                 if (n === 0) {
-                    effortContainer.innerHTML = `<div class="h-36 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80">Sin datos semanales de esfuerzo fisiológico.</div>`;
+                    effortContainer.innerHTML = `<div class="h-40 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80">Sin datos semanales de esfuerzo fisiológico.</div>`;
                 } else {
                     const maxTrimp = Math.max(250, ...weeks.map(w => w.trimp * 1.2));
                     const getX = i => n === 1 ? padL + plotW / 2 : Number((padL + (i / (n - 1)) * plotW).toFixed(1));
@@ -1799,80 +1874,74 @@
                     [2, 5, 8].forEach(lvl => {
                         const y = getY(lvl);
                         svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1E293B" stroke-width="1"/>`;
-                        svg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#64748B" font-size="10" font-family="JetBrains Mono, monospace">${lvl}/10</text>`;
+                        svg += `<text x="${padL - 6}" y="${y + 4}" text-anchor="end" fill="#94A3B8" font-size="11" font-weight="600" font-family="JetBrains Mono, monospace">${lvl}/10</text>`;
                     });
                     weeks.forEach((w, i) => {
                         const x = getX(i);
-                        const barH = Math.max(4, (w.trimp / maxTrimp) * plotH);
+                        const barH = Math.max(6, (w.trimp / maxTrimp) * plotH);
                         const barY = padT + plotH - barH;
-                        svg += `<rect x="${x - 14}" y="${barY}" width="28" height="${barH}" rx="4" fill="rgba(245,158,11,0.22)" stroke="rgba(245,158,11,0.45)" stroke-width="1"/>`;
-                        svg += `<text x="${x}" y="${barY + 12}" text-anchor="middle" fill="#FBBF24" font-size="8.5" font-family="JetBrains Mono, monospace">${w.trimp}p</text>`;
+                        svg += `<rect x="${x - 15}" y="${barY}" width="30" height="${barH}" rx="4" fill="rgba(245,158,11,0.22)" stroke="rgba(245,158,11,0.45)" stroke-width="1"/>`;
+                        svg += `<text x="${x}" y="${Math.min(padT + plotH - 4, barY + 13)}" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="700" font-family="JetBrains Mono, monospace">${w.trimp}p</text>`;
                     });
                     if (n > 1) {
-                        svg += `<line x1="${getX(0)}" y1="${getY(effReg.regPoints[0])}" x2="${getX(n - 1)}" y2="${getY(effReg.regPoints[n - 1])}" stroke="#10B981" stroke-width="1.8" stroke-dasharray="4,4"/>`;
+                        svg += `<line x1="${getX(0)}" y1="${getY(effReg.regPoints[0])}" x2="${getX(n - 1)}" y2="${getY(effReg.regPoints[n - 1])}" stroke="#10B981" stroke-width="2" stroke-dasharray="4,4"/>`;
                         const pts = effVals.map((v, i) => `${getX(i)},${getY(v)}`).join(' ');
-                        svg += `<polyline fill="none" stroke="#F97316" stroke-width="2.5" points="${pts}"/>`;
+                        svg += `<polyline fill="none" stroke="#F97316" stroke-width="3" points="${pts}"/>`;
                     }
                     effVals.forEach((v, i) => {
                         const x = getX(i), y = getY(v);
-                        svg += `<circle cx="${x}" cy="${y}" r="4.5" fill="#F97316" stroke="#090D16" stroke-width="1.5"/>`;
-                        svg += `<text x="${x}" y="${y - 9}" text-anchor="middle" fill="#F8FAFC" font-size="10" font-weight="700" font-family="JetBrains Mono, monospace">${v}/10</text>`;
-                        svg += `<text x="${x}" y="${H - 7}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono, monospace">${weeks[i].label}</text>`;
+                        const labelStr = `${v}`;
+                        svg += `<circle cx="${x}" cy="${y}" r="5" fill="#F97316" stroke="#090D16" stroke-width="2"/>`;
+                        svg += `<rect x="${x - 16}" y="${y - 23}" width="32" height="14" rx="4" fill="#090D16" fill-opacity="0.9" stroke="#334155" stroke-width="0.8"/>`;
+                        svg += `<text x="${x}" y="${y - 12}" text-anchor="middle" fill="#FFFFFF" font-size="11.5" font-weight="700" font-family="JetBrains Mono, monospace">${labelStr}</text>`;
+                        svg += `<text x="${x}" y="${H - 8}" text-anchor="middle" fill="#CBD5E1" font-size="11" font-weight="600" font-family="JetBrains Mono, monospace">${weeks[i].label}</text>`;
                     });
-                    effortContainer.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-44 block rounded-lg bg-slate-950/85 border border-slate-800/90 overflow-visible">${svg}</svg>`;
+                    effortContainer.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-52 sm:h-56 block rounded-xl bg-slate-950/90 border border-slate-800/90 overflow-visible">${svg}</svg>`;
                 }
             }
 
-            // 7. ANTHROPOMETRY DUAL CHART: WEIGHT (KG) & WAIST (CM)
-            const anthroContainer = document.getElementById('svg-chart-anthro');
-            const anthroBadge = document.getElementById('anthro-trend-slope-badge');
-            if (anthroContainer) {
-                const wVals = weeks.map(w => w.weight);
-                const cVals = weeks.map(w => w.waist);
-                const wReg = computeLeastSquaresLinearRegression(wVals);
-                const cReg = computeLeastSquaresLinearRegression(cVals);
-                if (anthroBadge) {
-                    anthroBadge.textContent = wReg.hasRegression
-                        ? `Peso: ${wReg.slope >= 0 ? '+' : ''}${wReg.slope.toFixed(2)} kg/sem • Cintura: ${cReg.slope >= 0 ? '+' : ''}${cReg.slope.toFixed(2)} cm/sem`
-                        : (weeks[0] ? `${weeks[0].weight} kg | ${weeks[0].waist} cm` : '--');
-                }
-                const W = 620, H = 185, padL = 46, padR = 46, padT = 26, padB = 28;
-                const plotW = W - padL - padR, plotH = H - padT - padB, n = weeks.length;
-                if (n === 0) {
-                    anthroContainer.innerHTML = `<div class="h-36 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80">Sin registros de peso y cintura.</div>`;
-                } else {
-                    const minW = Math.min(...wVals) - 1.2, maxW = Math.max(...wVals) + 1.2, spanW = Math.max(2, maxW - minW);
-                    const minC = Math.min(...cVals) - 1.2, maxC = Math.max(...cVals) + 1.2, spanC = Math.max(2, maxC - minC);
-                    const getX = i => n === 1 ? padL + plotW / 2 : Number((padL + (i / (n - 1)) * plotW).toFixed(1));
-                    const getYW = v => Number((padT + ((maxW - v) / spanW) * plotH).toFixed(1));
-                    const getYC = v => Number((padT + ((maxC - v) / spanC) * plotH).toFixed(1));
+            // 7. INDEPENDENT WEIGHT CHART (KG)
+            const weightWeeks = weeks.filter(w => w.weight !== null && w.weight > 30);
+            const wVals = weightWeeks.map(w => w.weight);
+            const wReg = computeLeastSquaresLinearRegression(wVals);
+            const weightBadge = document.getElementById('weight-trend-slope-badge');
+            if (weightBadge) {
+                weightBadge.textContent = wReg.hasRegression
+                    ? `Tendencia: ${wReg.slope >= 0 ? '+' : ''}${wReg.slope.toFixed(2)} kg/sem`
+                    : (wVals[0] ? `Actual: ${wVals[0].toFixed(1)} kg` : 'Sin datos');
+            }
+            const weightContainer = document.getElementById('svg-chart-weight');
+            if (weightContainer) {
+                weightContainer.innerHTML = buildSingleLineSvgChart({
+                    weeks: weightWeeks,
+                    values: wVals,
+                    regValues: wReg.regPoints,
+                    formatVal: v => `${Number(v).toFixed(1)}`,
+                    lineColor: '#10B981',
+                    regColor: '#06B6D4'
+                });
+            }
 
-                    let svg = '';
-                    [0.2, 0.5, 0.8].forEach(r => {
-                        const y = Number((padT + r * plotH).toFixed(1));
-                        const wLabel = (maxW - r * spanW).toFixed(1);
-                        const cLabel = (maxC - r * spanC).toFixed(1);
-                        svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1E293B" stroke-width="1"/>`;
-                        svg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#10B981" font-size="9.5" font-family="JetBrains Mono, monospace">${wLabel}kg</text>`;
-                        svg += `<text x="${W - padR + 6}" y="${y + 3}" text-anchor="start" fill="#06B6D4" font-size="9.5" font-family="JetBrains Mono, monospace">${cLabel}cm</text>`;
-                    });
-
-                    if (n > 1) {
-                        svg += `<polyline fill="none" stroke="#10B981" stroke-width="2.5" points="${wVals.map((v, i) => `${getX(i)},${getYW(v)}`).join(' ')}"/>`;
-                        svg += `<polyline fill="none" stroke="#06B6D4" stroke-width="2.5" stroke-dasharray="5,3" points="${cVals.map((v, i) => `${getX(i)},${getYC(v)}`).join(' ')}"/>`;
-                    }
-
-                    weeks.forEach((w, i) => {
-                        const x = getX(i), yW = getYW(w.weight), yC = getYC(w.waist);
-                        svg += `<circle cx="${x}" cy="${yW}" r="4" fill="#10B981" stroke="#090D16" stroke-width="1.5"/>`;
-                        svg += `<text x="${x}" y="${yW - 8}" text-anchor="middle" fill="#6EE7B7" font-size="9.5" font-family="JetBrains Mono, monospace">${w.weight}kg</text>`;
-                        svg += `<circle cx="${x}" cy="${yC}" r="4" fill="#06B6D4" stroke="#090D16" stroke-width="1.5"/>`;
-                        svg += `<text x="${x}" y="${yC + 14}" text-anchor="middle" fill="#67E8F9" font-size="9.5" font-family="JetBrains Mono, monospace">${w.waist}cm</text>`;
-                        svg += `<text x="${x}" y="${H - 7}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono, monospace">${w.label}</text>`;
-                    });
-
-                    anthroContainer.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-44 block rounded-lg bg-slate-950/85 border border-slate-800/90 overflow-visible">${svg}</svg>`;
-                }
+            // 8. INDEPENDENT WAIST CIRCUMFERENCE CHART (CM)
+            const waistWeeks = weeks.filter(w => w.waist !== null && w.waist > 40);
+            const cVals = waistWeeks.map(w => w.waist);
+            const cReg = computeLeastSquaresLinearRegression(cVals);
+            const waistBadge = document.getElementById('waist-trend-slope-badge');
+            if (waistBadge) {
+                waistBadge.textContent = cReg.hasRegression
+                    ? `Tendencia: ${cReg.slope >= 0 ? '+' : ''}${cReg.slope.toFixed(2)} cm/sem`
+                    : (cVals[0] ? `Actual: ${cVals[0].toFixed(1)} cm` : 'Sin datos');
+            }
+            const waistContainer = document.getElementById('svg-chart-waist');
+            if (waistContainer) {
+                waistContainer.innerHTML = buildSingleLineSvgChart({
+                    weeks: waistWeeks,
+                    values: cVals,
+                    regValues: cReg.regPoints,
+                    formatVal: v => `${Number(v).toFixed(1)}`,
+                    lineColor: '#06B6D4',
+                    regColor: '#10B981'
+                });
             }
         }
 
@@ -1911,6 +1980,7 @@
                 trimp: weekTrimp,
                 physioEffort,
                 trimpToHrvRatio,
+                userSavedV27: true,
                 updatedAt: new Date().toISOString()
             };
             document.getElementById('input-weekly-hrv').value = parsed.intervalStr;
@@ -1952,12 +2022,31 @@
             const listEl = document.getElementById('weekly-history-list');
             const sortedDesc = getSortedWeeklyHistoryArray().reverse();
             document.getElementById('weekly-history-count').textContent = `${sortedDesc.length} sem.`;
+            if (sortedDesc.length === 0) {
+                listEl.innerHTML = `<div class="text-xs text-slate-400 text-center py-5 bg-slate-950/60 rounded-xl border border-slate-800/80">No hay semanas guardadas todavía. Rellena tus datos arriba y pulsa "Guardar Semana".</div>`;
+                return;
+            }
             listEl.innerHTML = sortedDesc.map(item => `
-                <div onclick="document.getElementById('weekly-iso-picker').value='${item.weekKey}';loadWeeklyLogForSelectedWeek();" class="cursor-pointer rounded-xl p-2.5 border bg-slate-900/70 hover:bg-slate-800/60 border-slate-800 flex items-center justify-between gap-2">
-                    <div class="text-xs font-mono">
-                        <strong class="text-white">${item.weekKey}</strong> • <span class="text-cyan-300">VFC: ${item.hrv} ms [${item.hrvInterval}]</span> • <span class="text-rose-300">FC: ${item.weeklyRhr} ppm</span> • <span class="text-emerald-300">Rec: ${item.hrr} LPM</span>
+                <div onclick="document.getElementById('weekly-iso-picker').value='${item.weekKey}';loadWeeklyLogForSelectedWeek();" class="cursor-pointer rounded-xl p-2.5 border bg-slate-900/80 hover:bg-slate-800/70 border-slate-800 flex items-center justify-between gap-2 transition">
+                    <div class="text-xs font-mono min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <strong class="text-white text-xs">${item.weekKey}</strong>
+                            <span class="text-[10px] font-mono text-slate-400">(${item.weight}kg | ${item.waist}cm)</span>
+                        </div>
+                        <div class="mt-0.5 text-[11px] leading-snug">
+                            <span class="text-cyan-300">VFC: ${item.hrv} ms [${item.hrvInterval}]</span> •
+                            <span class="text-rose-300">FC: ${item.weeklyRhr} ppm</span> •
+                            <span class="text-emerald-300">Rec: ${item.hrr} LPM</span>
+                        </div>
                     </div>
-                    <span class="text-[10px] font-mono text-slate-400 shrink-0">${item.weight}kg | ${item.waist}cm</span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="event.stopPropagation();document.getElementById('weekly-iso-picker').value='${item.weekKey}';loadWeeklyLogForSelectedWeek();showToast('Semana ${item.weekKey} cargada en el formulario para editar.','info');" class="px-2 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono font-bold">
+                            ✏️
+                        </button>
+                        <button type="button" onclick="deleteWeeklyLogEntry('${item.weekKey}', event)" class="px-2 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-[11px] font-mono font-bold">
+                            🗑️
+                        </button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -2004,7 +2093,7 @@
             document.getElementById('report-preview-rhr').textContent = `${manual.weeklyRhr} ppm | Rec: ${manual.hrr} LPM`;
 
             return [
-                `=== REPORTE SEMANAL RUNLAB PRO v2.6 (${weekKey}) ===`,
+                `=== REPORTE SEMANAL RUNLAB PRO v2.7 (${weekKey}) ===`,
                 `1. VARIABLES FISIOLÓGICAS (KARVONEN)`,
                 `- FC Máxima: ${fcMax} ppm | FC Basal: ${fcBasal} ppm | Z2 (60-70% FCR): ${z2Min}-${z2Max} ppm`,
                 ``,
@@ -2047,7 +2136,7 @@
 
         /* MAINTENANCE & BACKUP */
         async function forceAppUpdateAntiCache() {
-            showToast('Limpiando caché y recargando v2.6...', 'info');
+            showToast('Limpiando caché y recargando v2.7...', 'info');
             try {
                 if ('serviceWorker' in navigator) {
                     const regs = await navigator.serviceWorker.getRegistrations();
@@ -2058,7 +2147,7 @@
                     for (const k of keys) await caches.delete(k);
                 }
             } catch (e) {}
-            setTimeout(() => { window.location.href = window.location.pathname + '?v=2.6_' + Date.now(); }, 350);
+            setTimeout(() => { window.location.href = window.location.pathname + '?v=2.7_' + Date.now(); }, 350);
         }
 
         async function exportDatabaseBackup() {
@@ -2108,8 +2197,8 @@
                 if (sec) sec.classList.toggle('hidden', t !== tabName);
                 if (nav) {
                     nav.className = t === tabName
-                        ? 'nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-emerald-400 bg-emerald-500/10 font-semibold transition min-w-0'
-                        : 'nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0';
+                        ? 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-emerald-400 bg-emerald-500/10 font-semibold transition min-w-0'
+                        : 'nav-btn flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-400 hover:text-slate-200 font-medium transition min-w-0';
                 }
             });
             if (tabName === 'dashboard') {
