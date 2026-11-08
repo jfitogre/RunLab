@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="RunLab Pro">
     <meta name="theme-color" content="#0b0f17">
-    <title>RunLab Pro v2.5 — Analítica .FIT & Entrenador IA</title>
+    <title>RunLab Pro v2.6 — Analítica .FIT & Entrenador IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +40,7 @@
 </head>
 <body class="min-h-screen flex flex-col w-full overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
 
-    <!-- STICKY HEADER (iPhone Notch Safe-Area Protected - v2.5) -->
+    <!-- STICKY HEADER (iPhone Notch Safe-Area Protected - v2.6) -->
     <header class="app-header px-3 pb-2.5 w-full">
         <div class="max-w-5xl mx-auto flex items-center justify-between gap-2 w-full">
             <div class="flex items-center gap-2 min-w-0">
@@ -50,7 +50,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
                         <h1 class="font-extrabold text-sm tracking-tight text-white truncate">RunLab <span class="text-emerald-400">Pro</span></h1>
-                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.5</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-mono font-extrabold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0">v2.6</span>
                     </div>
                     <button onclick="switchTab('settings')" class="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-200 font-mono truncate">
                         <i class="ph-fill ph-heart text-rose-400 text-[10px]"></i>
@@ -169,23 +169,6 @@
                         <span id="kpi-vam-zones" class="font-mono text-slate-300 truncate">Z4: --:--</span>
                         <span id="kpi-vam-age" class="px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono shrink-0">--d</span>
                     </div>
-                </div>
-            </div>
-
-            <!-- WEEKLY Z2 EFFICIENCY LINEAR REGRESSION CANVAS CHART -->
-            <div class="bg-panel border border-slate-800 rounded-xl p-3 w-full">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                            <i class="ph-bold ph-chart-line-up text-emerald-400 text-sm"></i>
-                            Evolución Semanal Z2 y Regresión Lineal (Tendencia)
-                        </h3>
-                        <span id="z2-trend-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">Sin datos</span>
-                    </div>
-                    <span class="text-[10px] text-slate-400 font-mono">↑ Más arriba = más rápido al mismo pulso</span>
-                </div>
-                <div class="w-full pt-2">
-                    <canvas id="z2RegressionCanvas" class="w-full h-40 block rounded-lg bg-slate-950/80 border border-slate-800/90"></canvas>
                 </div>
             </div>
 
@@ -326,23 +309,6 @@
                 </div>
             </div>
 
-            <!-- WEEKLY HRV EVOLUTION CANVAS CHART -->
-            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                            <i class="ph-bold ph-activity text-cyan-400 text-sm"></i>
-                            Evolución Semanal VFC (Banda ±5%, Rango Mín-Máx y Regresión)
-                        </h3>
-                        <span id="hrv-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300">-- ms/sem</span>
-                    </div>
-                    <span class="text-[10px] text-slate-400 font-mono">Barra vertical = Rango diario Apple Salud</span>
-                </div>
-                <div class="w-full pt-2">
-                    <canvas id="hrvEvolutionCanvas" class="w-full h-40 block rounded-lg bg-slate-950/80 border border-slate-800/90"></canvas>
-                </div>
-            </div>
-
             <!-- WEEKLY FORM WITH VFC, RHR AND CARDIAC RECOVERY (LPM) -->
             <div class="bg-panel border border-slate-800 rounded-xl p-3.5">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
@@ -429,13 +395,137 @@
             </div>
         </section>
 
-        <!-- TAB 3: REPORTE IA -->
+        <!-- TAB 3: GRÁFICAS DE TENDENCIA (USO PERSONAL LONGITUDINAL) -->
+        <section id="tab-trends" class="hidden space-y-3.5 w-full">
+            <!-- HEADER & DEMO TOGGLE -->
+            <div class="bg-panel border border-emerald-500/30 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Panel Personal Longitudinal</span>
+                        <span id="trends-weeks-count-pill" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">0 semanas</span>
+                    </div>
+                    <h2 class="text-sm sm:text-base font-bold text-white mt-1">Gráficas de Tendencia y Regresión Lineal</h2>
+                    <p class="text-[11px] text-slate-400">Visualiza cómo evolucionan tu eficiencia aeróbica Z2, tu sistema nervioso autónomo, la carga interna y tu composición corporal semana a semana.</p>
+                </div>
+                <button onclick="toggleTrendsDemoMode()" id="btn-toggle-trends-demo" class="self-start sm:self-center shrink-0 inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-cyan-300 border border-cyan-500/40 font-bold text-[11px] px-3 py-2 rounded-xl transition">
+                    <i class="ph-bold ph-magic-wand text-sm"></i>
+                    <span id="btn-toggle-trends-demo-text">Ver Demo 6 Semanas</span>
+                </button>
+            </div>
+
+            <!-- 1. EVOLUCIÓN SEMANAL Z2 Y REGRESIÓN LINEAL -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-chart-line-up text-emerald-400 text-sm"></i>
+                            1. Evolución Semanal en Z2 y Regresión Lineal (Tendencia)
+                        </h3>
+                        <span id="z2-trend-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">Sin datos</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">↑ Eje invertido: más arriba = más rápido al mismo pulso</span>
+                </div>
+                <div id="svg-chart-z2" class="w-full pt-2"></div>
+            </div>
+
+            <!-- 2. EVOLUCIÓN SEMANAL DE VFC (PUNTO MEDIO + RANGO DIARIO + BANDA BASE) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-heartbeat text-cyan-400 text-sm"></i>
+                            2. Punto Medio VFC, Rango Diario Apple Salud y Banda Base (±5%)
+                        </h3>
+                        <span id="hrv-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300">-- ms/sem</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">Barra vertical = Oscilación diaria (Mín-Máx)</span>
+                </div>
+                <div id="svg-chart-hrv" class="w-full pt-2"></div>
+            </div>
+
+            <!-- 3. MEDIA SEMANAL DE FC EN REPOSO VS FC BASAL (PPM) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-heart text-rose-400 text-sm"></i>
+                            3. Media Semanal de FC en Reposo vs FC Basal (PPM)
+                        </h3>
+                        <span id="rhr-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-rose-300">-- ppm/sem</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">Línea verde punteada = Tu FC Basal configurada</span>
+                </div>
+                <div id="svg-chart-rhr" class="w-full pt-2"></div>
+            </div>
+
+            <!-- 4. RECUPERACIÓN CARDÍACA MEDIA SEMANAL (LPM) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-arrow-fat-lines-down text-emerald-400 text-sm"></i>
+                            4. Recuperación Cardíaca Media Semanal (LPM)
+                        </h3>
+                        <span id="hrr-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-emerald-300">-- LPM/sem</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">↑ Más LPM = mejor reactivación parasimpática post-entreno</span>
+                </div>
+                <div id="svg-chart-hrr" class="w-full pt-2"></div>
+            </div>
+
+            <!-- 5. RATIO DE COSTE AUTONÓMICO (TRIMP / VFC) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-scales text-amber-400 text-sm"></i>
+                            5. Ratio de Coste Autonómico Semanal (TRIMP / VFC)
+                        </h3>
+                        <span id="ratio-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300">-- pts/ms</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">Estrés interno necesario por cada unidad de VFC</span>
+                </div>
+                <div id="svg-chart-ratio" class="w-full pt-2"></div>
+            </div>
+
+            <!-- 6. ESFUERZO FISIOLÓGICO (.FIT 1-10) Y CARGA TRIMP SEMANAL -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-fire text-orange-400 text-sm"></i>
+                            6. Esfuerzo Fisiológico (.FIT 1-10) y Carga TRIMP Semanal
+                        </h3>
+                        <span id="effort-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-orange-300">-- / 10</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">Barras = TRIMP semanal • Línea = Esfuerzo Fisiológico (1-10)</span>
+                </div>
+                <div id="svg-chart-effort" class="w-full pt-2"></div>
+            </div>
+
+            <!-- 7. ANTROPOMETRÍA SEMANAL: PESO MEDIO (KG) Y CINTURA (CM) -->
+            <div class="bg-panel border border-slate-800 rounded-xl p-3.5 w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-bold ph-ruler text-purple-400 text-sm"></i>
+                            7. Antropometría Semanal: Peso Medio (kg) y Cintura (cm)
+                        </h3>
+                        <span id="anthro-trend-slope-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-purple-300">-- kg / -- cm</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">Verde = Peso (kg) • Cian = Perímetro Cintura (cm)</span>
+                </div>
+                <div id="svg-chart-anthro" class="w-full pt-2"></div>
+            </div>
+        </section>
+
+        <!-- TAB 4: REPORTE IA -->
         <section id="tab-aireport" class="hidden space-y-4 w-full">
             <div class="bg-panel border border-slate-800 rounded-xl p-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-800">
                     <div>
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300">Prompt Entrenador IA</span>
-                        <h2 class="text-base font-bold text-white mt-1">Reporte Semanal Estructurado (v2.5)</h2>
+                        <h2 class="text-base font-bold text-white mt-1">Reporte Semanal Estructurado (v2.6)</h2>
                     </div>
                     <button onclick="generateAndCopyAIReport(true)" class="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-md active:scale-95 transition">
                         <i class="ph-bold ph-copy text-base"></i>
@@ -443,10 +533,10 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 my-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 my-3">
                     <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5">
                         <p class="text-[10px] text-slate-400">Eficiencia Z2 Media</p>
-                        <p id="report-preview-z2" class="mono-metric text-xs font-bold text-emerald-400 mt-0.5">--</p>
+                        <p id="report-preview-z2" class="mono-metric text-xs font-bold text-emerald-400 mt-0.5">--:-- /km</p>
                     </div>
                     <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5">
                         <p class="text-[10px] text-slate-400">VFC Punto Medio [Intervalo]</p>
@@ -462,7 +552,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: AJUSTES v2.5 & SEGURIDAD -->
+        <!-- TAB 5: AJUSTES v2.6 & SEGURIDAD -->
         <section id="tab-settings" class="hidden space-y-4 w-full">
             <div class="bg-panel border border-slate-800 rounded-xl p-4">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -470,7 +560,7 @@
                         <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Fisiología Dinámica</span>
                         <h2 class="text-base font-bold text-white mt-1">Configuración del Atleta</h2>
                     </div>
-                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.5</span>
+                    <span class="px-2 py-1 text-xs font-mono font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.6</span>
                 </div>
 
                 <form onsubmit="saveAthleteSettings(event)" class="mt-3.5 space-y-3.5">
@@ -557,35 +647,41 @@
     <!-- TOAST CONTAINER -->
     <div id="toast-container" class="fixed top-16 right-3 left-3 sm:left-auto sm:w-80 z-50 pointer-events-none flex flex-col gap-1.5"></div>
 
-    <!-- BOTTOM NAVIGATION BAR -->
+    <!-- BOTTOM NAVIGATION BAR (5 TABS MOBILE-FIRST IPHONE FIT) -->
     <nav class="fixed bottom-0 inset-x-0 z-40 bg-obsidian/95 backdrop-blur-xl border-t border-slate-800/90 bottom-nav-safe w-full">
-        <div class="max-w-md mx-auto grid grid-cols-4 gap-1 px-2 pt-1">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-emerald-400 bg-emerald-500/10 font-semibold transition">
+        <div class="max-w-lg mx-auto grid grid-cols-5 gap-0.5 px-1.5 pt-1">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-emerald-400 bg-emerald-500/10 font-semibold transition min-w-0">
                 <i class="ph-fill ph-chart-polar text-base"></i>
-                <span class="text-[10px] mt-0.5">Analítica .FIT</span>
+                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Analítica</span>
             </button>
-            <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition">
+            <button onclick="switchTab('weekly')" id="nav-weekly" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
                 <i class="ph-bold ph-heartbeat text-base"></i>
-                <span class="text-[10px] mt-0.5">VFC / Fatiga</span>
+                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">VFC / Fatiga</span>
             </button>
-            <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition">
+            <button onclick="switchTab('trends')" id="nav-trends" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
+                <i class="ph-bold ph-trend-up text-base"></i>
+                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Tendencias</span>
+            </button>
+            <button onclick="switchTab('aireport')" id="nav-aireport" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
                 <i class="ph-bold ph-robot text-base"></i>
-                <span class="text-[10px] mt-0.5">Reporte IA</span>
+                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Reporte IA</span>
             </button>
-            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition">
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0">
                 <i class="ph-bold ph-sliders-horizontal text-base"></i>
-                <span class="text-[10px] mt-0.5">Ajustes v2.5</span>
+                <span class="text-[9px] sm:text-[10px] mt-0.5 truncate">Ajustes v2.6</span>
             </button>
         </div>
     </nav>
 
     <script>
-        const APP_VERSION = '2.5';
+        const APP_VERSION = '2.6';
         const STORAGE_KEYS = {
-            SETTINGS: 'runlab_settings_v25',
+            SETTINGS: 'runlab_settings_v26',
+            SETTINGS_V25: 'runlab_settings_v25',
             SETTINGS_V24: 'runlab_settings_v24',
             SETTINGS_LEGACY: 'runlab_athlete_settings_v1',
-            WEEKLY_HISTORY: 'runlab_weekly_history_v25',
+            WEEKLY_HISTORY: 'runlab_weekly_history_v23',
+            WEEKLY_HISTORY_V25: 'runlab_weekly_history_v25',
             WEEKLY_HISTORY_V24: 'runlab_weekly_history_v24',
             WEEKLY_HISTORY_V23: 'runlab_weekly_history_v23'
         };
@@ -596,6 +692,7 @@
             workouts: [],
             selectedWorkoutId: null,
             weeklyLogs: {},
+            trendsDemoMode: false,
             leafletMap: null,
             mapLayers: []
         };
@@ -603,8 +700,8 @@
         function setupPWA() {
             try {
                 const manifest = {
-                    name: "RunLab Pro v2.5",
-                    short_name: "RunLab v2.5",
+                    name: "RunLab Pro v2.6",
+                    short_name: "RunLab v2.6",
                     start_url: "./index.html",
                     display: "standalone",
                     background_color: "#090D16",
@@ -631,7 +728,7 @@
 
         function loadSettingsFromLocalStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V24) || localStorage.getItem(STORAGE_KEYS.SETTINGS_LEGACY);
+                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V25) || localStorage.getItem(STORAGE_KEYS.SETTINGS_V24) || localStorage.getItem(STORAGE_KEYS.SETTINGS_LEGACY);
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (parsed.fcMax && parsed.fcBasal) {
@@ -1126,7 +1223,256 @@
             if (added > 0) showToast(`Subidos ${added} entrenamientos (${totalBatchKm.toFixed(2)} km).`, 'success');
         }
 
-        /* HTML5 CANVAS CHARTS: WEEKLY Z2 REGRESSION & WEEKLY HRV EVOLUTION */
+        /* LEAFLET GPS MAP ENGINE */
+        function initLeafletMap() {
+            const container = document.getElementById('map-container');
+            if (!container || appState.leafletMap || typeof L === 'undefined') return;
+            appState.leafletMap = L.map('map-container', { zoomControl: true, attributionControl: false }).setView([40.4168, -3.7038], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(appState.leafletMap);
+        }
+
+        function renderWorkoutOnMap(workout) {
+            if (!appState.leafletMap) initLeafletMap();
+            if (!appState.leafletMap) return;
+            appState.mapLayers.forEach(l => appState.leafletMap.removeLayer(l));
+            appState.mapLayers = [];
+
+            const recs = (workout?.records || []).filter(r => r.lat !== undefined && r.lon !== undefined);
+            if (recs.length < 2) return;
+
+            const spanSec = Math.max(1, recs[recs.length - 1].t - recs[0].t);
+            const trimSec = spanSec > 1500 ? 600 : spanSec * 0.15;
+            const warmupEnd = recs[0].t + trimSec;
+            const cooldownStart = recs[recs.length - 1].t - trimSec;
+
+            const warmupCoords = [], coreCoords = [], cooldownCoords = [];
+            for (const r of recs) {
+                const pt = [r.lat, r.lon];
+                if (r.t <= warmupEnd) warmupCoords.push(pt);
+                if (r.t >= warmupEnd && r.t <= cooldownStart) coreCoords.push(pt);
+                if (r.t >= cooldownStart) cooldownCoords.push(pt);
+            }
+
+            if (warmupCoords.length > 1) {
+                appState.mapLayers.push(L.polyline(warmupCoords, { color: '#64748B', weight: 3, dashArray: '5,6' }).addTo(appState.leafletMap));
+            }
+            if (coreCoords.length > 1) {
+                appState.mapLayers.push(L.polyline(coreCoords, { color: '#10B981', weight: 4 }).addTo(appState.leafletMap));
+            }
+            if (cooldownCoords.length > 1) {
+                appState.mapLayers.push(L.polyline(cooldownCoords, { color: '#64748B', weight: 3, dashArray: '5,6' }).addTo(appState.leafletMap));
+            }
+
+            const allBounds = L.latLngBounds(recs.map(r => [r.lat, r.lon]));
+            appState.leafletMap.fitBounds(allBounds, { padding: [18, 18] });
+        }
+
+        /* AUTONOMIC & WEEKLY BIOMARKERS HELPERS */
+        function getCurrentISOWeekString(dateObj = new Date()) {
+            const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+        }
+
+        function parseHrvIntervalInput(rawValue) {
+            const str = String(rawValue || '38-71').trim().replace(/,/g, '.');
+            const m = str.match(/(\d+(?:\.\d+)?)\s*[-–—/a]\s*(\d+(?:\.\d+)?)/i);
+            if (m) {
+                const a = parseFloat(m[1]), b = parseFloat(m[2]);
+                const min = Math.min(a, b), max = Math.max(a, b);
+                const mid = Number(((min + max) / 2).toFixed(1));
+                const amp = Number((max - min).toFixed(1));
+                return { min, max, mid, amp, intervalStr: `${min}-${max}` };
+            }
+            const single = parseFloat(str);
+            if (!isNaN(single) && single > 5) {
+                return { min: single, max: single, mid: Number(single.toFixed(1)), amp: 0, intervalStr: `${single}` };
+            }
+            return { min: 38, max: 71, mid: 54.5, amp: 33, intervalStr: '38-71' };
+        }
+
+        function getSortedWeeklyHistoryArray() {
+            return Object.entries(appState.weeklyLogs || {})
+                .map(([weekKey, val]) => {
+                    const parsed = parseHrvIntervalInput(val.hrvInterval || val.hrv || '38-71');
+                    return {
+                        weekKey,
+                        ...val,
+                        hrv: parsed.mid,
+                        hrvInterval: parsed.intervalStr,
+                        hrvMin: parsed.min,
+                        hrvMax: parsed.max,
+                        hrvAmp: parsed.amp,
+                        hrr: val.hrr !== undefined && val.hrr !== '' ? Number(val.hrr) : 28
+                    };
+                })
+                .sort((a, b) => a.weekKey.localeCompare(b.weekKey));
+        }
+
+        function computeAutomaticPhysiologicalEffort(workoutsList = getWorkoutsForCurrentWeek()) {
+            if (!workoutsList || workoutsList.length === 0) {
+                return { score10: 0, trimpPerMin: 0, label: 'Sin sesiones .FIT' };
+            }
+            let totalTrimp = 0, totalSec = 0;
+            workoutsList.forEach(w => {
+                if (!w.metrics) return;
+                totalTrimp += w.metrics.trimp || 0;
+                totalSec += w.metrics.totalDurationSec || 0;
+            });
+            const totalMin = Math.max(1, totalSec / 60);
+            const trimpPerMin = Number((totalTrimp / totalMin).toFixed(2));
+            const rawScore = 1.5 + (trimpPerMin * 3.1) + Math.min(1.5, totalTrimp / 280);
+            const score10 = Number(Math.max(1, Math.min(10, rawScore)).toFixed(1));
+            const label = score10 >= 8 ? 'Carga Muy Alta' : (score10 >= 6 ? 'Carga Moderada-Alta' : 'Carga Asimilable');
+            return { score10, trimpPerMin, label };
+        }
+
+        function computeAutonomicDiagnostics(targetWeekKey) {
+            const weekKey = targetWeekKey || document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
+            const sorted = getSortedWeeklyHistoryArray();
+            const currentSaved = appState.weeklyLogs[weekKey];
+            const parsedLive = parseHrvIntervalInput(currentSaved?.hrvInterval || document.getElementById('input-weekly-hrv')?.value || '38-71');
+
+            const currentEntry = {
+                weekKey,
+                hrv: parsedLive.mid,
+                hrvInterval: parsedLive.intervalStr,
+                hrvMin: parsedLive.min,
+                hrvMax: parsedLive.max,
+                hrvAmp: parsedLive.amp,
+                weeklyRhr: Number(currentSaved?.weeklyRhr ?? document.getElementById('input-weekly-rhr')?.value ?? (appState.settings.fcBasal + 2)),
+                hrr: Number(currentSaved?.hrr ?? document.getElementById('input-weekly-hrr')?.value ?? 28),
+                weight: Number(currentSaved?.weight ?? document.getElementById('input-weekly-weight')?.value ?? 71.4),
+                waist: Number(currentSaved?.waist ?? document.getElementById('input-weekly-waist')?.value ?? 78.5),
+                strengthNotes: currentSaved?.strengthNotes ?? document.getElementById('input-strength-notes')?.value ?? ''
+            };
+
+            const priorWeeks = sorted.filter(item => item.weekKey < weekKey).slice(-4);
+            const hasPriorBaseline = priorWeeks.length > 0;
+            const baselineHrv = hasPriorBaseline
+                ? Number((priorWeeks.reduce((acc, x) => acc + Number(x.hrv || 54.5), 0) / priorWeeks.length).toFixed(1))
+                : currentEntry.hrv;
+
+            const deltaHrvPct = baselineHrv > 0
+                ? Number((((currentEntry.hrv - baselineHrv) / baselineHrv) * 100).toFixed(1))
+                : 0;
+
+            const rhrDelta = currentEntry.weeklyRhr - appState.settings.fcBasal;
+            const weekWorkouts = getWorkoutsForCurrentWeek();
+            const weekTrimp = weekWorkouts.reduce((acc, w) => acc + (w.metrics?.trimp || 0), 0);
+            const trimpToHrvRatio = currentEntry.hrv > 0 ? Number((weekTrimp / currentEntry.hrv).toFixed(2)) : 0;
+            const physioEffort = computeAutomaticPhysiologicalEffort(weekWorkouts);
+
+            const reg = computeLeastSquaresLinearRegression(sorted.map(s => s.hrv));
+            const hrvSlopeMsPerWeek = reg.hasRegression ? Number(reg.slope.toFixed(1)) : 0;
+
+            let statusLevel = 'green', statusTitle = 'Asimilación Autonómica Óptima';
+            let statusSummary = `Punto medio VFC (${currentEntry.hrv} ms, rango ${currentEntry.hrvInterval} ms) estable frente a tu base (${baselineHrv} ms) y Recuperación Cardíaca de ${currentEntry.hrr} LPM.`;
+
+            if ((deltaHrvPct <= -7 && rhrDelta >= 3) || deltaHrvPct <= -10 || rhrDelta >= 5) {
+                statusLevel = 'red';
+                statusTitle = 'Sobrecarga Autonómica / Fatiga Simpática';
+                statusSummary = `Caída del punto medio VFC (${deltaHrvPct}%) junto con pulso en reposo elevado (+${rhrDelta} ppm vs Basal). Priorizar descarga.`;
+            } else if (deltaHrvPct <= -5 || rhrDelta >= 3 || currentEntry.hrvAmp >= 45) {
+                statusLevel = 'amber';
+                statusTitle = 'Fatiga Simpática Moderada / Oscilación Alta';
+                statusSummary = `VFC en ${currentEntry.hrv} ms (${deltaHrvPct}% vs base, oscilación ${currentEntry.hrvAmp} ms) y FC Reposo ${rhrDelta >= 0 ? '+' : ''}${rhrDelta} ppm. Vigilar asimilación.`;
+            }
+
+            return {
+                currentEntry,
+                hasPriorBaseline,
+                baselineHrv,
+                deltaHrvPct,
+                rhrDelta,
+                weekTrimp,
+                trimpToHrvRatio,
+                physioEffort,
+                hrvSlopeMsPerWeek,
+                statusLevel,
+                statusTitle,
+                statusSummary
+            };
+        }
+
+        function loadWeeklyLogsFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V25) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V24);
+                if (raw) appState.weeklyLogs = JSON.parse(raw) || {};
+            } catch (e) {
+                appState.weeklyLogs = {};
+            }
+            const picker = document.getElementById('weekly-iso-picker');
+            if (picker && !picker.value) picker.value = getCurrentISOWeekString();
+            loadWeeklyLogForSelectedWeek();
+        }
+
+        function loadWeeklyLogForSelectedWeek() {
+            const weekKey = document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
+            const saved = appState.weeklyLogs[weekKey];
+            if (saved) {
+                document.getElementById('input-weekly-hrv').value = saved.hrvInterval || saved.hrv || '38-71';
+                document.getElementById('input-weekly-rhr').value = saved.weeklyRhr ?? (appState.settings.fcBasal + 2);
+                document.getElementById('input-weekly-hrr').value = saved.hrr ?? 28;
+                document.getElementById('input-weekly-weight').value = saved.weight ?? 71.4;
+                document.getElementById('input-weekly-waist').value = saved.waist ?? 78.5;
+                document.getElementById('input-strength-notes').value = saved.strengthNotes ?? '';
+            } else {
+                document.getElementById('input-weekly-hrv').value = '38-71';
+                document.getElementById('input-weekly-rhr').value = appState.settings.fcBasal + 2;
+                document.getElementById('input-weekly-hrr').value = 28;
+                document.getElementById('input-weekly-weight').value = 71.4;
+                document.getElementById('input-weekly-waist').value = 78.5;
+                document.getElementById('input-strength-notes').value = '';
+            }
+            updateWeeklyFormLiveIndicators();
+            refreshAutonomicTabUI();
+        }
+
+        function updateWeeklyFormLiveIndicators() {
+            const basal = appState.settings.fcBasal || 57;
+            const basalRef = document.getElementById('weekly-basal-ref');
+            if (basalRef) basalRef.textContent = basal;
+
+            const parsed = parseHrvIntervalInput(document.getElementById('input-weekly-hrv')?.value || '38-71');
+            const midEl = document.getElementById('hrv-parsed-mid');
+            const ampEl = document.getElementById('hrv-parsed-amp');
+            if (midEl) midEl.textContent = `Punto Medio VFC: ${parsed.mid} ms`;
+            if (ampEl) ampEl.textContent = `Oscilación: ${parsed.amp} ms`;
+
+            const rhrVal = Number(document.getElementById('input-weekly-rhr')?.value || basal);
+            const diffRhr = rhrVal - basal;
+            const rhrBadge = document.getElementById('rhr-delta-badge');
+            if (rhrBadge) rhrBadge.textContent = `${diffRhr >= 0 ? '+' : ''}${diffRhr} ppm`;
+
+            const hrrVal = Number(document.getElementById('input-weekly-hrr')?.value || 28);
+            const hrrBadge = document.getElementById('hrr-status-badge');
+            if (hrrBadge) hrrBadge.textContent = `${hrrVal} LPM`;
+        }
+
+        /* LONGITUDINAL TRENDS ENGINE & 7 INTERACTIVE SVG CHARTS (TAB 3) */
+        function computeLeastSquaresLinearRegression(values) {
+            const n = values.length;
+            if (n < 2) {
+                return { slope: 0, intercept: values[0] || 0, regPoints: values.map(v => v), hasRegression: false };
+            }
+            let sX = 0, sY = 0, sXY = 0, sXX = 0;
+            for (let i = 0; i < n; i++) {
+                sX += i;
+                sY += values[i];
+                sXY += i * values[i];
+                sXX += i * i;
+            }
+            const denom = (n * sXX - sX * sX) || 1;
+            const slope = (n * sXY - sX * sY) / denom;
+            const intercept = (sY - slope * sX) / n;
+            const regPoints = values.map((_, i) => intercept + slope * i);
+            return { slope: Number(slope.toFixed(2)), intercept, regPoints, hasRegression: true };
+        }
+
         function computeWeeklyZ2RegressionData() {
             const weekMap = {};
             for (const w of appState.workouts) {
@@ -1136,323 +1482,397 @@
                 weekMap[isoWeek].weightedSpeedSum += w.metrics.z2AvgSpeedMs * w.metrics.z2TimeSec;
                 weekMap[isoWeek].z2SecSum += w.metrics.z2TimeSec;
             }
+            Object.entries(appState.weeklyLogs || {}).forEach(([wk, log]) => {
+                if (!weekMap[wk] && log.z2PaceSec && log.z2PaceSec > 120) {
+                    weekMap[wk] = { weekKey: wk, label: wk.replace(/^\d{4}-/, ''), weightedSpeedSum: 1000 / log.z2PaceSec, z2SecSum: 1 };
+                }
+            });
+
             const weeks = Object.values(weekMap).sort((a, b) => a.weekKey.localeCompare(b.weekKey)).map(item => ({
                 weekKey: item.weekKey,
                 label: item.label,
                 paceSec: Math.round(1000 / (item.weightedSpeedSum / item.z2SecSum))
             }));
 
-            const n = weeks.length;
-            if (n < 2) {
-                if (n === 1) weeks[0].regPaceSec = weeks[0].paceSec;
-                return { weeks, slopeSecPerWeek: 0, hasRegression: false };
-            }
-            let sX = 0, sY = 0, sXY = 0, sXX = 0;
-            for (let i = 0; i < n; i++) { sX += i; sY += weeks[i].paceSec; sXY += i * weeks[i].paceSec; sXX += i * i; }
-            const slope = (n * sXY - sX * sY) / (n * sXX - sX * sX || 1);
-            const intercept = (sY - slope * sX) / n;
-            weeks.forEach((w, i) => w.regPaceSec = intercept + slope * i);
-            return { weeks, slopeSecPerWeek: Number(slope.toFixed(1)), hasRegression: true };
+            const reg = computeLeastSquaresLinearRegression(weeks.map(w => w.paceSec));
+            weeks.forEach((w, i) => w.regPaceSec = reg.regPoints[i]);
+            return { weeks, slopeSecPerWeek: Number(reg.slope.toFixed(1)), hasRegression: reg.hasRegression };
         }
 
-        function renderWeeklyZ2TrendChart() {
-            const canvas = document.getElementById('z2RegressionCanvas');
-            const badge = document.getElementById('z2-trend-badge');
-            if (!canvas || !badge) return;
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            const width = Math.max(300, rect.width || 500), height = 160;
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
-            ctx.clearRect(0, 0, width, height);
-
-            const reg = computeWeeklyZ2RegressionData();
-            const weeks = reg.weeks;
-            if (weeks.length === 0) {
-                badge.textContent = 'Sube tus .FIT para ver la tendencia';
-                ctx.fillStyle = '#94A3B8';
-                ctx.font = '12px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('Sube archivos .FIT con tramo en Z2 para trazar la Regresión Lineal.', width / 2, height / 2);
-                return;
-            }
-
-            if (!reg.hasRegression) {
-                badge.textContent = `Actual: ${paceSecondsToString(weeks[0].paceSec)}/km`;
-            } else {
-                const s = reg.slopeSecPerWeek;
-                badge.textContent = s <= 0 ? `📈 Mejora (${s} s/km por sem)` : `📉 Deriva (+${s} s/km por sem)`;
-            }
-
-            const padL = 46, padR = 20, padT = 24, padB = 26;
-            const plotW = width - padL - padR, plotH = height - padT - padB;
-            const allP = weeks.flatMap(w => [w.paceSec, w.regPaceSec || w.paceSec]);
-            const minP = Math.min(...allP) - 10, maxP = Math.max(...allP) + 10, rng = Math.max(20, maxP - minP);
-            const getX = i => weeks.length === 1 ? padL + plotW / 2 : padL + (i / (weeks.length - 1)) * plotW;
-            const getY = sec => padT + ((sec - minP) / rng) * plotH;
-
-            ctx.strokeStyle = '#1E293B';
-            ctx.lineWidth = 1;
-            ctx.font = '10px JetBrains Mono, monospace';
-            ctx.fillStyle = '#64748B';
-            ctx.textAlign = 'right';
-            [0.2, 0.5, 0.8].forEach(r => {
-                const p = Math.round(minP + rng * r), y = getY(p);
-                ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(width - padR, y); ctx.stroke();
-                ctx.fillText(paceSecondsToString(p), padL - 6, y + 3);
-            });
-
-            if (reg.hasRegression) {
-                ctx.save();
-                ctx.strokeStyle = reg.slopeSecPerWeek <= 0 ? '#06B6D4' : '#F59E0B';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
-                ctx.beginPath();
-                ctx.moveTo(getX(0), getY(weeks[0].regPaceSec));
-                ctx.lineTo(getX(weeks.length - 1), getY(weeks[weeks.length - 1].regPaceSec));
-                ctx.stroke();
-                ctx.restore();
-            }
-
-            if (weeks.length > 1) {
-                ctx.strokeStyle = '#10B981';
-                ctx.lineWidth = 2.5;
-                ctx.beginPath();
-                weeks.forEach((w, i) => i === 0 ? ctx.moveTo(getX(i), getY(w.paceSec)) : ctx.lineTo(getX(i), getY(w.paceSec)));
-                ctx.stroke();
-            }
-
-            ctx.textAlign = 'center';
-            weeks.forEach((w, i) => {
-                const x = getX(i), y = getY(w.paceSec);
-                ctx.fillStyle = '#10B981';
-                ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#F8FAFC';
-                ctx.fillText(paceSecondsToString(w.paceSec), x, y - 8);
-                ctx.fillStyle = '#94A3B8';
-                ctx.fillText(w.label, x, height - 7);
-            });
+        function getDemo6WeeksDataset() {
+            const basal = appState.settings.fcBasal || 57;
+            return [
+                { weekKey: '2026-W40', label: 'W40', z2PaceSec: 398, hrv: 51.0, hrvMin: 36, hrvMax: 66, hrvInterval: '36-66', weeklyRhr: basal + 3, hrr: 24, trimp: 165, physioEffort: 5.8, trimpToHrvRatio: 3.24, weight: 72.4, waist: 79.6 },
+                { weekKey: '2026-W41', label: 'W41', z2PaceSec: 393, hrv: 53.5, hrvMin: 39, hrvMax: 68, hrvInterval: '39-68', weeklyRhr: basal + 2, hrr: 26, trimp: 178, physioEffort: 6.2, trimpToHrvRatio: 3.33, weight: 72.1, waist: 79.2 },
+                { weekKey: '2026-W42', label: 'W42', z2PaceSec: 389, hrv: 55.0, hrvMin: 40, hrvMax: 70, hrvInterval: '40-70', weeklyRhr: basal + 1, hrr: 27, trimp: 192, physioEffort: 6.6, trimpToHrvRatio: 3.49, weight: 71.8, waist: 78.9 },
+                { weekKey: '2026-W43', label: 'W43', z2PaceSec: 391, hrv: 49.5, hrvMin: 33, hrvMax: 66, hrvInterval: '33-66', weeklyRhr: basal + 4, hrr: 23, trimp: 220, physioEffort: 7.4, trimpToHrvRatio: 4.44, weight: 71.7, waist: 78.8 },
+                { weekKey: '2026-W44', label: 'W44', z2PaceSec: 384, hrv: 56.5, hrvMin: 42, hrvMax: 71, hrvInterval: '42-71', weeklyRhr: basal + 1, hrr: 29, trimp: 184, physioEffort: 6.3, trimpToHrvRatio: 3.26, weight: 71.5, waist: 78.6 },
+                { weekKey: '2026-W45', label: 'W45', z2PaceSec: 379, hrv: 58.0, hrvMin: 44, hrvMax: 72, hrvInterval: '44-72', weeklyRhr: basal + 0, hrr: 31, trimp: 196, physioEffort: 6.5, trimpToHrvRatio: 3.38, weight: 71.2, waist: 78.3 }
+            ];
         }
 
-        /* LEAFLET MAP */
-        function initLeafletMap() {
-            if (appState.leafletMap) return;
-            appState.leafletMap = L.map('map-container', { zoomControl: true, attributionControl: false }).setView([40.4168, -3.7038], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(appState.leafletMap);
-        }
+        function getUnifiedLongitudinalWeeks() {
+            if (appState.trendsDemoMode) return getDemo6WeeksDataset();
 
-        function renderWorkoutOnMap(workout) {
-            initLeafletMap();
-            const map = appState.leafletMap;
-            appState.mapLayers.forEach(l => map.removeLayer(l));
-            appState.mapLayers = [];
-            if (!workout || !workout.records) return;
-            const pts = workout.records.filter(r => r.lat !== undefined && r.lon !== undefined);
-            if (pts.length < 2) return;
+            const z2ByWeek = {};
+            const trimpByWeek = {};
+            const durByWeek = {};
 
-            const span = workout.records[workout.records.length - 1].t - workout.records[0].t;
-            const trim = span > 1500 ? 600 : span * 0.15;
-            const wEnd = workout.records[0].t + trim, cStart = workout.records[workout.records.length - 1].t - trim;
-            const warm = [], core = [], cool = [];
-            pts.forEach(p => {
-                if (p.t < wEnd) warm.push([p.lat, p.lon]);
-                else if (p.t > cStart) cool.push([p.lat, p.lon]);
-                else core.push([p.lat, p.lon]);
-            });
-
-            if (warm.length > 1) appState.mapLayers.push(L.polyline(warm, { color: '#94A3B8', weight: 4, dashArray: '6,6' }).addTo(map));
-            if (core.length > 1) appState.mapLayers.push(L.polyline(core, { color: '#10B981', weight: 5 }).addTo(map));
-            else appState.mapLayers.push(L.polyline(pts.map(p => [p.lat, p.lon]), { color: '#10B981', weight: 5 }).addTo(map));
-            if (cool.length > 1) appState.mapLayers.push(L.polyline(cool, { color: '#94A3B8', weight: 4, dashArray: '6,6' }).addTo(map));
-
-            map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lon])), { padding: [20, 20] });
-        }
-
-        /* APPLE HEALTH HRV INTERVAL PARSER (`38-71` OR SINGLE VALUE) & AUTONOMIC ENGINE */
-        function parseHrvIntervalInput(rawInput) {
-            const str = String(rawInput ?? '').trim().replace(/,/g, '.');
-            const matches = str.match(/\d+(\.\d+)?/g);
-            if (!matches || matches.length === 0) {
-                return { min: 54.5, max: 54.5, mid: 54.5, amp: 0, intervalStr: '54.5', isInterval: false, highOscillation: false };
-            }
-            if (matches.length >= 2) {
-                const n1 = parseFloat(matches[0]), n2 = parseFloat(matches[1]);
-                const min = Math.max(10, Math.min(250, Math.min(n1, n2)));
-                const max = Math.max(10, Math.min(250, Math.max(n1, n2)));
-                const mid = Number(((min + max) / 2).toFixed(1));
-                const amp = Number((max - min).toFixed(1));
-                return { min, max, mid, amp, intervalStr: `${Math.round(min)}-${Math.round(max)}`, isInterval: min !== max, highOscillation: amp > 35 };
-            }
-            const val = Number(Math.max(10, Math.min(250, parseFloat(matches[0]))).toFixed(1));
-            return { min: val, max: val, mid: val, amp: 0, intervalStr: `${val}`, isInterval: false, highOscillation: false };
-        }
-
-        function getCurrentISOWeekString(dateObj = new Date()) {
-            const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            return `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
-        }
-
-        function loadWeeklyLogsFromStorage() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V24) || localStorage.getItem(STORAGE_KEYS.WEEKLY_HISTORY_V23);
-                if (raw) {
-                    appState.weeklyLogs = JSON.parse(raw) || {};
-                } else {
-                    const cw = getCurrentISOWeekString();
-                    const p = parseHrvIntervalInput('38-71');
-                    appState.weeklyLogs = {
-                        [cw]: { weeklyRhr: appState.settings.fcBasal + 2, hrr: 28, hrv: p.mid, hrvInterval: p.intervalStr, hrvMin: p.min, hrvMax: p.max, hrvAmp: p.amp, weight: 71.4, waist: 78.5, strengthNotes: '' }
-                    };
+            appState.workouts.forEach(w => {
+                if (!w.metrics) return;
+                const wk = getCurrentISOWeekString(new Date(w.startTime));
+                trimpByWeek[wk] = (trimpByWeek[wk] || 0) + (w.metrics.trimp || 0);
+                durByWeek[wk] = (durByWeek[wk] || 0) + (w.metrics.totalDurationSec || 0);
+                if (w.metrics.z2AvgSpeedMs > 0 && w.metrics.z2TimeSec >= 20) {
+                    if (!z2ByWeek[wk]) z2ByWeek[wk] = { spdSum: 0, secSum: 0 };
+                    z2ByWeek[wk].spdSum += w.metrics.z2AvgSpeedMs * w.metrics.z2TimeSec;
+                    z2ByWeek[wk].secSum += w.metrics.z2TimeSec;
                 }
-                localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY, JSON.stringify(appState.weeklyLogs));
-            } catch (e) { appState.weeklyLogs = {}; }
-            const picker = document.getElementById('weekly-iso-picker');
-            if (picker && !picker.value) picker.value = getCurrentISOWeekString();
-            loadWeeklyLogForSelectedWeek();
-        }
-
-        function getSortedWeeklyHistoryArray() {
-            return Object.entries(appState.weeklyLogs || {}).map(([weekKey, d]) => {
-                const p = parseHrvIntervalInput(d.hrvInterval || d.hrv || '38-71');
-                return {
-                    weekKey,
-                    label: weekKey.replace(/^\d{4}-/, ''),
-                    weeklyRhr: Number(d.weeklyRhr) || appState.settings.fcBasal,
-                    hrr: d.hrr !== undefined && d.hrr !== '' ? Number(d.hrr) : 28,
-                    hrv: p.mid,
-                    hrvInterval: p.intervalStr,
-                    hrvMin: p.min,
-                    hrvMax: p.max,
-                    hrvAmp: p.amp,
-                    highOscillation: p.highOscillation,
-                    weight: Number(d.weight) || 71.4,
-                    waist: Number(d.waist) || 78.5,
-                    strengthNotes: d.strengthNotes || ''
-                };
-            }).sort((a, b) => a.weekKey.localeCompare(b.weekKey));
-        }
-
-        function computeAutomaticPhysiologicalEffort(workoutsSubset) {
-            if (!workoutsSubset || workoutsSubset.length === 0) return { score10: 0, trimpPerMin: 0, label: 'Sin carga' };
-            let totalTrimp = 0, totalDurationSec = 0;
-            workoutsSubset.forEach(w => {
-                if (w.metrics) { totalTrimp += w.metrics.trimp || 0; totalDurationSec += w.metrics.totalDurationSec || 0; }
             });
-            const trimpPerMin = totalTrimp / Math.max(1, totalDurationSec / 60);
-            const rawScore = 1.5 + (trimpPerMin * 3.1) + Math.min(1.5, totalTrimp / 280);
-            const score10 = Number(Math.max(1.0, Math.min(10.0, rawScore)).toFixed(1));
-            const label = score10 >= 8.0 ? 'Estrés Fisiológico Muy Alto' : (score10 >= 6.5 ? 'Carga Moderada-Alta' : 'Estímulo Aeróbico Asimilable');
-            return { score10, trimpPerMin: Number(trimpPerMin.toFixed(2)), label };
+
+            const allKeys = new Set([...Object.keys(appState.weeklyLogs || {}), ...Object.keys(trimpByWeek)]);
+            const sortedKeys = Array.from(allKeys).sort();
+            const currentWeekWorkouts = getWorkoutsForCurrentWeek();
+            const fallbackTrimp = currentWeekWorkouts.reduce((a, w) => a + (w.metrics?.trimp || 0), 0);
+            const fallbackEffort = computeAutomaticPhysiologicalEffort(currentWeekWorkouts).score10;
+
+            let fallbackZ2Sec = null;
+            let fSpd = 0, fSec = 0;
+            currentWeekWorkouts.forEach(w => {
+                if (w.metrics && w.metrics.z2TimeSec >= 20 && w.metrics.z2AvgSpeedMs > 0) {
+                    fSpd += w.metrics.z2AvgSpeedMs * w.metrics.z2TimeSec;
+                    fSec += w.metrics.z2TimeSec;
+                }
+            });
+            if (fSec > 0) fallbackZ2Sec = Math.round(1000 / (fSpd / fSec));
+
+            return sortedKeys.map((wk, idx) => {
+                const log = appState.weeklyLogs[wk] || {};
+                const parsedHrv = parseHrvIntervalInput(log.hrvInterval || log.hrv || '38-71');
+                const z2Calc = z2ByWeek[wk] ? Math.round(1000 / (z2ByWeek[wk].spdSum / z2ByWeek[wk].secSum)) : (log.z2PaceSec || (idx === sortedKeys.length - 1 ? fallbackZ2Sec : null));
+                const wkTrimp = trimpByWeek[wk] !== undefined ? trimpByWeek[wk] : (log.trimp !== undefined ? Number(log.trimp) : (idx === sortedKeys.length - 1 ? fallbackTrimp : 0));
+                const wkDurMin = Math.max(1, (durByWeek[wk] || 3600) / 60);
+                const calcEffort = wkTrimp > 0 ? Number(Math.max(1, Math.min(10, 1.5 + ((wkTrimp / wkDurMin) * 3.1) + Math.min(1.5, wkTrimp / 280))).toFixed(1)) : 0;
+                const wkEffort = log.physioEffort !== undefined ? Number(log.physioEffort) : (calcEffort || (idx === sortedKeys.length - 1 ? fallbackEffort : 0));
+                const wkRatio = parsedHrv.mid > 0 ? Number((wkTrimp / parsedHrv.mid).toFixed(2)) : 0;
+
+                return {
+                    weekKey: wk,
+                    label: wk.replace(/^\d{4}-/, ''),
+                    z2PaceSec: z2Calc,
+                    hrv: parsedHrv.mid,
+                    hrvMin: parsedHrv.min,
+                    hrvMax: parsedHrv.max,
+                    hrvInterval: parsedHrv.intervalStr,
+                    weeklyRhr: Number(log.weeklyRhr) || (appState.settings.fcBasal + 2),
+                    hrr: log.hrr !== undefined && log.hrr !== '' ? Number(log.hrr) : 28,
+                    trimp: wkTrimp,
+                    physioEffort: wkEffort,
+                    trimpToHrvRatio: log.trimpToHrvRatio !== undefined ? Number(log.trimpToHrvRatio) : wkRatio,
+                    weight: Number(log.weight) || 71.4,
+                    waist: Number(log.waist) || 78.5
+                };
+            });
         }
 
-        function computeAutonomicDiagnostics(targetWeekKey) {
-            const selectedKey = targetWeekKey || document.getElementById('weekly-iso-picker')?.value || getCurrentISOWeekString();
-            const allWeeks = getSortedWeeklyHistoryArray();
-            const { fcBasal } = appState.settings;
-            const saved = appState.weeklyLogs[selectedKey];
-            const parsedHrv = parseHrvIntervalInput(saved ? (saved.hrvInterval || saved.hrv) : (document.getElementById('input-weekly-hrv')?.value || '38-71'));
-            const rawHrrInput = document.getElementById('input-weekly-hrr')?.value;
+        function toggleTrendsDemoMode() {
+            appState.trendsDemoMode = !appState.trendsDemoMode;
+            const btnText = document.getElementById('btn-toggle-trends-demo-text');
+            const btn = document.getElementById('btn-toggle-trends-demo');
+            if (appState.trendsDemoMode) {
+                btnText.textContent = 'Ocultar Demo (Ver Mis Datos)';
+                btn.className = 'self-start sm:self-center shrink-0 inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold text-[11px] px-3 py-2 rounded-xl transition';
+                showToast('Modo Demo 6 semanas activado en Gráficas de Tendencia.', 'info');
+            } else {
+                btnText.textContent = 'Ver Demo 6 Semanas';
+                btn.className = 'self-start sm:self-center shrink-0 inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 font-bold text-[11px] px-3 py-2 rounded-xl transition';
+            }
+            renderAllPersonalTrendCharts();
+        }
 
-            const currentEntry = {
-                weeklyRhr: saved ? Number(saved.weeklyRhr) : (Number(document.getElementById('input-weekly-rhr')?.value) || (fcBasal + 2)),
-                hrr: saved && saved.hrr !== undefined && saved.hrr !== '' ? Number(saved.hrr) : (rawHrrInput !== undefined && rawHrrInput !== '' ? Number(rawHrrInput) : 28),
-                hrv: parsedHrv.mid,
-                hrvInterval: parsedHrv.intervalStr,
-                hrvMin: parsedHrv.min,
-                hrvMax: parsedHrv.max,
-                hrvAmp: parsedHrv.amp,
-                isInterval: parsedHrv.isInterval,
-                highOscillation: parsedHrv.highOscillation,
-                weight: saved ? Number(saved.weight) : (Number(document.getElementById('input-weekly-weight')?.value) || 71.4),
-                waist: saved ? Number(saved.waist) : (Number(document.getElementById('input-weekly-waist')?.value) || 78.5),
-                strengthNotes: saved ? (saved.strengthNotes || '') : (document.getElementById('input-strength-notes')?.value || '')
-            };
-
-            const priorWeeks = allWeeks.filter(w => w.weekKey < selectedKey).slice(-4);
-            const hasPriorBaseline = priorWeeks.length > 0;
-            const baselineHrv = hasPriorBaseline ? Number((priorWeeks.reduce((a, w) => a + w.hrv, 0) / priorWeeks.length).toFixed(1)) : currentEntry.hrv;
-            const deltaHrvPct = baselineHrv > 0 ? Number((((currentEntry.hrv - baselineHrv) / baselineHrv) * 100).toFixed(1)) : 0;
-            const rhrDelta = currentEntry.weeklyRhr - fcBasal;
-
-            const weeksUpTo = allWeeks.filter(w => w.weekKey <= selectedKey).slice(-6);
-            let hrvSlopeMsPerWeek = 0;
-            if (weeksUpTo.length >= 2) {
-                const n = weeksUpTo.length;
-                let sX = 0, sY = 0, sXY = 0, sXX = 0;
-                for (let i = 0; i < n; i++) { sX += i; sY += weeksUpTo[i].hrv; sXY += i * weeksUpTo[i].hrv; sXX += i * i; }
-                hrvSlopeMsPerWeek = Number(((n * sXY - sX * sY) / (n * sXX - sX * sX || 1)).toFixed(1));
+        function buildSingleLineSvgChart({ weeks, values, regValues, formatVal, lineColor, regColor, invertY = false, refLineVal = null, refLineLabel = '', minMaxBars = null, bandRange = null }) {
+            const W = 620, H = 185, padL = 48, padR = 24, padT = 26, padB = 28;
+            const plotW = W - padL - padR, plotH = H - padT - padB;
+            const n = weeks.length;
+            if (n === 0) {
+                return `<div class="h-36 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80">Guarda tu semana o activa "Ver Demo 6 Semanas" para visualizar la curva.</div>`;
             }
 
-            const weekWorkouts = getWorkoutsForCurrentWeek();
-            const weekTrimp = weekWorkouts.reduce((a, w) => a + (w.metrics?.trimp || 0), 0);
-            const trimpToHrvRatio = currentEntry.hrv > 0 ? Number((weekTrimp / currentEntry.hrv).toFixed(2)) : 0;
-            const physioEffort = computeAutomaticPhysiologicalEffort(weekWorkouts);
+            const extraVals = [...values, ...(regValues || [])];
+            if (refLineVal !== null) extraVals.push(refLineVal);
+            if (minMaxBars) minMaxBars.forEach(b => { extraVals.push(b.min, b.max); });
+            if (bandRange) { extraVals.push(bandRange.low, bandRange.high); }
 
-            let statusLevel = 'green', statusTitle = 'Asimilación Óptima';
-            let statusSummary = `Punto Medio VFC: ${currentEntry.hrv} ms [Intervalo ${currentEntry.hrvInterval} ms | Oscilación: ${currentEntry.hrvAmp} ms]. Variación vs Base 4 sem (${baselineHrv} ms): ${deltaHrvPct >= 0 ? '+' : ''}${deltaHrvPct}%. FC Reposo: ${currentEntry.weeklyRhr} ppm (${rhrDelta >= 0 ? '+' : ''}${rhrDelta} ppm vs basal) | Recuperación Cardíaca: ${currentEntry.hrr} LPM.`;
+            const rawMin = Math.min(...extraVals), rawMax = Math.max(...extraVals);
+            const padRange = Math.max(1.5, (rawMax - rawMin) * 0.18);
+            const minV = rawMin - padRange, maxV = rawMax + padRange;
+            const span = Math.max(1, maxV - minV);
 
-            if (deltaHrvPct <= -8 || (deltaHrvPct <= -5 && rhrDelta >= 4) || rhrDelta >= 5) {
-                statusLevel = 'red';
-                statusTitle = 'Sobrecarga Autonómica';
-                statusSummary = `ALERTA ROJA: Caída de VFC (${deltaHrvPct}% vs base ${baselineHrv} ms) o elevación de FC Reposo (+${rhrDelta} ppm) con Recuperación Cardíaca de ${currentEntry.hrr} LPM. Priorizar descarga.`;
-            } else if (deltaHrvPct <= -5 || rhrDelta >= 3 || currentEntry.highOscillation) {
-                statusLevel = 'amber';
-                statusTitle = currentEntry.highOscillation ? 'Fatiga Simpática / Oscilación Alta (>35 ms)' : 'Fatiga Simpática Moderada';
-                statusSummary = `PRECAUCIÓN: Punto Medio VFC ${currentEntry.hrv} ms (${deltaHrvPct}% vs base), Oscilación Interdiaria de ${currentEntry.hrvAmp} ms, FC Reposo a +${rhrDelta} ppm y Recuperación Cardíaca de ${currentEntry.hrr} LPM.`;
+            const getX = i => n === 1 ? padL + plotW / 2 : Number((padL + (i / (n - 1)) * plotW).toFixed(1));
+            const getY = v => {
+                const ratio = invertY ? (v - minV) / span : (maxV - v) / span;
+                return Number((padT + ratio * plotH).toFixed(1));
+            };
+
+            let gridSvg = '';
+            [0.2, 0.5, 0.8].forEach(r => {
+                const val = invertY ? (minV + span * r) : (maxV - span * r);
+                const y = getY(val);
+                gridSvg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1E293B" stroke-width="1"/>`;
+                gridSvg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#64748B" font-size="10" font-family="JetBrains Mono, monospace">${formatVal(val)}</text>`;
+            });
+
+            let bandSvg = '';
+            if (bandRange) {
+                const yTop = getY(bandRange.high), yBot = getY(bandRange.low);
+                bandSvg = `<rect x="${padL}" y="${Math.min(yTop, yBot)}" width="${plotW}" height="${Math.max(4, Math.abs(yBot - yTop))}" fill="rgba(16,185,129,0.11)" rx="3"/>`;
             }
 
-            return { weekKey: selectedKey, currentEntry, hasPriorBaseline, baselineHrv, deltaHrvPct, rhrDelta, hrvSlopeMsPerWeek, weekTrimp, trimpToHrvRatio, physioEffort, statusLevel, statusTitle, statusSummary };
+            let refSvg = '';
+            if (refLineVal !== null) {
+                const ry = getY(refLineVal);
+                refSvg = `<line x1="${padL}" y1="${ry}" x2="${W - padR}" y2="${ry}" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4,4"/>
+                          <text x="${W - padR - 4}" y="${ry - 5}" text-anchor="end" fill="#10B981" font-size="9.5" font-family="JetBrains Mono, monospace">${refLineLabel}</text>`;
+            }
+
+            let barsSvg = '';
+            if (minMaxBars) {
+                minMaxBars.forEach((b, i) => {
+                    if (b.max > b.min) {
+                        const x = getX(i);
+                        barsSvg += `<line x1="${x}" y1="${getY(b.max)}" x2="${x}" y2="${getY(b.min)}" stroke="rgba(6,182,212,0.42)" stroke-width="6" stroke-linecap="round"/>`;
+                    }
+                });
+            }
+
+            let regLineSvg = '';
+            if (n > 1 && regValues && regValues.length === n) {
+                regLineSvg = `<line x1="${getX(0)}" y1="${getY(regValues[0])}" x2="${getX(n - 1)}" y2="${getY(regValues[n - 1])}" stroke="${regColor}" stroke-width="2" stroke-dasharray="5,5"/>`;
+            }
+
+            let pathSvg = '';
+            if (n > 1) {
+                const pts = values.map((v, i) => `${getX(i)},${getY(v)}`).join(' ');
+                pathSvg = `<polyline fill="none" stroke="${lineColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>`;
+            }
+
+            let nodesSvg = '';
+            values.forEach((v, i) => {
+                const x = getX(i), y = getY(v);
+                nodesSvg += `<circle cx="${x}" cy="${y}" r="4.5" fill="${lineColor}" stroke="#090D16" stroke-width="1.5"/>`;
+                nodesSvg += `<text x="${x}" y="${y - 9}" text-anchor="middle" fill="#F8FAFC" font-size="10" font-weight="600" font-family="JetBrains Mono, monospace">${formatVal(v)}</text>`;
+                nodesSvg += `<text x="${x}" y="${H - 7}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono, monospace">${weeks[i].label}</text>`;
+            });
+
+            return `<svg viewBox="0 0 ${W} ${H}" class="w-full h-44 block rounded-lg bg-slate-950/85 border border-slate-800/90 overflow-visible">${gridSvg}${bandSvg}${refSvg}${barsSvg}${regLineSvg}${pathSvg}${nodesSvg}</svg>`;
         }
 
-        function loadWeeklyLogForSelectedWeek() {
-            const weekKey = document.getElementById('weekly-iso-picker').value || getCurrentISOWeekString();
-            const allWeeks = getSortedWeeklyHistoryArray();
-            const last = allWeeks[allWeeks.length - 1];
-            const entry = appState.weeklyLogs[weekKey] || {
-                weeklyRhr: last ? last.weeklyRhr : (appState.settings.fcBasal + 2),
-                hrr: last && last.hrr !== undefined ? last.hrr : 28,
-                hrvInterval: last ? last.hrvInterval : '38-71',
-                weight: last ? last.weight : 71.4,
-                waist: last ? last.waist : 78.5,
-                strengthNotes: ''
-            };
-            document.getElementById('input-weekly-rhr').value = entry.weeklyRhr;
-            document.getElementById('input-weekly-hrr').value = entry.hrr !== undefined ? entry.hrr : 28;
-            document.getElementById('input-weekly-hrv').value = entry.hrvInterval || entry.hrv || '38-71';
-            document.getElementById('input-weekly-weight').value = entry.weight;
-            document.getElementById('input-weekly-waist').value = entry.waist;
-            document.getElementById('input-strength-notes').value = entry.strengthNotes || '';
-            updateWeeklyFormLiveIndicators();
-            refreshAutonomicTabUI();
-        }
+        function renderAllPersonalTrendCharts() {
+            const weeks = getUnifiedLongitudinalWeeks();
+            const pill = document.getElementById('trends-weeks-count-pill');
+            if (pill) pill.textContent = appState.trendsDemoMode ? '6 sem. (Demo)' : `${weeks.length} sem. registradas`;
 
-        function updateWeeklyFormLiveIndicators() {
-            const parsed = parseHrvIntervalInput(document.getElementById('input-weekly-hrv')?.value || '38-71');
-            const weeklyRhr = Number(document.getElementById('input-weekly-rhr')?.value) || appState.settings.fcBasal;
-            const weeklyHrr = Number(document.getElementById('input-weekly-hrr')?.value) || 0;
-            const basal = appState.settings.fcBasal;
+            // 1. Z2 PACE CHART (INVERTED Y-AXIS: FASTER IS HIGHER)
+            const z2Weeks = weeks.filter(w => w.z2PaceSec && w.z2PaceSec > 120);
+            const z2Vals = z2Weeks.map(w => w.z2PaceSec);
+            const z2Reg = computeLeastSquaresLinearRegression(z2Vals);
+            const z2Badge = document.getElementById('z2-trend-badge');
+            if (z2Badge) {
+                if (z2Weeks.length === 0) z2Badge.textContent = 'Sin sesiones Z2';
+                else if (!z2Reg.hasRegression) z2Badge.textContent = `Actual: ${paceSecondsToString(z2Vals[0])}/km`;
+                else z2Badge.textContent = z2Reg.slope <= 0 ? `📈 Mejora (${z2Reg.slope.toFixed(1)} s/km por sem)` : `📉 Deriva (+${z2Reg.slope.toFixed(1)} s/km por sem)`;
+            }
+            const z2Container = document.getElementById('svg-chart-z2');
+            if (z2Container) {
+                z2Container.innerHTML = buildSingleLineSvgChart({
+                    weeks: z2Weeks,
+                    values: z2Vals,
+                    regValues: z2Reg.regPoints,
+                    formatVal: v => paceSecondsToString(Math.round(v)),
+                    lineColor: '#10B981',
+                    regColor: z2Reg.slope <= 0 ? '#06B6D4' : '#F59E0B',
+                    invertY: true
+                });
+            }
 
-            document.getElementById('hrv-parsed-mid').textContent = `Punto Medio VFC: ${parsed.mid} ms`;
-            const ampEl = document.getElementById('hrv-parsed-amp');
-            ampEl.textContent = `Oscilación: ${parsed.amp} ms${parsed.highOscillation ? ' (Alta >35ms)' : ' (Estable)'}`;
-            ampEl.className = parsed.highOscillation ? 'text-amber-300 font-bold' : 'text-cyan-300';
+            // 2. HRV MIDPOINT + DAILY INTERVAL BARS + 5% BASELINE BAND
+            const hrvVals = weeks.map(w => w.hrv);
+            const hrvReg = computeLeastSquaresLinearRegression(hrvVals);
+            const hrvMean = hrvVals.length > 0 ? hrvVals.reduce((a, b) => a + b, 0) / hrvVals.length : 55;
+            const hrvBadge = document.getElementById('hrv-trend-slope-badge');
+            if (hrvBadge) {
+                hrvBadge.textContent = hrvReg.hasRegression ? `Regresión: ${hrvReg.slope >= 0 ? '+' : ''}${hrvReg.slope.toFixed(1)} ms/sem` : (hrvVals[0] ? `${hrvVals[0]} ms [${weeks[0].hrvInterval}]` : '--');
+            }
+            const hrvContainer = document.getElementById('svg-chart-hrv');
+            if (hrvContainer) {
+                hrvContainer.innerHTML = buildSingleLineSvgChart({
+                    weeks,
+                    values: hrvVals,
+                    regValues: hrvReg.regPoints,
+                    formatVal: v => `${Number(v).toFixed(1)}ms`,
+                    lineColor: '#06B6D4',
+                    regColor: '#10B981',
+                    minMaxBars: weeks.map(w => ({ min: w.hrvMin, max: w.hrvMax })),
+                    bandRange: { low: hrvMean * 0.95, high: hrvMean * 1.05 }
+                });
+            }
 
-            const rhrDiff = weeklyRhr - basal;
-            document.getElementById('weekly-basal-ref').textContent = basal;
-            document.getElementById('rhr-delta-badge').textContent = `${rhrDiff >= 0 ? '+' : ''}${rhrDiff} ppm`;
-            document.getElementById('hrv-delta-badge').textContent = `${parsed.mid} ms`;
+            // 3. WEEKLY RESTING HR VS BASAL HR
+            const rhrVals = weeks.map(w => w.weeklyRhr);
+            const rhrReg = computeLeastSquaresLinearRegression(rhrVals);
+            const basal = appState.settings.fcBasal || 57;
+            const rhrBadge = document.getElementById('rhr-trend-slope-badge');
+            if (rhrBadge) {
+                rhrBadge.textContent = rhrReg.hasRegression ? `Tendencia: ${rhrReg.slope >= 0 ? '+' : ''}${rhrReg.slope.toFixed(1)} ppm/sem` : (rhrVals[0] ? `${rhrVals[0]} ppm (Basal ${basal})` : '--');
+            }
+            const rhrContainer = document.getElementById('svg-chart-rhr');
+            if (rhrContainer) {
+                rhrContainer.innerHTML = buildSingleLineSvgChart({
+                    weeks,
+                    values: rhrVals,
+                    regValues: rhrReg.regPoints,
+                    formatVal: v => `${Math.round(v)}`,
+                    lineColor: '#F43F5E',
+                    regColor: '#F59E0B',
+                    refLineVal: basal,
+                    refLineLabel: `Basal ${basal} ppm`
+                });
+            }
 
-            const hrrBadge = document.getElementById('hrr-status-badge');
+            // 4. HEART RATE RECOVERY (LPM)
+            const hrrVals = weeks.map(w => w.hrr);
+            const hrrReg = computeLeastSquaresLinearRegression(hrrVals);
+            const hrrBadge = document.getElementById('hrr-trend-slope-badge');
             if (hrrBadge) {
-                hrrBadge.textContent = weeklyHrr > 0 ? `${weeklyHrr} LPM` : 'LPM';
-                hrrBadge.className = weeklyHrr >= 25
-                    ? 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-emerald-500/15 text-emerald-300'
-                    : 'shrink-0 text-[10px] font-mono px-2 py-2 rounded-lg bg-amber-500/15 text-amber-300';
+                hrrBadge.textContent = hrrReg.hasRegression ? `Tendencia: ${hrrReg.slope >= 0 ? '+' : ''}${hrrReg.slope.toFixed(1)} LPM/sem` : (hrrVals[0] ? `${hrrVals[0]} LPM` : '--');
+            }
+            const hrrContainer = document.getElementById('svg-chart-hrr');
+            if (hrrContainer) {
+                hrrContainer.innerHTML = buildSingleLineSvgChart({
+                    weeks,
+                    values: hrrVals,
+                    regValues: hrrReg.regPoints,
+                    formatVal: v => `${Math.round(v)} LPM`,
+                    lineColor: '#10B981',
+                    regColor: '#06B6D4'
+                });
+            }
+
+            // 5. AUTONOMIC COST RATIO (TRIMP / VFC)
+            const ratioVals = weeks.map(w => w.trimpToHrvRatio);
+            const ratioReg = computeLeastSquaresLinearRegression(ratioVals);
+            const ratioBadge = document.getElementById('ratio-trend-slope-badge');
+            if (ratioBadge) {
+                ratioBadge.textContent = ratioReg.hasRegression ? `Tendencia: ${ratioReg.slope >= 0 ? '+' : ''}${ratioReg.slope.toFixed(2)} /sem` : (ratioVals[0] !== undefined ? `Ratio: ${ratioVals[0]}` : '--');
+            }
+            const ratioContainer = document.getElementById('svg-chart-ratio');
+            if (ratioContainer) {
+                ratioContainer.innerHTML = buildSingleLineSvgChart({
+                    weeks,
+                    values: ratioVals,
+                    regValues: ratioReg.regPoints,
+                    formatVal: v => Number(v).toFixed(2),
+                    lineColor: '#F59E0B',
+                    regColor: '#06B6D4'
+                });
+            }
+
+            // 6. AUTOMATIC PHYSIOLOGICAL EFFORT (1-10) & TRIMP BARS
+            const effortContainer = document.getElementById('svg-chart-effort');
+            const effortBadge = document.getElementById('effort-trend-slope-badge');
+            if (effortContainer) {
+                const effVals = weeks.map(w => w.physioEffort);
+                const effReg = computeLeastSquaresLinearRegression(effVals);
+                if (effortBadge) {
+                    const lastW = weeks[weeks.length - 1];
+                    effortBadge.textContent = lastW ? `Última: ${lastW.physioEffort}/10 (${lastW.trimp} TRIMP)` : '--';
+                }
+                const W = 620, H = 185, padL = 46, padR = 24, padT = 26, padB = 28;
+                const plotW = W - padL - padR, plotH = H - padT - padB, n = weeks.length;
+                if (n === 0) {
+                    effortContainer.innerHTML = `<div class="h-36 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80">Sin datos semanales de esfuerzo fisiológico.</div>`;
+                } else {
+                    const maxTrimp = Math.max(250, ...weeks.map(w => w.trimp * 1.2));
+                    const getX = i => n === 1 ? padL + plotW / 2 : Number((padL + (i / (n - 1)) * plotW).toFixed(1));
+                    const getY = e => Number((padT + ((10 - Math.max(0, Math.min(10, e))) / 10) * plotH).toFixed(1));
+                    let svg = '';
+                    [2, 5, 8].forEach(lvl => {
+                        const y = getY(lvl);
+                        svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1E293B" stroke-width="1"/>`;
+                        svg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#64748B" font-size="10" font-family="JetBrains Mono, monospace">${lvl}/10</text>`;
+                    });
+                    weeks.forEach((w, i) => {
+                        const x = getX(i);
+                        const barH = Math.max(4, (w.trimp / maxTrimp) * plotH);
+                        const barY = padT + plotH - barH;
+                        svg += `<rect x="${x - 14}" y="${barY}" width="28" height="${barH}" rx="4" fill="rgba(245,158,11,0.22)" stroke="rgba(245,158,11,0.45)" stroke-width="1"/>`;
+                        svg += `<text x="${x}" y="${barY + 12}" text-anchor="middle" fill="#FBBF24" font-size="8.5" font-family="JetBrains Mono, monospace">${w.trimp}p</text>`;
+                    });
+                    if (n > 1) {
+                        svg += `<line x1="${getX(0)}" y1="${getY(effReg.regPoints[0])}" x2="${getX(n - 1)}" y2="${getY(effReg.regPoints[n - 1])}" stroke="#10B981" stroke-width="1.8" stroke-dasharray="4,4"/>`;
+                        const pts = effVals.map((v, i) => `${getX(i)},${getY(v)}`).join(' ');
+                        svg += `<polyline fill="none" stroke="#F97316" stroke-width="2.5" points="${pts}"/>`;
+                    }
+                    effVals.forEach((v, i) => {
+                        const x = getX(i), y = getY(v);
+                        svg += `<circle cx="${x}" cy="${y}" r="4.5" fill="#F97316" stroke="#090D16" stroke-width="1.5"/>`;
+                        svg += `<text x="${x}" y="${y - 9}" text-anchor="middle" fill="#F8FAFC" font-size="10" font-weight="700" font-family="JetBrains Mono, monospace">${v}/10</text>`;
+                        svg += `<text x="${x}" y="${H - 7}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono, monospace">${weeks[i].label}</text>`;
+                    });
+                    effortContainer.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-44 block rounded-lg bg-slate-950/85 border border-slate-800/90 overflow-visible">${svg}</svg>`;
+                }
+            }
+
+            // 7. ANTHROPOMETRY DUAL CHART: WEIGHT (KG) & WAIST (CM)
+            const anthroContainer = document.getElementById('svg-chart-anthro');
+            const anthroBadge = document.getElementById('anthro-trend-slope-badge');
+            if (anthroContainer) {
+                const wVals = weeks.map(w => w.weight);
+                const cVals = weeks.map(w => w.waist);
+                const wReg = computeLeastSquaresLinearRegression(wVals);
+                const cReg = computeLeastSquaresLinearRegression(cVals);
+                if (anthroBadge) {
+                    anthroBadge.textContent = wReg.hasRegression
+                        ? `Peso: ${wReg.slope >= 0 ? '+' : ''}${wReg.slope.toFixed(2)} kg/sem • Cintura: ${cReg.slope >= 0 ? '+' : ''}${cReg.slope.toFixed(2)} cm/sem`
+                        : (weeks[0] ? `${weeks[0].weight} kg | ${weeks[0].waist} cm` : '--');
+                }
+                const W = 620, H = 185, padL = 46, padR = 46, padT = 26, padB = 28;
+                const plotW = W - padL - padR, plotH = H - padT - padB, n = weeks.length;
+                if (n === 0) {
+                    anthroContainer.innerHTML = `<div class="h-36 flex items-center justify-center text-xs text-slate-400 bg-slate-950/70 rounded-lg border border-slate-800/80">Sin registros de peso y cintura.</div>`;
+                } else {
+                    const minW = Math.min(...wVals) - 1.2, maxW = Math.max(...wVals) + 1.2, spanW = Math.max(2, maxW - minW);
+                    const minC = Math.min(...cVals) - 1.2, maxC = Math.max(...cVals) + 1.2, spanC = Math.max(2, maxC - minC);
+                    const getX = i => n === 1 ? padL + plotW / 2 : Number((padL + (i / (n - 1)) * plotW).toFixed(1));
+                    const getYW = v => Number((padT + ((maxW - v) / spanW) * plotH).toFixed(1));
+                    const getYC = v => Number((padT + ((maxC - v) / spanC) * plotH).toFixed(1));
+
+                    let svg = '';
+                    [0.2, 0.5, 0.8].forEach(r => {
+                        const y = Number((padT + r * plotH).toFixed(1));
+                        const wLabel = (maxW - r * spanW).toFixed(1);
+                        const cLabel = (maxC - r * spanC).toFixed(1);
+                        svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1E293B" stroke-width="1"/>`;
+                        svg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#10B981" font-size="9.5" font-family="JetBrains Mono, monospace">${wLabel}kg</text>`;
+                        svg += `<text x="${W - padR + 6}" y="${y + 3}" text-anchor="start" fill="#06B6D4" font-size="9.5" font-family="JetBrains Mono, monospace">${cLabel}cm</text>`;
+                    });
+
+                    if (n > 1) {
+                        svg += `<polyline fill="none" stroke="#10B981" stroke-width="2.5" points="${wVals.map((v, i) => `${getX(i)},${getYW(v)}`).join(' ')}"/>`;
+                        svg += `<polyline fill="none" stroke="#06B6D4" stroke-width="2.5" stroke-dasharray="5,3" points="${cVals.map((v, i) => `${getX(i)},${getYC(v)}`).join(' ')}"/>`;
+                    }
+
+                    weeks.forEach((w, i) => {
+                        const x = getX(i), yW = getYW(w.weight), yC = getYC(w.waist);
+                        svg += `<circle cx="${x}" cy="${yW}" r="4" fill="#10B981" stroke="#090D16" stroke-width="1.5"/>`;
+                        svg += `<text x="${x}" y="${yW - 8}" text-anchor="middle" fill="#6EE7B7" font-size="9.5" font-family="JetBrains Mono, monospace">${w.weight}kg</text>`;
+                        svg += `<circle cx="${x}" cy="${yC}" r="4" fill="#06B6D4" stroke="#090D16" stroke-width="1.5"/>`;
+                        svg += `<text x="${x}" y="${yC + 14}" text-anchor="middle" fill="#67E8F9" font-size="9.5" font-family="JetBrains Mono, monospace">${w.waist}cm</text>`;
+                        svg += `<text x="${x}" y="${H - 7}" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="JetBrains Mono, monospace">${w.label}</text>`;
+                    });
+
+                    anthroContainer.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-44 block rounded-lg bg-slate-950/85 border border-slate-800/90 overflow-visible">${svg}</svg>`;
+                }
             }
         }
 
@@ -1461,6 +1881,21 @@
             const weekKey = document.getElementById('weekly-iso-picker').value || getCurrentISOWeekString();
             const parsed = parseHrvIntervalInput(document.getElementById('input-weekly-hrv').value);
             const hrrVal = Number(document.getElementById('input-weekly-hrr').value);
+
+            const weekWorkouts = getWorkoutsForCurrentWeek();
+            let weekTrimp = 0, z2SpdWeighted = 0, z2SecTotal = 0;
+            weekWorkouts.forEach(w => {
+                if (!w.metrics) return;
+                weekTrimp += w.metrics.trimp || 0;
+                if (w.metrics.z2TimeSec >= 20 && w.metrics.z2AvgSpeedMs > 0) {
+                    z2SpdWeighted += w.metrics.z2AvgSpeedMs * w.metrics.z2TimeSec;
+                    z2SecTotal += w.metrics.z2TimeSec;
+                }
+            });
+            const z2PaceSec = z2SecTotal > 0 ? Math.round(1000 / (z2SpdWeighted / z2SecTotal)) : null;
+            const physioEffort = computeAutomaticPhysiologicalEffort(weekWorkouts).score10;
+            const trimpToHrvRatio = parsed.mid > 0 ? Number((weekTrimp / parsed.mid).toFixed(2)) : 0;
+
             appState.weeklyLogs[weekKey] = {
                 weeklyRhr: Number(document.getElementById('input-weekly-rhr').value),
                 hrr: hrrVal,
@@ -1472,88 +1907,17 @@
                 weight: Number(document.getElementById('input-weekly-weight').value),
                 waist: Number(document.getElementById('input-weekly-waist').value),
                 strengthNotes: document.getElementById('input-strength-notes').value.trim(),
+                z2PaceSec,
+                trimp: weekTrimp,
+                physioEffort,
+                trimpToHrvRatio,
                 updatedAt: new Date().toISOString()
             };
             document.getElementById('input-weekly-hrv').value = parsed.intervalStr;
             localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY, JSON.stringify(appState.weeklyLogs));
+            localStorage.setItem(STORAGE_KEYS.WEEKLY_HISTORY_V25, JSON.stringify(appState.weeklyLogs));
             refreshAllViews();
-            showToast(`Semana ${weekKey} guardada (VFC: ${parsed.mid} ms | Rec. Cardíaca: ${hrrVal} LPM).`, 'success');
-        }
-
-        function renderWeeklyHrvTrendChart() {
-            const canvas = document.getElementById('hrvEvolutionCanvas');
-            const slopeBadge = document.getElementById('hrv-trend-slope-badge');
-            if (!canvas || !slopeBadge) return;
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            const width = Math.max(300, rect.width || 500), height = 160;
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
-            ctx.clearRect(0, 0, width, height);
-
-            const weeks = getSortedWeeklyHistoryArray();
-            if (weeks.length === 0) return;
-
-            const n = weeks.length;
-            let sX = 0, sY = 0, sXY = 0, sXX = 0;
-            weeks.forEach((w, i) => { sX += i; sY += w.hrv; sXY += i * w.hrv; sXX += i * i; });
-            const slope = n > 1 ? (n * sXY - sX * sY) / (n * sXX - sX * sX || 1) : 0;
-            const intercept = (sY - slope * sX) / n;
-            const meanHrv = sY / n;
-
-            slopeBadge.textContent = n > 1 ? `Regresión: ${slope >= 0 ? '+' : ''}${slope.toFixed(1)} ms/sem` : `Media: ${weeks[0].hrv} ms [${weeks[0].hrvInterval}]`;
-
-            const padL = 42, padR = 20, padT = 22, padB = 26;
-            const plotW = width - padL - padR, plotH = height - padT - padB;
-            const allV = weeks.flatMap(w => [w.hrv, w.hrvMin, w.hrvMax, meanHrv * 0.95, meanHrv * 1.05]);
-            const minV = Math.max(10, Math.min(...allV) - 6), maxV = Math.max(...allV) + 6, rng = Math.max(10, maxV - minV);
-            const getX = i => n === 1 ? padL + plotW / 2 : padL + (i / (n - 1)) * plotW;
-            const getY = v => padT + ((maxV - v) / rng) * plotH;
-
-            const yTop = getY(meanHrv * 1.05), yBot = getY(meanHrv * 0.95);
-            ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
-            ctx.fillRect(padL, yTop, plotW, Math.max(4, yBot - yTop));
-
-            weeks.forEach((w, i) => {
-                const x = getX(i);
-                if (w.hrvMax > w.hrvMin) {
-                    ctx.strokeStyle = 'rgba(6, 182, 212, 0.45)';
-                    ctx.lineWidth = 5;
-                    ctx.beginPath(); ctx.moveTo(x, getY(w.hrvMax)); ctx.lineTo(x, getY(w.hrvMin)); ctx.stroke();
-                }
-            });
-
-            if (n > 1) {
-                ctx.strokeStyle = '#06B6D4';
-                ctx.lineWidth = 2.5;
-                ctx.beginPath();
-                weeks.forEach((w, i) => i === 0 ? ctx.moveTo(getX(i), getY(w.hrv)) : ctx.lineTo(getX(i), getY(w.hrv)));
-                ctx.stroke();
-
-                ctx.save();
-                ctx.strokeStyle = '#10B981';
-                ctx.lineWidth = 1.8;
-                ctx.setLineDash([4, 4]);
-                ctx.beginPath();
-                ctx.moveTo(getX(0), getY(intercept));
-                ctx.lineTo(getX(n - 1), getY(intercept + slope * (n - 1)));
-                ctx.stroke();
-                ctx.restore();
-            }
-
-            ctx.font = '10px JetBrains Mono, monospace';
-            ctx.textAlign = 'center';
-            weeks.forEach((w, i) => {
-                const x = getX(i), y = getY(w.hrv);
-                ctx.fillStyle = '#06B6D4';
-                ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#F8FAFC';
-                ctx.fillText(`${w.hrv}ms`, x, y - 8);
-                ctx.fillStyle = '#94A3B8';
-                ctx.fillText(w.label, x, height - 7);
-            });
+            showToast(`Semana ${weekKey} guardada en Historial y Gráficas de Tendencia.`, 'success');
         }
 
         function refreshAutonomicTabUI() {
@@ -1584,8 +1948,6 @@
             document.getElementById('auto-kpi-physio-effort').textContent = `${diag.physioEffort.score10} / 10`;
             document.getElementById('auto-kpi-trimp-density').textContent = `${diag.physioEffort.trimpPerMin} TRIMP/min`;
             document.getElementById('auto-kpi-physio-label').textContent = diag.physioEffort.label;
-
-            renderWeeklyHrvTrendChart();
 
             const listEl = document.getElementById('weekly-history-list');
             const sortedDesc = getSortedWeeklyHistoryArray().reverse();
@@ -1642,7 +2004,7 @@
             document.getElementById('report-preview-rhr').textContent = `${manual.weeklyRhr} ppm | Rec: ${manual.hrr} LPM`;
 
             return [
-                `=== REPORTE SEMANAL RUNLAB PRO v2.5 (${weekKey}) ===`,
+                `=== REPORTE SEMANAL RUNLAB PRO v2.6 (${weekKey}) ===`,
                 `1. VARIABLES FISIOLÓGICAS (KARVONEN)`,
                 `- FC Máxima: ${fcMax} ppm | FC Basal: ${fcBasal} ppm | Z2 (60-70% FCR): ${z2Min}-${z2Max} ppm`,
                 ``,
@@ -1685,7 +2047,7 @@
 
         /* MAINTENANCE & BACKUP */
         async function forceAppUpdateAntiCache() {
-            showToast('Limpiando caché y recargando v2.5...', 'info');
+            showToast('Limpiando caché y recargando v2.6...', 'info');
             try {
                 if ('serviceWorker' in navigator) {
                     const regs = await navigator.serviceWorker.getRegistrations();
@@ -1696,7 +2058,7 @@
                     for (const k of keys) await caches.delete(k);
                 }
             } catch (e) {}
-            setTimeout(() => { window.location.href = window.location.pathname + '?v=2.5_' + Date.now(); }, 350);
+            setTimeout(() => { window.location.href = window.location.pathname + '?v=2.6_' + Date.now(); }, 350);
         }
 
         async function exportDatabaseBackup() {
@@ -1740,17 +2102,22 @@
 
         /* UI & MODALS */
         function switchTab(tabName) {
-            ['dashboard', 'weekly', 'aireport', 'settings'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
-                document.getElementById(`nav-${t}`).className = t === tabName
-                    ? 'nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-emerald-400 bg-emerald-500/10 font-semibold transition'
-                    : 'nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition';
+            ['dashboard', 'weekly', 'trends', 'aireport', 'settings'].forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (sec) sec.classList.toggle('hidden', t !== tabName);
+                if (nav) {
+                    nav.className = t === tabName
+                        ? 'nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-emerald-400 bg-emerald-500/10 font-semibold transition min-w-0'
+                        : 'nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-slate-400 hover:text-slate-200 font-medium transition min-w-0';
+                }
             });
             if (tabName === 'dashboard') {
-                renderWeeklyZ2TrendChart();
                 if (appState.leafletMap) setTimeout(() => appState.leafletMap.invalidateSize(), 120);
             } else if (tabName === 'weekly') {
                 refreshAutonomicTabUI();
+            } else if (tabName === 'trends') {
+                renderAllPersonalTrendCharts();
             } else if (tabName === 'aireport') {
                 generateAndCopyAIReport(false);
             }
@@ -1861,8 +2228,6 @@
                 document.getElementById('vam-validity-badge').textContent = 'Caducado (>42d)';
             }
 
-            renderWeeklyZ2TrendChart();
-
             const listEl = document.getElementById('workouts-list');
             document.getElementById('workouts-count-badge').textContent = `${appState.workouts.length} ses.`;
             if (appState.workouts.length === 0) {
@@ -1917,6 +2282,7 @@
             refreshDashboardUI();
             updateWeeklyFormLiveIndicators();
             refreshAutonomicTabUI();
+            renderAllPersonalTrendCharts();
             generateAndCopyAIReport(false);
         }
 
@@ -1930,8 +2296,7 @@
         }
 
         window.addEventListener('resize', () => {
-            renderWeeklyZ2TrendChart();
-            renderWeeklyHrvTrendChart();
+            renderAllPersonalTrendCharts();
         });
 
         window.onload = async function () {
